@@ -60,6 +60,21 @@ Open your browser and navigate to: **http://localhost:8000**
 * Navigate to the root URL (e.g. `http://localhost:8000/`) to access the login page.
 * You will be automatically redirected to the appropriate dashboard (`/admin`, `/organiser`, or `/voter`) based on your assigned role.
 
+### Default Test Accounts
+If you imported the provided `evoting_system.sql` database, you can log in using the following test credentials:
+
+**Administrator:**
+* **Email:** `admin@evoting.com`
+* **Password:** `admin`
+
+**Organiser:**
+* **Email:** `sandy@evoting.com` *(or `ivaan@evoting.com`)*
+* **Password:** `12345678`
+
+**Voter:**
+* **Email:** `sudhan@evoting.com` *(or `john@evoting.com`)*
+* **Password:** `12345678`
+
 ## License
 
 This project is licensed under the terms included in the `LICENSE` file.
