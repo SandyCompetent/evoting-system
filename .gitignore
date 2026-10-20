@@ -1,0 +1,31 @@
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Composer dependencies
+/vendor/
+
+# User uploads
+/upload/*
+!/upload/.gitkeep
+!/upload/csv/.gitkeep
+!/upload/photo/.gitkeep
+!/upload/symbol/.gitkeep
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
