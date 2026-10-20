@@ -1,5 +1,5 @@
 <?php
-	require_once($_SERVER['DOCUMENT_ROOT'] . "/evoting/includes/db.php");
-	require_once($_SERVER['DOCUMENT_ROOT'] . "/evoting/includes/functions.php");
-	require_once($_SERVER['DOCUMENT_ROOT'] . "/evoting/includes/header.php");
+	require_once(__DIR__ . "/db.php");
+require_once(__DIR__ . "/functions.php");
+require_once(__DIR__ . "/header.php");
 ?>

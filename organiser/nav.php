@@ -2,14 +2,14 @@
 require_once("../includes/init.php");
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] != 'organiser') {
-	echo "<script>window.location = '/';</script>";
+	echo "<script>window.location = '../index.php';</script>";
 	exit(0);
 }
 ?>
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="/evoting/organiser">e-Voting</a>
+			<a class="navbar-brand" href="index.php">e-Voting</a>
 			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>

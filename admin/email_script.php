@@ -35,7 +35,7 @@ if (isset($_POST['sendMailBtn'])) {
     $result = @mail($to, $subject, $message, $headers);
 
     echo '<script>alert("Email sent successfully !")</script>';
-    echo '<script>window.location.href="/evoting/admin";</script>';
+    echo '<script>window.location.href="index.php";</script>';
 }
 ?>
 

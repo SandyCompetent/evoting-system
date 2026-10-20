@@ -61,5 +61,8 @@ echo -e "\n${GREEN}🚀 Starting the PHP development server...${NC}"
 echo -e "🌐 You can access the application at: ${YELLOW}http://localhost:$PORT${NC}"
 echo -e "Press [Ctrl+C] to stop the server.\n"
 
+# Open the browser automatically
+sleep 1 && open "http://localhost:$PORT" &
+
 # Run PHP built-in server
 php -S localhost:$PORT
