@@ -12,7 +12,7 @@ if (isset($_POST["submit"])) {
 	$fname = trim($_POST["first_name"]);
 	$email = trim($_POST["email"]);
 	$dob = trim($_POST["dob"]);
-	$encPass = sha1("12345678");
+	$encPass = password_hash("12345678", PASSWORD_DEFAULT);
 	$role = "voter";
 	$voted = "No";
 
@@ -35,7 +35,7 @@ if (isset($_POST["upload_csv"])) {
 	$file_folder = "../upload/csv/" . $filename;
 
 	
-	$encCsvPass = sha1("12345678");
+	$encCsvPass = password_hash("12345678", PASSWORD_DEFAULT);
 
 
 	$ext = substr($filename, strrpos($filename, "."), (strlen($filename) - strrpos($filename, ".")));

@@ -8,13 +8,22 @@ if (isset($_SESSION["role"]) && ($_SESSION["role"] == "admin" || $_SESSION["role
 
 if (isset($_POST["login"])) {
 	$email = trim($_POST["email"]);
-	$password = sha1($_POST["password"]);
+	$password = $_POST["password"];
 
-	if ($data = fetchData("system_users", "WHERE email = '$email' AND password = '$password'")) {
-		$_SESSION["user_id"] = $data[0]["user_id"];
-		$_SESSION["role"] = $data[0]["role"];
-		echo "<script>window.location='" . $_SESSION["role"] . "';</script>";
-		exit(0);
+	if ($data = fetchData("system_users", "WHERE email = '$email'")) {
+		if (password_verify($password, $data[0]["password"]) || sha1($password) == $data[0]["password"]) {
+			// If it was still a sha1 password, upgrade it to password_hash
+			if (sha1($password) == $data[0]["password"]) {
+				$newHash = password_hash($password, PASSWORD_DEFAULT);
+				$userId = $data[0]["user_id"];
+				executeUpdateQuery("UPDATE system_users SET password = '$newHash' WHERE user_id = '$userId'");
+			}
+
+			$_SESSION["user_id"] = $data[0]["user_id"];
+			$_SESSION["role"] = $data[0]["role"];
+			echo "<script>window.location='" . $_SESSION["role"] . "';</script>";
+			exit(0);
+		}
 	}
 	$_SESSION["errors"][] = "Invalid email/password";
 	

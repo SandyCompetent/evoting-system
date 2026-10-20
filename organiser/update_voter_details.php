@@ -13,7 +13,7 @@ if (isset($_POST["submit"])) {
 	$fname = trim($_POST["first_name"]);
 	$email = trim($_POST["email"]);
 	$pass = trim($_POST["password"]);
-	$encPass = sha1($pass);
+	$encPass = password_hash($pass, PASSWORD_DEFAULT);
 	
 	$sql = "UPDATE system_users SET full_name = '$fname', email = '$email', password = '$encPass' WHERE user_id = $voter_refID";
 	if (executeInsertQuery($sql)) {

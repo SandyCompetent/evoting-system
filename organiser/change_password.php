@@ -26,12 +26,14 @@
 		}
 		else
 		{
-			$password = sha1($old_password);
+			$password = $old_password;
 			
-			if(fetchData("system_users", "WHERE user_id = '$user_id' AND password = '$password'"))
+			$user_data = fetchData("system_users", "WHERE user_id = '$user_id'");
+
+			if($user_data && (password_verify($password, $user_data[0]["password"]) || sha1($password) == $user_data[0]["password"]))
 			{
-				$password = sha1($new_password);
-				if(executeUpdateQuery("UPDATE system_users SET password = '$password' WHERE user_id = '$user_id'"))
+				$new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
+				if(executeUpdateQuery("UPDATE system_users SET password = '$new_password_hash' WHERE user_id = '$user_id'"))
 				{
 					$_SESSION["messages"][] = "Changed successfully.";
 				}

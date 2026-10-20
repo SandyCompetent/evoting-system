@@ -52,7 +52,7 @@ require_once("nav.php");
 															$fname = $value['full_name'];
 															$email = $value['email'];
 															$pass = "12345678";
-															$encPass = sha1($pass);
+															$encPass = password_hash($pass, PASSWORD_DEFAULT);
 															$role = "organiser";
 
 															$data = fetchData("election_category", "WHERE name='$category'");

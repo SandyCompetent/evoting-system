@@ -5,7 +5,7 @@ if (isset($_POST["submit"])) {
 	$fname = trim($_POST["first_name"]);
 	$email = trim($_POST["email"]);
 	$pass = trim($_POST["pass"]);
-	$encPass = sha1($pass);
+	$encPass = password_hash($pass, PASSWORD_DEFAULT);
 	$role = "organiser";
 	$cat = trim($_POST["election_category"]);
 
