@@ -5,7 +5,7 @@ A secure and robust E-Voting System built with PHP and MySQL. This system suppor
 ## Features
 
 * **Role-Based Access Control:** Distinct dashboards and functionalities for `admin`, `organiser`, and `voter`.
-* **Secure Authentication:** Session management and hashed passwords for secure access.
+* **Secure Authentication:** Session management and modern password hashing (`password_hash` & `password_verify`) for secure access.
 * **Database Driven:** Powered by a MySQL database for storing election data, candidates, and votes securely.
 * **Easy Setup:** Included SQL dump (`evoting_system.sql`) for quick initialization.
 
@@ -21,25 +21,43 @@ A secure and robust E-Voting System built with PHP and MySQL. This system suppor
 
 ## Installation & Setup
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   ```
+### Prerequisites (macOS/Homebrew)
+If you are on macOS, you can easily install the required environment via terminal:
+```bash
+brew install php mysql
+brew services start mysql
+```
 
-2. **Set up the Database:**
-   * Create a new MySQL database (e.g., `evoting_system`).
-   * Import the provided `evoting_system.sql` file into your database to create the required tables.
+### 1. Set up the Database
+Log into your local MySQL instance:
+```bash
+mysql -u root
+```
+Create the database and exit:
+```sql
+CREATE DATABASE evoting_system;
+EXIT;
+```
+Import the provided `evoting_system.sql` file into your database to create the required tables:
+```bash
+mysql -u root evoting_system < evoting_system.sql
+```
 
-3. **Configure the Application:**
-   * Ensure your database configuration in the `includes/` directory (e.g., `init.php` or `db.php`) matches your local MySQL credentials.
+### 2. Configure the Application
+* Ensure your database configuration in `includes/db.php` matches your local MySQL credentials. The default is `localhost`, user `root`, with no password.
 
-4. **Run the Application:**
-   * Host the project folder on a local server environment (like XAMPP, MAMP, WAMP, or Laravel Valet).
-   * Open your browser and navigate to the project directory (e.g., `http://localhost/evoting_system`).
+### 3. Run the Application
+You can host the project folder on a local server environment (like XAMPP, MAMP, WAMP), or simply use PHP's built-in development server. 
+
+To use the built-in server, open your terminal, navigate to the project root directory, and run:
+```bash
+php -S localhost:8000
+```
+Open your browser and navigate to: **http://localhost:8000**
 
 ## Usage
 
-* Navigate to `index.php` to access the login page.
+* Navigate to the root URL (e.g. `http://localhost:8000/`) to access the login page.
 * You will be automatically redirected to the appropriate dashboard (`/admin`, `/organiser`, or `/voter`) based on your assigned role.
 
 ## License
