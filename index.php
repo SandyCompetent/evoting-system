@@ -1,53 +1,70 @@
 <?php
-require_once("includes/init.php");
+require_once __DIR__ . "/includes/bootstrap.php";
 
-if (isset($_SESSION["role"]) && ($_SESSION["role"] == "admin" || $_SESSION["role"] == "organiser")) {
-	echo "<script>window.location='" . $_SESSION["role"] . "';</script>";
-	exit(0);
+// Already logged in? Send to the right dashboard.
+if (isset($_SESSION["role"]) && in_array($_SESSION["role"], ["admin", "organiser", "voter"], true)) {
+    redirect($_SESSION["role"] . "/");
 }
 
+// ---- Login ----
 if (isset($_POST["login"])) {
-	$email = trim($_POST["email"]);
-	$password = $_POST["password"];
+    csrf_verify();
+    $email    = trim($_POST["email"] ?? "");
+    $password = (string) ($_POST["password"] ?? "");
 
-	if ($data = fetchData("system_users", "WHERE email = '$email'")) {
-		if (password_verify($password, $data[0]["password"]) || sha1($password) == $data[0]["password"]) {
-			// If it was still a sha1 password, upgrade it to password_hash
-			if (sha1($password) == $data[0]["password"]) {
-				$newHash = password_hash($password, PASSWORD_DEFAULT);
-				$userId = $data[0]["user_id"];
-				executeUpdateQuery("UPDATE system_users SET password = '$newHash' WHERE user_id = '$userId'");
-			}
+    $user = fetchOne("SELECT * FROM system_users WHERE email = ?", [$email]);
 
-			$_SESSION["user_id"] = $data[0]["user_id"];
-			$_SESSION["role"] = $data[0]["role"];
-			echo "<script>window.location='" . $_SESSION["role"] . "';</script>";
-			exit(0);
-		}
-	}
-	$_SESSION["errors"][] = "Invalid email/password";
-	
+    $valid = false;
+    if ($user) {
+        if (password_verify($password, $user["password"])) {
+            $valid = true;
+        } elseif (hash_equals((string) $user["password"], sha1($password))) {
+            // Legacy SHA1 hash: verified, now transparently upgraded.
+            $valid = true;
+            execute(
+                "UPDATE system_users SET password = ? WHERE user_id = ?",
+                [password_hash($password, PASSWORD_DEFAULT), $user["user_id"]]
+            );
+        }
+    }
+
+    if ($valid) {
+        session_regenerate_id(true);          // prevent session fixation
+        $_SESSION["user_id"] = $user["user_id"];
+        $_SESSION["role"]    = $user["role"];
+        redirect($user["role"] . "/");
+    }
+
+    $_SESSION["errors"][] = "Invalid email/password";
+    redirect($_SERVER["PHP_SELF"]);
 }
 
+// ---- Public request to register an election ----
 if (isset($_POST["request_register"])) {
-	$full_name = trim($_POST["full_name"]);
-	$email = trim($_POST["email"]);
-	$election_category = trim($_POST["category"]);
-	$max_voter = trim($_POST["max_voter"]);
-	$is_adult_voter = trim($_POST["is_adult_voter"]);
-	$expire_datetime = trim($_POST["expire_timestamp"]);
+    csrf_verify();
+    $full_name = trim($_POST["full_name"] ?? "");
+    $email     = trim($_POST["email"] ?? "");
+    $category  = trim($_POST["category"] ?? "");
+    $max_voter = (int) ($_POST["max_voter"] ?? 0);
+    $is_adult  = (($_POST["is_adult_voter"] ?? "No") === "Yes") ? "Yes" : "No";
+    $expire    = trim($_POST["expire_timestamp"] ?? "");
 
-	$sql = "INSERT INTO request_to_register (full_name, email, election_category, max_voter, adult_voter, expire_timestamp) VALUES ('$full_name', '$email', '$election_category', '$max_voter', '$is_adult_voter', '$expire_datetime')";
-	if (executeInsertQuery($sql)) {
-		$_SESSION["messages"][] = "Request Registered Successfully";
-		echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-		exit(0);
-	} else {
-		$_SESSION["errors"][] = "Request Registration Failed" + $_SESSION["errors"];
-		
-	}
+    if ($full_name === "" || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION["errors"][] = "Please provide a valid name and email.";
+        redirect($_SERVER["PHP_SELF"]);
+    }
+
+    execute(
+        "INSERT INTO request_to_register
+            (full_name, email, election_category, max_voter, adult_voter, expire_timestamp)
+         VALUES (?, ?, ?, ?, ?, ?)",
+        [$full_name, $email, $category, $max_voter, $is_adult, $expire]
+    );
+    $_SESSION["messages"][] = "Request Registered Successfully";
+    redirect($_SERVER["PHP_SELF"]);
 }
 
+require_once __DIR__ . "/includes/header.php";
 ?>
 <div class="container">
 	<div class="col-md-12 text-center">
@@ -63,7 +80,8 @@ if (isset($_POST["request_register"])) {
 					<div class="title">Register User Can Login Here !</div>
 				</div>
 				<div class="panel-body">
-					<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+					<form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+						<?php echo csrf_field(); ?>
 						<div class="form-group">
 							<label class="control-label col-sm-4 highlight" for="email">Email Address</label>
 							<input type="email" class="form-control" name="email" id="email" placeholder="Enter email address" required>
@@ -83,11 +101,12 @@ if (isset($_POST["request_register"])) {
 			<?php require_once("includes/view_messages_and_errors.php"); ?>
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<div class="title">For organising your elections with our system, please <button type="submit" class="btn btn-primary btn-sm" name="login" data-toggle="collapse" data-target="#register_form">Fill the Form</button></div>
+					<div class="title">For organising your elections with our system, please <button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#register_form">Fill the Form</button></div>
 
 				</div>
 				<div id="register_form" class="panel-body collapse">
-					<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+					<form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+						<?php echo csrf_field(); ?>
 
 						<div class="form-group">
 							<label class="control-label col-sm-4 highlight" for="full_name">Full Name</label>
@@ -101,7 +120,7 @@ if (isset($_POST["request_register"])) {
 							<label class="control-label col-sm-4 highlight" for="category">Election Category</label>
 							<input type="text" class="form-control" name="category" id="category" placeholder="Enter election category" required>
 						</div>
-						
+
 						<div class="form-group">
 							<label class="control-label col-sm-4 highlight" for="expire_timestamp">Voting Expire Time</label>
 
@@ -129,7 +148,7 @@ if (isset($_POST["request_register"])) {
 							</select>
 						</div>
 
-						
+
 						<div class="form-group">
 							<label class="control-label col-sm-4 highlight" for="is_adult_voter">Are Voter 18+ ?</label>
 							<div class="radio">
@@ -137,7 +156,7 @@ if (isset($_POST["request_register"])) {
 								<label><input type="radio" name="is_adult_voter" value="No" checked>No</label>
 							</div>
 						</div>
-						
+
 						<button type="submit" class="btn btn-primary  btn-block" name="request_register">Request to Create Election System</button>
 
 					</form>
@@ -154,7 +173,6 @@ if (isset($_POST["request_register"])) {
 
 <script type="text/javascript">
 	$('.form_datetime').datetimepicker({
-		//language:  'fr',
 		weekStart: 1,
 		todayBtn: 1,
 		autoclose: 1,

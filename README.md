@@ -1,11 +1,11 @@
 # E-Voting System
 
-A secure and robust E-Voting System built with PHP and MySQL. This system supports multiple user roles, including Administrators, Organisers, and Voters, to manage and participate in elections seamlessly.
+An E-Voting System built with PHP and MySQL, used as a web-security hardening case study. NOTE: this is a learning project and must not be used to run a real election. This system supports multiple user roles, including Administrators, Organisers, and Voters, to manage and participate in elections seamlessly.
 
 ## Features
 
 * **Role-Based Access Control:** Distinct dashboards and functionalities for `admin`, `organiser`, and `voter`.
-* **Secure Authentication:** Session management and modern password hashing (`password_hash` & `password_verify`) for secure access.
+* **Authentication:** Session management with `password_hash`/`password_verify`, session regeneration on login, and parameterized queries. Security hardening is in progress — see `REFACTOR_LOG.md`.
 * **Database Driven:** Powered by a MySQL database for storing election data, candidates, and votes securely.
 * **Easy Setup:** Included SQL dump (`evoting_system.sql`) for quick initialization.
 
@@ -44,7 +44,7 @@ mysql -u root evoting_system < evoting_system.sql
 ```
 
 ### 2. Configure the Application
-* Ensure your database configuration in `includes/db.php` matches your local MySQL credentials. The default is `localhost`, user `root`, with no password.
+* Copy `.env.example` to `.env` and set your MySQL credentials there (no longer hard-coded in `includes/db.php`). Defaults: host `localhost`, user `root`, empty password.\n* Run the DB migration: `mysql -u root evoting_system < db/migration_2026-10-20_security.sql`.
 
 ### 3. Run the Application
 You can host the project folder on a local server environment (like XAMPP, MAMP, WAMP), or simply use PHP's built-in development server. 

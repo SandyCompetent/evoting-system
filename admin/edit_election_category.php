@@ -1,5 +1,21 @@
 <?php
-	require_once("nav.php");
+require_once __DIR__ . "/../includes/bootstrap.php";
+require_role("admin");
+
+if (($editId = pressed_action("edit")) !== null) {
+    csrf_verify();
+    $_SESSION["category_refID"] = $editId;
+    redirect("update_election_category.php");
+}
+if (($delId = pressed_action("delete")) !== null) {
+    csrf_verify();
+    $n = execute("DELETE FROM election_category WHERE id = ?", [$delId]);
+    $_SESSION[$n ? "messages" : "errors"][] = $n ? "Category deleted." : "Delete failed.";
+    redirect($_SERVER["PHP_SELF"]);
+}
+
+require_once __DIR__ . "/nav.php";
+$categories = fetchAll("SELECT * FROM election_category ORDER BY name");
 ?>
 
 <div class="page-section">
@@ -12,9 +28,10 @@
 						<div class="title">Edit Election Category</div>
 					</div>
 					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
-						<div class="form-group">
-								<table class="table ">
+						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+							<?php echo csrf_field(); ?>
+							<div class="form-group">
+								<table class="table">
 									<thead>
 										<tr>
 											<th width="30%">Category Name</th>
@@ -24,40 +41,17 @@
 										</tr>
 									</thead>
 									<tbody>
-										<?php if ($data = fetchData("election_category", "")) :
-											foreach ($data as $value) : ?>
-												<tr>
-													<?php
-													$categoryID = $value["id"];
-													echo '<td>' . $value['name'] . '</td>';
-													echo '<td>' . $value['timestamp'] . '</td>';
-													echo '<td>' . $value['expire_timestamp'] . '</td>';
-													echo '<td><button type="submit" class="btn btn-primary btn-sm" name="edit' . $categoryID . '">Edit</button>&emsp;';
-													echo '<button type="submit" class="btn btn-danger btn-sm" id="delete" name="delete' . $categoryID . '">Delete</button>';
-
-													if (isset($_POST['edit' . $categoryID])) {
-														unset($_SESSION['category_refID']);
-														$_SESSION['category_refID'] = $categoryID;
-														exit(header("Location:update_election_category.php"));
-													}
-
-													if (isset($_POST['delete' . $categoryID])) {
-
-														if (executeDeleteQuery("election_category","WHERE id=$categoryID")) {
-															$_SESSION["messages"][] = "Data Deleted Successfully";
-															echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-															exit(0);
-														} else {
-															$_SESSION["errors"][] = "Data Deletion Failed" + $_SESSION["errors"];
-															echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-															exit(0);
-														}
-													}
-													?>
-												</tr>
-										<?php endforeach;
-										endif; ?>
-
+										<?php foreach ($categories as $value): ?>
+											<tr>
+												<td><?php echo e($value['name']); ?></td>
+												<td><?php echo e($value['timestamp'] ?? ''); ?></td>
+												<td><?php echo e($value['expire_timestamp'] ?? ''); ?></td>
+												<td>
+													<button type="submit" class="btn btn-primary btn-sm" name="edit<?php echo (int) $value['id']; ?>">Edit</button>&emsp;
+													<button type="submit" class="btn btn-danger btn-sm" name="delete<?php echo (int) $value['id']; ?>" onclick="return confirm('Delete this category?');">Delete</button>
+												</td>
+											</tr>
+										<?php endforeach; ?>
 									</tbody>
 								</table>
 							</div>
@@ -69,7 +63,6 @@
 	</div>
 </div>
 
-
 <?php
-	require_once("../includes/footer.php");
+require_once("../includes/footer.php");
 ?>

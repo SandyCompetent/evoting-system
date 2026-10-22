@@ -1,59 +1,36 @@
 <?php
+require_once __DIR__ . "/../includes/bootstrap.php";
+require_role("organiser");
 
-require_once("nav.php");
-
-$user_id = $_SESSION['user_id'];
-
-$data = fetchData("system_users", "WHERE user_id=$user_id");
-foreach ($data as $value) :
-	$category_id = $value["election_category_id"];
-endforeach;
-
-
+$user_id   = (int) $_SESSION["user_id"];
+$organiser = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
+$category_id = (int) ($organiser["election_category_id"] ?? 0);
 
 if (isset($_POST["submit"])) {
-	$candidate_name = trim($_POST["candidate_name"]);
-
-	$photoFileName = $_FILES["uploadPhoto"]["name"];
-	$photoTempName = $_FILES["uploadPhoto"]["tmp_name"];
-	$photoFolder = "../upload/photo/" . $photoFileName;
-
-	$symbolFileName = $_FILES["uploadSymbol"]["name"];
-	$symbolTempName = $_FILES["uploadSymbol"]["tmp_name"];
-	$symbolFolder = "../upload/symbol/" . $symbolFileName;
-
-
-	$sql = "INSERT INTO candidate(full_name, photo, symbol, category_id) VALUES('$candidate_name','$photoFileName','$symbolFileName','$category_id')";
-
-	if (executeInsertQuery($sql)) {
-
-		if (move_uploaded_file($photoTempName, $photoFolder) && move_uploaded_file($symbolTempName, $symbolFolder)) {
-
-			$data = fetchData("candidate", "WHERE full_name='$candidate_name'");
-			foreach ($data as $value) :
-				$candidate_id = $value["id"];
-			endforeach;
-
-
-			$sql = "INSERT INTO vote_details(category_id, candidate_id, vote) VALUES($category_id, $candidate_id, 0)";
-			if (executeInsertQuery($sql)) {
-				$_SESSION["messages"][] = "Data Inserted Successfully";
-				echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-				exit(0);
-			} else {
-				$_SESSION["errors"][] = "Data Insertion Failed";
-				echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-				exit(0);
-			}
-		} else {
-			$_SESSION["errors"][] = "Image Move Failed";
-		}
-	} else {
-		$_SESSION["errors"][] = "Data Updation Failed";
-		echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-		exit(0);
-	}
+    csrf_verify();
+    $candidate_name = trim($_POST["candidate_name"] ?? "");
+    if ($candidate_name === "") {
+        $_SESSION["errors"][] = "Candidate name is required.";
+        redirect($_SERVER["PHP_SELF"]);
+    }
+    try {
+        $photo  = store_uploaded_image($_FILES["uploadPhoto"]  ?? [], __DIR__ . "/../upload/photo");
+        $symbol = store_uploaded_image($_FILES["uploadSymbol"] ?? [], __DIR__ . "/../upload/symbol");
+        // Votes now live in the `vote` table (one row per ballot), so a candidate
+        // no longer needs a pre-seeded counter row. The tally is derived on read.
+        execute(
+            "INSERT INTO candidate (full_name, photo, symbol, category_id) VALUES (?, ?, ?, ?)",
+            [$candidate_name, $photo, $symbol, $category_id]
+        );
+        $_SESSION["messages"][] = "Candidate added successfully.";
+    } catch (Throwable $ex) {
+        error_log("Candidate create failed: " . $ex->getMessage());
+        $_SESSION["errors"][] = "Could not add candidate: " . $ex->getMessage();
+    }
+    redirect($_SERVER["PHP_SELF"]);
 }
+
+require_once __DIR__ . "/nav.php";
 ?>
 
 <div class="page-section">
@@ -66,7 +43,8 @@ if (isset($_POST["submit"])) {
 						<div class="title">Add Candidate</div>
 					</div>
 					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+							<?php echo csrf_field(); ?>
 							<div class="form-group">
 								<label class="control-label col-sm-3 highlight" for="candidate_name">Candidate Name</label>
 								<div class="col-sm-8">
@@ -76,15 +54,15 @@ if (isset($_POST["submit"])) {
 							<div class="form-group">
 								<label class="control-label col-sm-3 highlight" for="uploadPhoto">Candidate Photo</label>
 								<div class="col-sm-8">
-									Select photo to upload:
-									<input type="file" name="uploadPhoto" id="uploadPhoto" value=""><br />
+									Select photo to upload (JPG/PNG/GIF, max 2 MB):
+									<input type="file" name="uploadPhoto" id="uploadPhoto" accept="image/*" required><br />
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="control-label col-sm-3 highlight" for="uploadSymbol">Candidate Symbol</label>
 								<div class="col-sm-8">
-									Select symbol to upload:
-									<input type="file" name="uploadSymbol" id="uploadSymbol" value=""><br />
+									Select symbol to upload (JPG/PNG/GIF, max 2 MB):
+									<input type="file" name="uploadSymbol" id="uploadSymbol" accept="image/*" required><br />
 								</div>
 							</div>
 							<div class="form-group">

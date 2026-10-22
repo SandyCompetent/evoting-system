@@ -34,11 +34,8 @@ if mysql -u root -e "SELECT 1;" &> /dev/null; then
     mysql -u root -e "CREATE DATABASE IF NOT EXISTS evoting_system;"
 
     echo -e "Importing database schema and default data from 'evoting_system.sql'..."
-    mysql -u root evoting_system -e "SET FOREIGN_KEY_CHECKS = 0; SOURCE evoting_system.sql; SET FOREIGN_KEY_CHECKS = 1;" 2>/dev/null
-
-    # Alternatively, you can drop and recreate the DB to ensure a clean slate every time:
-    # mysql -u root -e "DROP DATABASE IF EXISTS evoting_system; CREATE DATABASE evoting_system;"
-    # mysql -u root evoting_system < evoting_system.sql
+    mysql -u root -e "DROP DATABASE IF EXISTS evoting_system; CREATE DATABASE evoting_system;"
+    mysql -u root evoting_system < evoting_system.sql
 
     echo -e "✅ Database setup complete!"
 else

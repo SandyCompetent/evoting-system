@@ -1,104 +1,29 @@
 <?php
-
-function fetchData($table, $conidtion)
+/**
+ * Parameterized data-access API. Every value MUST be passed via the $params
+ * array (never concatenated into the SQL string). This is the only data layer
+ * in the application; the legacy string-SQL helpers were removed in
+ * installment 2 of the security refactor.
+ */
+function q(string $sql, array $params = []): PDOStatement
 {
-	global $db;
-	$table = trim($table);
-	$conidtion = trim($conidtion);
-	if(strlen($table) == 0)
-	{
-		return false;
-	}
-	$sql = "SELECT * FROM $table $conidtion";
-	$result_set = $db->query($sql);
-	if($result_set->rowCount())
-	{
-		return $result_set->fetchAll(PDO::FETCH_ASSOC);
-	}
-	return false;
+    $stmt = db()->prepare($sql);
+    $stmt->execute($params);
+    return $stmt;
 }
 
-function executeDeleteQuery($table, $condition)
+function fetchAll(string $sql, array $params = []): array
 {
-	global $db;
-	$table = trim($table);
-	$condition = trim($condition);
-	if(strlen($table) == 0 || strlen($condition) == 0)
-	{
-		return false;
-	}
-	$sql = "DELETE FROM $table $condition";
-	$stmt = $db->prepare($sql);
-	if($stmt->execute())
-	{
-		if($stmt->rowCount() == 1)
-		{
-			return true;
-		}
-		else
-		{
-			return $stmt->ErrorInfo();
-		}
-	}
-	return false;
+    return q($sql, $params)->fetchAll();
 }
 
-function executeInsertQuery($sql)
+function fetchOne(string $sql, array $params = []): ?array
 {
-	global $db;
-	$sql = trim($sql);
-	if(strlen($sql) == 0)
-	{
-		return $sql;
-	}
-	$stmt = $db->prepare($sql);
-	if($stmt->execute())
-	{
-		return true;
-	}
-	return false;
+    $row = q($sql, $params)->fetch();
+    return $row === false ? null : $row;
 }
 
-function executeUpdateQuery($sql)
+function execute(string $sql, array $params = []): int
 {
-	global $db;
-	$sql = trim($sql);
-	if(strlen($sql) == 0)
-	{
-		return $sql;
-	}
-	try
-	{
-		$stmt = $db->prepare($sql);
-		if($stmt->execute())
-		{
-			return true;
-		}
-
-	}
-	catch (PDOException $e) {
-		echo "DataBase Error: The user could not be added.<br>".$e->getMessage();
-		return false;
-	  } catch (Exception $e) {
-		echo "General Error: The user could not be added.<br>".$e->getMessage();
-		return false;
-	  }	
+    return q($sql, $params)->rowCount();
 }
-
-function getRowCount($table, $condition)
-{
-	global $db;
-	$table = trim($table);
-	$conidtion = trim($condition);
-	if(strlen($table) == 0)
-	{
-		return false;
-	}
-	$sql = "SELECT COUNT(1) FROM $table $condition";
-	$result = $db->query($sql);
-	$count = $result->fetch()[0];
-	$result->closeCursor();
-	return $count;
-}
-
-?>

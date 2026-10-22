@@ -1,71 +1,129 @@
 <?php
-require_once("nav.php");
+require_once __DIR__ . "/../includes/bootstrap.php";
 
-$user_id = $_SESSION['user_id'];
+// Guard before any output so we can redirect safely.
+if (($_SESSION["role"] ?? "") !== "organiser") {
+    redirect("../index.php");
+}
 
-$data = fetchData("system_users", "WHERE user_id=$user_id");
-foreach ($data as $value) :
-	$category_id = $value["election_category_id"];
-endforeach;
+$user_id  = (int) $_SESSION["user_id"];
+$organiser = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
+$category_id = (int) ($organiser["election_category_id"] ?? 0);
 
+// Collects temporary passwords generated this request, shown once to the organiser.
+$created_credentials = [];
+
+// ---- Manual single-voter creation ----
 if (isset($_POST["submit"])) {
-	$fname = trim($_POST["first_name"]);
-	$email = trim($_POST["email"]);
-	$dob = trim($_POST["dob"]);
-	$encPass = password_hash("12345678", PASSWORD_DEFAULT);
-	$role = "voter";
-	$voted = "No";
+    csrf_verify();
+    $fname = trim($_POST["first_name"] ?? "");
+    $email = trim($_POST["email"] ?? "");
+    $dob   = trim($_POST["dob"] ?? "");
 
-	$sql = "INSERT INTO system_users(user_id, full_name, date_of_birth,email,password,role,election_category_id, voted) VALUES('','$fname','$dob','$email','$encPass','$role', '$category_id', '$voted')";
-	if (executeInsertQuery($sql)) {
-		$_SESSION["messages"][] = "Data Inserted Successfully";
-		echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-		exit(0);
-	} else {
-		$_SESSION["errors"][] = "Data Insertion Failed";
-		echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-		exit(0);
-	}
+    if ($fname === "" || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION["errors"][] = "Please provide a valid name and email.";
+        redirect($_SERVER["PHP_SELF"]);
+    }
+
+    $plain   = bin2hex(random_bytes(4));                 // unique temporary password
+    $encPass = password_hash($plain, PASSWORD_DEFAULT);
+
+    try {
+        execute(
+            "INSERT INTO system_users
+                (full_name, date_of_birth, email, password, role, election_category_id, voted)
+             VALUES (?, ?, ?, ?, 'voter', ?, 'No')",
+            [$fname, $dob, $email, $encPass, $category_id]
+        );
+        $_SESSION["messages"][] = "Voter '" . $fname . "' created. Temporary password: " . $plain
+            . " (share it securely; the voter should change it on first login).";
+    } catch (PDOException $e) {
+        error_log("Voter insert failed: " . $e->getMessage());
+        $_SESSION["errors"][] = "Could not create voter (the email may already be registered).";
+    }
+    redirect($_SERVER["PHP_SELF"]);
 }
 
+// ---- Bulk CSV import ----
 if (isset($_POST["upload_csv"])) {
+    csrf_verify();
 
-	$filename = $_FILES["csv_file"]["name"];
-	$file_temp_name = $_FILES["csv_file"]["tmp_name"];
-	$file_folder = "../upload/csv/" . $filename;
+    $tmp  = $_FILES["csv_file"]["tmp_name"] ?? "";
+    $name = $_FILES["csv_file"]["name"] ?? "";
+    $ok   = ($_FILES["csv_file"]["error"] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
 
-	
-	$encCsvPass = password_hash("12345678", PASSWORD_DEFAULT);
+    if (!$ok || !is_uploaded_file($tmp)) {
+        $_SESSION["errors"][] = "File upload failed. Please try again.";
+        redirect($_SERVER["PHP_SELF"]);
+    }
+    if (strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== "csv") {
+        $_SESSION["errors"][] = "Please upload a .csv file only.";
+        redirect($_SERVER["PHP_SELF"]);
+    }
 
+    // Read directly from the temp upload; never move an uploaded file into a
+    // web-served directory.
+    $handle = fopen($tmp, "r");
+    if ($handle === false) {
+        $_SESSION["errors"][] = "Could not read the uploaded file.";
+        redirect($_SERVER["PHP_SELF"]);
+    }
 
-	$ext = substr($filename, strrpos($filename, "."), (strlen($filename) - strrpos($filename, ".")));
-	//we check,file must be have csv extention
-	if ($ext == ".csv") {
+    $pdo = db();
+    $pdo->beginTransaction();
+    $insert = $pdo->prepare(
+        "INSERT INTO system_users
+            (full_name, email, date_of_birth, password, role, election_category_id, voted)
+         VALUES (?, ?, ?, ?, 'voter', ?, 'No')"
+    );
 
-		if (move_uploaded_file($file_temp_name, $file_folder)) {
-			$file = fopen($file_folder, "r");
-			while (($emapData = fgetcsv($file, 10000, ",")) !== FALSE) {
-				
-				$sql = "INSERT into system_users(full_name, email, date_of_birth, password, election_category_id) values('$emapData[0]','$emapData[1]', '$emapData[2]', '$encCsvPass', '$category_id')";
-				if (executeInsertQuery($sql)) {
-					
-				} else {
-					$_SESSION["errors"][] = "Data Insertion Failed";
-					echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-					exit(0);
-				}
-			}
-			fclose($file);
-			$_SESSION["messages"][] = "Data Inserted Successfully";
-				echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-				exit(0);
-		} else {
-			$_SESSION["errors"][] = "Image Move Failed";
-		}
-	} else {
-		echo "Error: Please Upload only CSV File";
-	}
+    $rowNum = 0;
+    $imported = 0;
+    $skipped = 0;
+    try {
+        while (($cols = fgetcsv($handle, 10000, ",")) !== false) {
+            $rowNum++;
+            // Skip an optional header row.
+            if ($rowNum === 1 && stripos((string) ($cols[0] ?? ""), "name") !== false) {
+                continue;
+            }
+            $full  = sanitize_csv_cell(trim((string) ($cols[0] ?? "")));
+            $email = trim((string) ($cols[1] ?? ""));
+            $dob   = trim((string) ($cols[2] ?? ""));
+
+            if ($full === "" || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $skipped++;
+                continue;
+            }
+
+            $plain   = bin2hex(random_bytes(4));
+            $insert->execute([
+                $full, $email, $dob, password_hash($plain, PASSWORD_DEFAULT), $category_id,
+            ]);
+            $created_credentials[] = $email . " -> " . $plain;
+            $imported++;
+        }
+        $pdo->commit();
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        error_log("CSV import failed: " . $e->getMessage());
+        $_SESSION["errors"][] = "Import aborted on row {$rowNum}; no voters were added.";
+        fclose($handle);
+        redirect($_SERVER["PHP_SELF"]);
+    }
+    fclose($handle);
+
+    $_SESSION["messages"][] = "Imported {$imported} voter(s); skipped {$skipped} invalid row(s).";
+    // Stash generated credentials to show once on the next render.
+    $_SESSION["csv_credentials"] = $created_credentials;
+    redirect($_SERVER["PHP_SELF"]);
 }
+
+require_once __DIR__ . "/nav.php";
+
+// Pull any one-time credentials produced by a just-finished CSV import.
+$csv_credentials = $_SESSION["csv_credentials"] ?? [];
+unset($_SESSION["csv_credentials"]);
 ?>
 
 <div class="page-section">
@@ -73,16 +131,29 @@ if (isset($_POST["upload_csv"])) {
 		<div class="row">
 			<div class="col-md-12">
 				<?php require_once("../includes/view_messages_and_errors.php"); ?>
+
+				<?php if (!empty($csv_credentials)): ?>
+					<div class="alert alert-warning">
+						<strong>Temporary passwords (shown once):</strong>
+						<ul>
+							<?php foreach ($csv_credentials as $line): ?>
+								<li><?php echo e($line); ?></li>
+							<?php endforeach; ?>
+						</ul>
+					</div>
+				<?php endif; ?>
+
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div class="title">Create New Voter (Manual Entry)</div>
 					</div>
 					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+							<?php echo csrf_field(); ?>
 							<div class="form-group">
 								<label class="control-label col-sm-3 highlight" for="first_name">Full Name</label>
 								<div class="col-sm-8">
-									<input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter first name" required>
+									<input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter full name" required>
 								</div>
 							</div>
 
@@ -95,7 +166,7 @@ if (isset($_POST["upload_csv"])) {
 							<div class="form-group">
 								<label class="control-label col-sm-3 highlight" for="password">Password</label>
 								<div class="col-sm-8">
-									<input type="text" class="form-control" id="password" name="password" value="12345678" disabled>
+									<input type="text" class="form-control" id="password" value="(auto-generated and shown after creation)" readonly>
 								</div>
 							</div>
 
@@ -123,19 +194,20 @@ if (isset($_POST["upload_csv"])) {
 						<div class="title">Create New Voter (Upload CSV File)</div>
 					</div>
 					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+							<?php echo csrf_field(); ?>
 
 							<div class="form-group">
 								<label class="control-label col-sm-3 highlight" for="csv_file">Import CSV file</label>
 								<div class="col-sm-8">
-									<input type="file" class="form-control" id="csv_file" name="csv_file" required>
+									<input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
 								</div>
 							</div>
 
 							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="csv_file">CSV Template</label>
+								<label class="control-label col-sm-3 highlight">CSV Template</label>
 								<div class="col-sm-8">
-									<img src="assets/template.png">
+									<img src="assets/template.png" alt="CSV template: full_name, email, date_of_birth">
 								</div>
 							</div>
 
@@ -144,7 +216,7 @@ if (isset($_POST["upload_csv"])) {
 									<button type="submit" class="btn btn-primary btn-sm" id="upload_csv" name="upload_csv">Upload</button>
 								</div>
 							</div>
-							
+
 						</form>
 					</div>
 				</div>
@@ -155,7 +227,6 @@ if (isset($_POST["upload_csv"])) {
 </div>
 
 <script type="text/javascript" src="assets/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
-
 
 <script type="text/javascript">
 	$('.form_datetime').datetimepicker({

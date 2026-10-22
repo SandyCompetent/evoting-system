@@ -1,5 +1,52 @@
 <?php
-require_once("nav.php");
+require_once __DIR__ . "/../includes/bootstrap.php";
+require_role("admin");
+
+// Reject a pending request.
+if (($delId = pressed_action("delete")) !== null) {
+    csrf_verify();
+    $n = execute("DELETE FROM request_to_register WHERE id = ?", [$delId]);
+    $_SESSION[$n ? "messages" : "errors"][] = $n ? "Request rejected." : "Reject failed.";
+    redirect($_SERVER["PHP_SELF"]);
+}
+
+// Accept a pending request: create the category + an organiser, then mark approved.
+if (($acceptId = pressed_action("edit")) !== null) {
+    csrf_verify();
+    $req = fetchOne("SELECT * FROM request_to_register WHERE id = ? AND ac_status = 'Pending'", [$acceptId]);
+    if (!$req) {
+        $_SESSION["errors"][] = "Request not found or already processed.";
+        redirect($_SERVER["PHP_SELF"]);
+    }
+    $plain = bin2hex(random_bytes(4));
+    $pdo = db();
+    try {
+        $pdo->beginTransaction();
+        execute(
+            "INSERT INTO election_category (name, expire_timestamp) VALUES (?, ?)",
+            [trim($req["election_category"]), trim($req["expire_timestamp"])]
+        );
+        $categoryId = (int) $pdo->lastInsertId();
+        execute(
+            "INSERT INTO system_users (full_name, email, password, role, election_category_id)
+             VALUES (?, ?, ?, 'organiser', ?)",
+            [$req["full_name"], $req["email"], password_hash($plain, PASSWORD_DEFAULT), $categoryId]
+        );
+        // Mark THIS request approved (legacy bug used the category id here).
+        execute("UPDATE request_to_register SET ac_status = 'Approved' WHERE id = ?", [$acceptId]);
+        $pdo->commit();
+        $_SESSION["messages"][] = "Approved. Category and organiser created. "
+            . "Temporary password for " . $req["email"] . ": " . $plain . " (share securely).";
+    } catch (PDOException $ex) {
+        if ($pdo->inTransaction()) { $pdo->rollBack(); }
+        error_log("Request approval failed: " . $ex->getMessage());
+        $_SESSION["errors"][] = "Approval failed (the organiser email may already exist).";
+    }
+    redirect($_SERVER["PHP_SELF"]);
+}
+
+require_once __DIR__ . "/nav.php";
+$requests = fetchAll("SELECT * FROM request_to_register WHERE ac_status = 'Pending' ORDER BY timestamp DESC");
 ?>
 
 <div class="page-section">
@@ -12,9 +59,10 @@ require_once("nav.php");
 						<div class="title">Request for Election System</div>
 					</div>
 					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+							<?php echo csrf_field(); ?>
 							<div class="form-group">
-								<table class="table ">
+								<table class="table">
 									<thead>
 										<tr>
 											<th>Full Name</th>
@@ -28,80 +76,21 @@ require_once("nav.php");
 										</tr>
 									</thead>
 									<tbody>
-										<?php if ($data = fetchData("request_to_register", "WHERE ac_status='Pending'")) :
-											foreach ($data as $value) : ?>
-												<tr>
-													<?php
-													$request_id = $value['id'];
-													echo '<td>' . $value['full_name'] . '</td>';
-													echo '<td>' . $value['email'] . '</td>';
-													echo '<td>' . $value['election_category'] . '</td>';
-													echo '<td>' . $value['max_voter'] . '</td>';
-													echo '<td>' . $value['adult_voter'] . '</td>';
-													echo '<td>' . $value['expire_timestamp'] . '</td>';
-													echo '<td>' . $value['timestamp'] . '</td>';
-													echo '<td><button type="submit" class="btn btn-primary btn-sm" name="edit' . $request_id . '">Accept</button>&emsp;';
-													echo '<button type="submit" class="btn btn-danger btn-sm" id="delete" name="delete' . $request_id . '">Reject</button>';
-
-													if (isset($_POST['edit' . $request_id])) {
-														$category = trim($value['election_category']);
-														$expire_datetime = trim($value['expire_timestamp']);
-
-														$sql = "INSERT INTO election_category (name, expire_timestamp) VALUES ('$category', '$expire_datetime')";
-														if (executeInsertQuery($sql)) {
-															$fname = $value['full_name'];
-															$email = $value['email'];
-															$pass = "12345678";
-															$encPass = password_hash($pass, PASSWORD_DEFAULT);
-															$role = "organiser";
-
-															$data = fetchData("election_category", "WHERE name='$category'");
-															foreach ($data as $value) :
-																$cat = $value["id"];
-															endforeach;
-
-
-															$sql = "INSERT INTO system_users(user_id,full_name,email,password,role,election_category_id) VALUES('','$fname','$email','$encPass','$role','$cat')";
-															if (executeInsertQuery($sql)) {
-																
-																//XYZ
-																$sql = "UPDATE request_to_register SET ac_status = 'Approved' WHERE id = '$cat'";
-																if (executeInsertQuery($sql)) {
-																	$_SESSION["messages"][] = "Data Accepted. New Category and Organiser is Created";
-																
-																} else {
-																	$_SESSION["errors"][] = "Data Updation Failed";
-																}
-																
-															} else {
-																$_SESSION["errors"][] = "Data Failed to Accept";
-																echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-																exit(0);
-															}
-														} else {
-															$_SESSION["errors"][] = "Data Insertion Failed" + $_SESSION["errors"];
-															echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-															exit(0);
-														}
-													}
-
-													if (isset($_POST['delete' . $request_id])) {
-
-														if (executeDeleteQuery("request_to_register","WHERE id=$request_id")) {
-															$_SESSION["messages"][] = "Data Deleted Successfully";
-															echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-															exit(0);
-														} else {
-															$_SESSION["errors"][] = "Data Deletion Failed" + $_SESSION["errors"];
-															echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-															exit(0);
-														}
-													}
-													?>
-												</tr>
-										<?php endforeach;
-										endif; ?>
-
+										<?php foreach ($requests as $value): ?>
+											<tr>
+												<td><?php echo e($value['full_name']); ?></td>
+												<td><?php echo e($value['email']); ?></td>
+												<td><?php echo e($value['election_category']); ?></td>
+												<td><?php echo e($value['max_voter']); ?></td>
+												<td><?php echo e($value['adult_voter']); ?></td>
+												<td><?php echo e($value['expire_timestamp']); ?></td>
+												<td><?php echo e($value['timestamp']); ?></td>
+												<td>
+													<button type="submit" class="btn btn-primary btn-sm" name="edit<?php echo (int) $value['id']; ?>">Accept</button>&emsp;
+													<button type="submit" class="btn btn-danger btn-sm" name="delete<?php echo (int) $value['id']; ?>" onclick="return confirm('Reject this request?');">Reject</button>
+												</td>
+											</tr>
+										<?php endforeach; ?>
 									</tbody>
 								</table>
 							</div>
@@ -109,11 +98,9 @@ require_once("nav.php");
 					</div>
 				</div>
 			</div>
-
 		</div>
 	</div>
 </div>
-
 
 <?php
 require_once("../includes/footer.php");

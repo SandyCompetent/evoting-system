@@ -1,15 +1,32 @@
 <?php
-require_once("nav.php");
+require_once __DIR__ . "/../includes/bootstrap.php";
+require_role("organiser");
 
-$user_id = $_SESSION['user_id'];
+$user_id   = (int) $_SESSION["user_id"];
+$organiser = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
+$category_id = (int) ($organiser["election_category_id"] ?? 0);
 
-$data = fetchData("system_users", "WHERE user_id=$user_id");
-foreach ($data as $value) :
-	$category_id = $value["election_category_id"];
-endforeach;
+// Handle Edit button -> stash ref id and go to update page.
+if (($editId = pressed_action("edit")) !== null) {
+    csrf_verify();
+    $_SESSION["candidate_refID"] = $editId;
+    redirect("update_candidate_details.php");
+}
 
+// Handle Delete button (scoped to this organiser's category).
+if (($delId = pressed_action("delete")) !== null) {
+    csrf_verify();
+    // Remove any ballots cast for this candidate first, then the candidate.
+    execute("DELETE FROM vote WHERE candidate_id = ? AND category_id = ?", [$delId, $category_id]);
+    $n = execute("DELETE FROM candidate WHERE id = ? AND category_id = ?", [$delId, $category_id]);
+    $_SESSION[$n ? "messages" : "errors"][] = $n ? "Candidate deleted." : "Delete failed.";
+    redirect($_SERVER["PHP_SELF"]);
+}
+
+require_once __DIR__ . "/nav.php";
+
+$candidates = fetchAll("SELECT * FROM candidate WHERE category_id = ? ORDER BY full_name", [$category_id]);
 ?>
-
 
 <div class="page-section">
 	<div class="container">
@@ -21,9 +38,10 @@ endforeach;
 						<div class="title">Edit Candidate Details</div>
 					</div>
 					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+							<?php echo csrf_field(); ?>
 							<div class="form-group">
-								<table class="table ">
+								<table class="table">
 									<thead>
 										<tr>
 											<th width="30%">Name</th>
@@ -34,55 +52,28 @@ endforeach;
 										</tr>
 									</thead>
 									<tbody>
-										<?php if ($data = fetchData("candidate", "WHERE category_id='$category_id'")) :
-											foreach ($data as $value) : ?>
-												<tr>
-													<?php
-													$candidate_id = $value['id'];
-													echo '<td>' . $value['full_name'] . '</td>';
-													echo '<td><img src="../upload/photo/' . $value['photo'] . '" alt="Photo" style="width:100px;height:100px;vertical-align: middle;max-width: 100px;max-height: 100px;display: -moz-inline-box;display: inline-block;"> </td>';
-													echo '<td><img src="../upload/symbol/' . $value['symbol'] . '" alt="Photo" style="width:100px;height:100px;vertical-align: middle;max-width: 100px;max-height: 100px;display: -moz-inline-box;display: inline-block;"> </td>';
-													echo '<td>' . $value['timestamp'] . '</td>';
-													echo '<td><button type="submit" class="btn btn-primary btn-sm" name="edit' . $candidate_id . '">Edit</button>&emsp;';
-													echo '<button type="submit" class="btn btn-danger btn-sm" id="delete" name="delete' . $candidate_id . '">Delete</button>';
-
-													if (isset($_POST['edit' . $candidate_id])) {
-														unset($_SESSION['candidate_refID']);
-														$_SESSION['candidate_refID'] = $candidate_id;
-														exit(header("Location:update_candidate_details.php"));
-													}
-
-													if (isset($_POST['delete' . $candidate_id])) {
-														if (executeDeleteQuery("candidate", "WHERE id='$candidate_id'")) {
-												
-															$_SESSION["messages"][] = "Data Deleted Successfully";
-															echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-															exit(0);
-															
-														} else {
-															$_SESSION["errors"][] = "Data Deletion Failed" + $_SESSION["errors"];
-															echo "<script>window.location='" . $_SERVER["PHP_SELF"] . "';</script>";
-															exit(0);
-														}
-													}
-													?>
-												</tr>
-										<?php endforeach;
-										endif; ?>
-
+										<?php foreach ($candidates as $value): ?>
+											<tr>
+												<td><?php echo e($value['full_name']); ?></td>
+												<td><img src="../upload/photo/<?php echo e($value['photo']); ?>" alt="Photo" style="width:100px;height:100px;object-fit:cover;"></td>
+												<td><img src="../upload/symbol/<?php echo e($value['symbol']); ?>" alt="Symbol" style="width:100px;height:100px;object-fit:cover;"></td>
+												<td><?php echo e($value['timestamp']); ?></td>
+												<td>
+													<button type="submit" class="btn btn-primary btn-sm" name="edit<?php echo (int) $value['id']; ?>">Edit</button>&emsp;
+													<button type="submit" class="btn btn-danger btn-sm" name="delete<?php echo (int) $value['id']; ?>" onclick="return confirm('Delete this candidate?');">Delete</button>
+												</td>
+											</tr>
+										<?php endforeach; ?>
 									</tbody>
 								</table>
 							</div>
 						</form>
 					</div>
-
 				</div>
 			</div>
-
 		</div>
 	</div>
 </div>
-
 
 <?php
 require_once("../includes/footer.php");

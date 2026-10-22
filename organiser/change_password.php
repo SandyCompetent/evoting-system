@@ -1,56 +1,42 @@
-<?php 
-	require_once("nav.php");
-	
-	if(isset($_POST["change"]))
-	{
-		$user_id = trim($_SESSION["user_id"]);
-		$old_password = trim($_POST["old_password"]);
-		$new_password = trim($_POST["new_password"]);
-		$confirm_password = trim($_POST["confirm_password"]);
-		
-		if(empty($user_id) || empty($old_password) || empty($new_password) || empty($confirm_password))
-		{
-			$_SESSION["errors"][] = "Please enter all mandatory fields.";
-		}
-		else if($old_password == $new_password)
-		{
-			$_SESSION["errors"][] = "Old password and new password cannot be same.";
-		}
-		else if($new_password != $confirm_password)
-		{
-			$_SESSION["errors"][] = "The password and confirmation password are not matching.";
-		}
-		else if(strlen($_POST["new_password"]) <= 7)
-		{
-			$_SESSION["errors"][] = "Password must be of atleast 8 characters.";
-		}
-		else
-		{
-			$password = $old_password;
-			
-			$user_data = fetchData("system_users", "WHERE user_id = '$user_id'");
+<?php
+require_once __DIR__ . "/../includes/bootstrap.php";
+require_role("organiser");
 
-			if($user_data && (password_verify($password, $user_data[0]["password"]) || sha1($password) == $user_data[0]["password"]))
-			{
-				$new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
-				if(executeUpdateQuery("UPDATE system_users SET password = '$new_password_hash' WHERE user_id = '$user_id'"))
-				{
-					$_SESSION["messages"][] = "Changed successfully.";
-				}
-				else
-				{
-					$_SESSION["errors"][] = "Failed to change, Please try again in a few minutes.";
-				}
-			}
-			else
-			{
-				$_SESSION["errors"][] = "Incorrect old password.";
-			}
-		}
-		
-		echo "<script>window.location='".$_SERVER["PHP_SELF"]."';</script>";
-		exit(0);
-	}
+if (isset($_POST["change"])) {
+    csrf_verify();
+    $user_id = (int) $_SESSION["user_id"];
+    $old = (string) ($_POST["old_password"] ?? "");
+    $new = (string) ($_POST["new_password"] ?? "");
+    $confirm = (string) ($_POST["confirm_password"] ?? "");
+
+    if ($old === "" || $new === "" || $confirm === "") {
+        $_SESSION["errors"][] = "Please enter all mandatory fields.";
+    } elseif ($old === $new) {
+        $_SESSION["errors"][] = "Old password and new password cannot be same.";
+    } elseif ($new !== $confirm) {
+        $_SESSION["errors"][] = "The password and confirmation password are not matching.";
+    } elseif (strlen($new) < 8) {
+        $_SESSION["errors"][] = "Password must be at least 8 characters.";
+    } else {
+        $user = fetchOne("SELECT password FROM system_users WHERE user_id = ?", [$user_id]);
+        $ok = $user && (
+            password_verify($old, $user["password"]) ||
+            hash_equals((string) $user["password"], sha1($old))
+        );
+        if ($ok) {
+            execute(
+                "UPDATE system_users SET password = ? WHERE user_id = ?",
+                [password_hash($new, PASSWORD_DEFAULT), $user_id]
+            );
+            $_SESSION["messages"][] = "Changed successfully.";
+        } else {
+            $_SESSION["errors"][] = "Incorrect old password.";
+        }
+    }
+    redirect($_SERVER["PHP_SELF"]);
+}
+
+require_once __DIR__ . "/nav.php";
 ?>
 
 <div class="page-section">
@@ -63,7 +49,8 @@
 						<div class="title">Change Password</div>
 					</div>
 					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+							<?php echo csrf_field(); ?>
 							<div class="form-group">
 								<label class="control-label col-sm-3 highlight" for="old_password">Old Password</label>
 								<div class="col-sm-8">
@@ -82,7 +69,7 @@
 									<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Enter confirm password" required>
 								</div>
 							</div>
-							<div class="form-group"> 
+							<div class="form-group">
 								<div class="col-sm-offset-3 col-sm-10">
 									<button type="submit" class="btn btn-primary btn-sm" id="change" name="change">Change</button>
 								</div>
@@ -95,6 +82,6 @@
 	</div>
 </div>
 
-<?php 
-	require_once("../includes/footer.php");
+<?php
+require_once("../includes/footer.php");
 ?>
