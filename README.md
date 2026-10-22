@@ -28,7 +28,7 @@ A secure, modern online voting web application built with **PHP** and **MySQL**.
 ├── tests/                # Domain test runner, unit test suites, and in-memory test fakes
 ├── upload/               # Upload directory for candidate photos and party symbols
 ├── portfolio/            # Standalone showcase application & 11 high-res screenshots
-└── evoting_system.sql    # Clean database schema & initial demo dataset
+└── evoting-system.sql    # Clean database schema & initial demo dataset
 ```
 
 ---
@@ -45,7 +45,7 @@ brew services start mysql
 Create the database and import the latest schema:
 ```bash
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS evoting_system;"
-mysql -u root evoting_system < evoting_system.sql
+mysql -u root evoting_system < evoting-system.sql
 ```
 
 ### 3. Application Configuration
@@ -114,7 +114,7 @@ This project includes a dedicated showcase portfolio package located in [`portfo
   1. In your GitHub repository, navigate to **Settings** > **Pages**.
   2. Under **Build and deployment** > **Source**, select **GitHub Actions**.
   3. Push to `main`, and the portfolio will be live at:
-     `https://sandycompetent.github.io/evoting_system/`
+     `https://sandycompetent.github.io/evoting-system/`
 
 ---
 

@@ -81,5 +81,5 @@ To publish the portfolio online:
    ```
 4. GitHub Actions will automatically deploy the contents of the `portfolio/` directory.
 5. Your live portfolio will be available at:
-   **`https://<your-username>.github.io/<repo-name>/`** (e.g. `https://sandycompetent.github.io/evoting_system/`).
+   **`https://<your-username>.github.io/<repo-name>/`** (e.g. `https://sandycompetent.github.io/evoting-system/`).
 

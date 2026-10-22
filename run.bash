@@ -33,9 +33,9 @@ if mysql -u root -e "SELECT 1;" &> /dev/null; then
     echo -e "Creating database 'evoting_system' if it doesn't exist..."
     mysql -u root -e "CREATE DATABASE IF NOT EXISTS evoting_system;"
 
-    echo -e "Importing database schema and default data from 'evoting_system.sql'..."
+    echo -e "Importing database schema and default data from 'evoting-system.sql'..."
     mysql -u root -e "DROP DATABASE IF EXISTS evoting_system; CREATE DATABASE evoting_system;"
-    mysql -u root evoting_system < evoting_system.sql
+    mysql -u root evoting_system < evoting-system.sql
 
     echo -e "✅ Database setup complete!"
 else
@@ -43,7 +43,7 @@ else
     echo -e "Ensure your MySQL server is running (e.g., 'brew services start mysql')."
     echo -e "If your MySQL 'root' user requires a password, please set up the database manually:"
     echo -e "  1. mysql -u root -p -e 'CREATE DATABASE evoting_system;'"
-    echo -e "  2. mysql -u root -p evoting_system < evoting_system.sql"
+    echo -e "  2. mysql -u root -p evoting_system < evoting-system.sql"
     echo ""
 fi
 
