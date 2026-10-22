@@ -65,7 +65,7 @@ If you imported the provided `evoting_system.sql` database, you can log in using
 
 **Administrator:**
 * **Email:** `admin@evoting.com`
-* **Password:** `admin`
+* **Password:** `12345678`
 
 **Organiser:**
 * **Email:** `sandy@evoting.com` *(or `ivaan@evoting.com`)*
