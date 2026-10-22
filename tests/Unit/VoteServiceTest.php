@@ -49,6 +49,17 @@ final class VoteServiceTest extends TestCase
         self::assertSame(1, $svc->turnout(10));
     }
 
+    public function testTurnoutReportReturnsValueObject(): void
+    {
+        $svc = $this->service();
+        $svc->castVote(1, 100);
+        $report = $svc->turnoutReport(10);
+        self::assertSame(1, $report->eligibleVoters);
+        self::assertSame(1, $report->votesCast);
+        self::assertSame(0, $report->pendingVoters());
+        self::assertSame(100.0, $report->percentage());
+    }
+
     public function testRejectsVoterWithNoElection(): void
     {
         $svc = $this->service();

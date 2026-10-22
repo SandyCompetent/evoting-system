@@ -1,80 +1,123 @@
-# E-Voting System
+# e-Voting System
 
-An E-Voting System built with PHP and MySQL, used as a web-security hardening case study. NOTE: this is a learning project and must not be used to run a real election. This system supports multiple user roles, including Administrators, Organisers, and Voters, to manage and participate in elections seamlessly.
+A secure, modern online voting web application built with **PHP** and **MySQL**. Designed for student councils, academic departments, clubs, and organizations to conduct transparent elections with role-based dashboards and automated ballot auditing.
 
-## Features
+---
 
-* **Role-Based Access Control:** Distinct dashboards and functionalities for `admin`, `organiser`, and `voter`.
-* **Authentication:** Session management with `password_hash`/`password_verify`, session regeneration on login, and parameterized queries. Security hardening is in progress — see `REFACTOR_LOG.md`.
-* **Database Driven:** Powered by a MySQL database for storing election data, candidates, and votes securely.
-* **Easy Setup:** Included SQL dump (`evoting_system.sql`) for quick initialization.
+## Architecture & Modernization Highlights
+
+* **Layered Architecture:** Refactored into Domain Entities (`Candidate`, `Turnout`, `User`, `Election`), Service Layer (`VoteService`, `AuthService`, `DemoDataSeeder`), and Repositories (`CandidateRepository`, `CategoryRepository`, `UserRepository`).
+* **Double-Voting Prevention:** Database-enforced `UNIQUE(voter_id, category_id)` constraint prevents multiple ballots from being cast per voter, even under concurrent requests.
+* **Modern Interface:** Powered by **Bootstrap 5.3.3**, **Bootswatch Zephyr**, and **Bootstrap Icons**, featuring responsive candidate card grids, native HTML5 date/time pickers, floating form labels, and synchronized live countdown timers.
+* **Security & Authentication:** Session fixation safeguards via `session_regenerate_id()`, Bcrypt (`PASSWORD_BCRYPT`) password hashing with automatic legacy upgrade verification, CSRF token validation, and PDO parameterized queries.
+* **Automated Unit Testing:** Includes a zero-dependency CLI test suite runner covering the domain core with 53 unit tests and 134 assertions (`php tests/run_tests.php`).
+
+---
 
 ## Directory Structure
 
-* `admin/`: Administrator dashboard and functionalities.
-* `organiser/`: Election organiser dashboard.
-* `voter/`: Voter interface for casting votes.
-* `includes/`: Core PHP scripts, database initialization (`init.php`), and shared resources.
-* `assets/`: CSS, JavaScript, and image assets.
-* `upload/`: Directory for user-uploaded content (e.g., candidate photos).
-* `Screenshots/`: Application screenshots.
+```
+├── .github/workflows/    # CI/CD workflows, including GitHub Pages deployment
+├── admin/                # Administrator dashboard, election categories, registration review
+├── organiser/            # Election organiser portal, candidate rosters, voter lists
+├── voter/                # Voter interface, interactive ballot card grid, results showcase
+├── src/                  # Layered PHP application core (Domain, Service, Repository, Exception)
+├── includes/             # Shared bootstrap, security helpers, layout header/footer
+├── assets/               # CSS styles (with Bootstrap 3-to-5 bridge) and JavaScript
+├── db/                   # Database migrations and CLI demo data seeding tools
+├── tests/                # Domain test runner, unit test suites, and in-memory test fakes
+├── upload/               # Upload directory for candidate photos and party symbols
+├── portfolio/            # Standalone showcase application & 11 high-res screenshots
+└── evoting_system.sql    # Clean database schema & initial demo dataset
+```
 
-## Installation & Setup
+---
 
-### Prerequisites (macOS/Homebrew)
-If you are on macOS, you can easily install the required environment via terminal:
+## Quick Setup & Running Locally
+
+### 1. Prerequisites (macOS with Homebrew)
 ```bash
 brew install php mysql
 brew services start mysql
 ```
 
-### 1. Set up the Database
-Log into your local MySQL instance:
+### 2. Database Initialization
+Create the database and import the latest schema:
 ```bash
-mysql -u root
-```
-Create the database and exit:
-```sql
-CREATE DATABASE evoting_system;
-EXIT;
-```
-Import the provided `evoting_system.sql` file into your database to create the required tables:
-```bash
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS evoting_system;"
 mysql -u root evoting_system < evoting_system.sql
 ```
 
-### 2. Configure the Application
-* Copy `.env.example` to `.env` and set your MySQL credentials there (no longer hard-coded in `includes/db.php`). Defaults: host `localhost`, user `root`, empty password.\n* Run the DB migration: `mysql -u root evoting_system < db/migration_2026-10-20_security.sql`.
+### 3. Application Configuration
+Copy the sample environment file and configure your database credentials if different from the defaults:
+```bash
+cp .env.example .env
+```
+*(Default settings: host `localhost`, user `root`, empty password, database `evoting_system`).*
 
-### 3. Run the Application
-You can host the project folder on a local server environment (like XAMPP, MAMP, WAMP), or simply use PHP's built-in development server. 
-
-To use the built-in server, open your terminal, navigate to the project root directory, and run:
+### 4. Start the Application
+Run PHP's built-in development server:
 ```bash
 php -S localhost:8000
 ```
-Open your browser and navigate to: **http://localhost:8000**
+Open **[http://localhost:8000](http://localhost:8000)** in your browser.
 
-## Usage
+Alternatively, execute the automated runner script:
+```bash
+./run.bash
+```
 
-* Navigate to the root URL (e.g. `http://localhost:8000/`) to access the login page.
-* You will be automatically redirected to the appropriate dashboard (`/admin`, `/organiser`, or `/voter`) based on your assigned role.
+---
 
-### Default Test Accounts
-If you imported the provided `evoting_system.sql` database, you can log in using the following test credentials:
+## Automated Tests
 
-**Administrator:**
-* **Email:** `admin@evoting.com`
-* **Password:** `12345678`
+Run the domain unit test suite directly from your terminal:
+```bash
+php tests/run_tests.php
+```
+All 53 unit tests run in memory using SQLite PDO and in-memory repository fakes, executing deterministically without mutating your local MySQL database.
 
-**Organiser:**
-* **Email:** `sandy@evoting.com` *(or `ivaan@evoting.com`)*
-* **Password:** `12345678`
+---
 
-**Voter:**
-* **Email:** `sudhan@evoting.com` *(or `john@evoting.com`)*
-* **Password:** `12345678`
+## Showcase & Test Accounts
+
+The included dataset is populated with current non-past dates:
+
+| Role | Email Login | Password | Flow to Explore |
+|---|---|---|---|
+| **Administrator** | `admin@evoting.com` | `12345678` | System management, category approvals, Demo Data generator. |
+| **Organiser (Live)** | `council.organiser@evoting.com` | `password123` | Active turnout metrics (64%), voting window editor, candidate roster. |
+| **Voter (Ready to Vote)** | `voter17@evoting.com` | `password123` | **Live Ballot:** Interactive candidate card grid with real-time submission. |
+| **Voter (Already Voted)** | `voter1@evoting.com` | `password123` | **Confirmation State:** "Thank You for Voting" card & poll closing countdown. |
+| **Voter (Upcoming)** | `fvoter1@evoting.com` | `password123` | **Opening Soon:** Countdown timer counting down to voting window start. |
+| **Voter (Concluded)** | `alumni1@evoting.com` | `password123` | **Results Showcase:** Gold trophy winner banner & Google Bar chart. |
+
+### Generating Additional Demo Data
+* **From the Admin UI:** Navigate to **Demo Data** in the Admin navigation bar (`/admin/generate_demo_data.php`) for 1-click showcase setup, voter generation, and vote simulations.
+* **From the Command Line:**
+  ```bash
+  php db/seed_demo_data.php --fresh
+  ```
+
+---
+
+## Standalone Portfolio & GitHub Pages
+
+This project includes a dedicated showcase portfolio package located in [`portfolio/`](portfolio):
+
+* **Open locally:**
+  ```bash
+  open portfolio/index.html
+  ```
+* **Host on GitHub Pages:**
+  The repository includes an automated GitHub Actions deployment workflow at [`.github/workflows/deploy-portfolio.yml`](.github/workflows/deploy-portfolio.yml).
+  1. In your GitHub repository, navigate to **Settings** > **Pages**.
+  2. Under **Build and deployment** > **Source**, select **GitHub Actions**.
+  3. Push to `main`, and the portfolio will be live at:
+     `https://sandycompetent.github.io/evoting_system/`
+
+---
 
 ## License
 
-This project is licensed under the terms included in the `LICENSE` file.
+This project is licensed under the terms included in the [`LICENSE`](LICENSE) file.

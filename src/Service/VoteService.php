@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Domain\Tally;
+use App\Domain\Turnout;
 use App\Exception\AlreadyVotedException;
 use App\Exception\InvalidCandidateException;
 use App\Exception\NotEligibleException;
@@ -71,5 +72,12 @@ final class VoteService
     public function turnout(int $categoryId): int
     {
         return $this->votes->distinctVoterCount($categoryId);
+    }
+
+    public function turnoutReport(int $categoryId): Turnout
+    {
+        $eligible = $this->categories->countVoters($categoryId);
+        $cast = $this->votes->distinctVoterCount($categoryId);
+        return new Turnout($eligible, $cast);
     }
 }

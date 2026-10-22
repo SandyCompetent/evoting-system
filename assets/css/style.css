@@ -1,65 +1,316 @@
+/* ==========================================================================
+   e-Voting System - Modern Application & Compatibility Styles
+   ========================================================================== */
+
+/* Global Layout & Typography */
 body {
-  background-color: #fafafa;
+    min-height: 100vh;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
+
 .page-section {
-  margin-top: 100px;
+    padding-top: 1.5rem;
+    padding-bottom: 2.5rem;
 }
+
 .title {
-  font-size: 16px;
-  font-weight: bold;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
 }
+
 .highlight:after {
-  content: " *";
-  color: red;
+    content: " *";
+    color: #dc2626;
+    font-weight: bold;
 }
+
 .textarea-non-resize {
-  resize: none;
-}
-.page-section-left {
-  margin-top: 100px;
-  background-color: #ff9e2c;
-  position: absolute;
-  left: 0px;
-  width: 50%;
+    resize: none;
 }
 
-.page-section-right {
-  margin-top: 100px;
-  background-color: #b6701e;
-  position: absolute;
-  right: 0px;
-  width: 50%;
+/* Ensure badges with light background always have dark, high-contrast readable text */
+.badge.bg-light {
+    color: #334155 !important;
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
 }
 
-.counter {
-  background: #2c2c2c;
-  -moz-box-shadow: inset 0 0 5px #000000;
-  -webkit-box-shadow: inset 0 0 5px #000000;
-  box-shadow: inset 0 0 5px #000000;
-  min-height: 150px;
-  text-align: center;
+/* ==========================================================================
+   Bootstrap 3-to-5 Backward Compatibility Bridge
+   Allows existing controllers to render cleanly with BS5 tokens.
+   ========================================================================== */
+
+.panel {
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
 }
 
-.counter h3 {
-  color: #e5e5e5;
-  font-size: 14px;
-  font-style: normal;
-  font-variant: normal;
-  font-weight: lighter;
-  letter-spacing: 1px;
-  padding-top: 20px;
-  margin-bottom: 30px;
+.panel-default {
+    border-color: rgba(0, 0, 0, 0.08);
 }
 
-#countdown {
-  color: #ffffff;
+.panel-heading {
+    padding: 1rem 1.25rem;
+    background-color: #f8fafc;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    font-weight: 600;
 }
 
-#countdown span {
-  color: #e5e5e5;
-  font-size: 26px;
-  font-weight: normal;
-  margin-left: 20px;
-  margin-right: 20px;
-  text-align: center;
+.panel-heading .title {
+    margin: 0;
+}
+
+.panel-body {
+    padding: 1.25rem;
+}
+
+.panel-footer {
+    padding: 0.75rem 1.25rem;
+    background-color: #f8fafc;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.control-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    color: #334155;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.pull-right {
+    float: right !important;
+}
+
+.pull-left {
+    float: left !important;
+}
+
+.input-group-addon {
+    display: flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+}
+
+/* ==========================================================================
+   Modern Interactive Candidate Ballot Cards
+   ========================================================================== */
+
+.candidate-card-wrapper {
+    position: relative;
+    height: 100%;
+}
+
+.candidate-radio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.candidate-card {
+    display: block;
+    cursor: pointer;
+    border: 2px solid #e2e8f0;
+    border-radius: 1rem;
+    background-color: #ffffff;
+    padding: 1.5rem;
+    height: 100%;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.candidate-card:hover {
+    border-color: #93c5fd;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.1);
+}
+
+/* Highlight checked card state (CSS :has on wrapper or sibling selector) */
+.candidate-card-wrapper:has(.candidate-radio:checked) .candidate-card,
+.candidate-card:has(.candidate-radio:checked),
+.candidate-radio:checked + .candidate-card {
+    border-color: #3b82f6 !important;
+    background-color: #eff6ff !important;
+    box-shadow: 0 0 0 2px #3b82f6, 0 10px 20px -5px rgba(59, 130, 246, 0.2) !important;
+}
+
+.candidate-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #f1f5f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.candidate-symbol-badge {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.candidate-symbol-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-monogram {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+    color: #ffffff;
+    font-size: 2.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #f1f5f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.candidate-check-indicator {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.candidate-card-wrapper:has(.candidate-radio:checked) .candidate-check-indicator,
+.candidate-card:has(.candidate-radio:checked) .candidate-check-indicator,
+.candidate-radio:checked + .candidate-card .candidate-check-indicator {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   Modern Glassmorphic Countdown Component
+   ========================================================================== */
+
+.countdown-box {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 1rem;
+    padding: 1.75rem;
+    color: #ffffff;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);
+}
+
+.countdown-tiles {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.countdown-tile {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    min-width: 82px;
+    text-align: center;
+}
+
+.countdown-tile .val {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #38bdf8;
+    display: block;
+    font-variant-numeric: tabular-nums;
+}
+
+.countdown-tile .lbl {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    margin-top: 0.35rem;
+    display: block;
+}
+
+/* ==========================================================================
+   Victory Hero Banner
+   ========================================================================== */
+
+.winner-banner {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fde68a;
+    border-radius: 1rem;
+    padding: 1.75rem;
+    box-shadow: 0 4px 15px -3px rgba(245, 158, 11, 0.15);
+}
+
+.winner-trophy-icon {
+    font-size: 2.75rem;
+    color: #d97706;
+}
+
+/* ==========================================================================
+   Modern Dashboard Stat Cards
+   ========================================================================== */
+
+.stat-card {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 0.875rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    background: #ffffff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.chart-responsive-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 280px;
 }

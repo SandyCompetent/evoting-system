@@ -2,7 +2,6 @@
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("admin");
 
-$generated = null;
 if (isset($_POST["submit"])) {
     csrf_verify();
     $fname = trim($_POST["first_name"] ?? "");
@@ -20,7 +19,7 @@ if (isset($_POST["submit"])) {
              VALUES (?, ?, ?, 'organiser', ?)",
             [$fname, $email, password_hash($plain, PASSWORD_DEFAULT), $cat]
         );
-        $_SESSION["messages"][] = "Organiser created. Temporary password for {$email}: {$plain} (share securely).";
+        $_SESSION["messages"][] = "Organiser account created. Temporary password for {$email}: {$plain} (share securely).";
     } catch (PDOException $ex) {
         error_log("Organiser create failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Could not create organiser (the email may already be registered).";
@@ -29,61 +28,60 @@ if (isset($_POST["submit"])) {
 }
 
 require_once __DIR__ . "/nav.php";
-$categories = fetchAll("SELECT id, name FROM election_category ORDER BY name");
+$categories = fetchAll("SELECT id, name FROM election_category ORDER BY name ASC");
 ?>
 
-<div class="page-section">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<?php require_once("../includes/view_messages_and_errors.php"); ?>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="title">Create Organiser Account</div>
-					</div>
-					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
-							<?php echo csrf_field(); ?>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="first_name">Full Name</label>
-								<div class="col-sm-8">
-									<input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter full name" required>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="email">Email Address</label>
-								<div class="col-sm-8">
-									<input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="password">Password</label>
-								<div class="col-sm-8">
-									<input type="text" class="form-control" id="password" value="(auto-generated and shown after creation)" readonly>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="election_category">Election Category</label>
-								<div class="col-sm-8">
-									<select class="form-control" id="election_category" name="election_category" required>
-										<option value="">Select election category</option>
-										<?php foreach ($categories as $c): ?>
-											<option value="<?php echo (int) $c['id']; ?>"><?php echo e($c['name']); ?></option>
-										<?php endforeach; ?>
-									</select>
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-offset-3 col-sm-10">
-									<button type="submit" class="btn btn-primary btn-sm" id="submit" name="submit">Create</button>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <?php require_once("../includes/view_messages_and_errors.php"); ?>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-semibold text-primary">
+                        <i class="bi bi-person-plus-fill me-2"></i>Create New Organiser Account
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                        <?php echo csrf_field(); ?>
+
+                        <div class="mb-3">
+                            <label class="form-label highlight fw-semibold" for="first_name">Full Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Organiser full name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label highlight fw-semibold" for="email">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="organiser@institution.edu" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="password">Initial Password</label>
+                            <input type="text" class="form-control text-muted bg-light" id="password" value="(auto-generated and displayed after creation)" readonly>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label highlight fw-semibold" for="election_category">Assign to Election Category</label>
+                            <select class="form-select" id="election_category" name="election_category" required>
+                                <option value="">Choose an election category</option>
+                                <?php foreach ($categories as $c): ?>
+                                    <option value="<?php echo (int) $c['id']; ?>"><?php echo e($c['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="edit_account_details.php" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold" id="submit" name="submit">
+                                <i class="bi bi-person-check me-1"></i> Create Organiser
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php

@@ -2,36 +2,26 @@
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("voter");
 
+use App\Repository\Pdo\PdoUserRepository;
+use App\Service\AuthService;
+
+$auth = new AuthService(new PdoUserRepository(db()));
+
 if (isset($_POST["change"])) {
     csrf_verify();
     $user_id = (int) $_SESSION["user_id"];
-    $old = (string) ($_POST["old_password"] ?? "");
-    $new = (string) ($_POST["new_password"] ?? "");
+    $old     = (string) ($_POST["old_password"] ?? "");
+    $new     = (string) ($_POST["new_password"] ?? "");
     $confirm = (string) ($_POST["confirm_password"] ?? "");
 
-    if ($old === "" || $new === "" || $confirm === "") {
-        $_SESSION["errors"][] = "Please enter all mandatory fields.";
-    } elseif ($old === $new) {
-        $_SESSION["errors"][] = "Old password and new password cannot be same.";
-    } elseif ($new !== $confirm) {
-        $_SESSION["errors"][] = "The password and confirmation password are not matching.";
-    } elseif (strlen($new) < 8) {
-        $_SESSION["errors"][] = "Password must be at least 8 characters.";
-    } else {
-        $user = fetchOne("SELECT password FROM system_users WHERE user_id = ?", [$user_id]);
-        $ok = $user && (
-            password_verify($old, $user["password"]) ||
-            hash_equals((string) $user["password"], sha1($old))
-        );
-        if ($ok) {
-            execute(
-                "UPDATE system_users SET password = ? WHERE user_id = ?",
-                [password_hash($new, PASSWORD_DEFAULT), $user_id]
-            );
-            $_SESSION["messages"][] = "Changed successfully.";
-        } else {
-            $_SESSION["errors"][] = "Incorrect old password.";
-        }
+    try {
+        $auth->changePassword($user_id, $old, $new, $confirm);
+        $_SESSION["messages"][] = "Password changed successfully.";
+    } catch (\InvalidArgumentException $ex) {
+        $_SESSION["errors"][] = $ex->getMessage();
+    } catch (\Throwable $ex) {
+        error_log("Voter password change error: " . $ex->getMessage());
+        $_SESSION["errors"][] = "Could not update password. Please try again.";
     }
     redirect($_SERVER["PHP_SELF"]);
 }
@@ -39,47 +29,46 @@ if (isset($_POST["change"])) {
 require_once __DIR__ . "/nav.php";
 ?>
 
-<div class="page-section">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<?php require_once("../includes/view_messages_and_errors.php"); ?>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="title">Change Password</div>
-					</div>
-					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
-							<?php echo csrf_field(); ?>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="old_password">Old Password</label>
-								<div class="col-sm-8">
-									<input type="password" class="form-control" id="old_password" name="old_password" placeholder="Enter old password" required>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="new_password">New Password</label>
-								<div class="col-sm-8">
-									<input type="password" class="form-control" id="new_password" name="new_password" placeholder="Enter new password" required>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="confirm_password">Confirm Password</label>
-								<div class="col-sm-8">
-									<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Enter confirm password" required>
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-offset-3 col-sm-10">
-									<button type="submit" class="btn btn-primary btn-sm" id="change" name="change">Change</button>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <?php require_once("../includes/view_messages_and_errors.php"); ?>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-semibold text-primary">
+                        <i class="bi bi-shield-lock-fill me-2"></i>Change Voter Password
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                        <?php echo csrf_field(); ?>
+
+                        <div class="mb-3">
+                            <label class="form-label highlight fw-semibold" for="old_password">Current Password</label>
+                            <input type="password" class="form-control" id="old_password" name="old_password" placeholder="Enter current password" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label highlight fw-semibold" for="new_password">New Password</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="At least 8 characters" minlength="8" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label highlight fw-semibold" for="confirm_password">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter new password" minlength="8" required>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold" id="change" name="change">
+                                <i class="bi bi-key-fill me-1"></i> Update Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php

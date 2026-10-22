@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . "/includes/bootstrap.php";
 
+use App\Repository\Pdo\PdoUserRepository;
+use App\Service\AuthService;
+
 // Already logged in? Send to the right dashboard.
 if (isset($_SESSION["role"]) && in_array($_SESSION["role"], ["admin", "organiser", "voter"], true)) {
     redirect($_SESSION["role"] . "/");
@@ -12,30 +15,17 @@ if (isset($_POST["login"])) {
     $email    = trim($_POST["email"] ?? "");
     $password = (string) ($_POST["password"] ?? "");
 
-    $user = fetchOne("SELECT * FROM system_users WHERE email = ?", [$email]);
+    $auth = new AuthService(new PdoUserRepository(db()));
+    $user = $auth->authenticate($email, $password);
 
-    $valid = false;
-    if ($user) {
-        if (password_verify($password, $user["password"])) {
-            $valid = true;
-        } elseif (hash_equals((string) $user["password"], sha1($password))) {
-            // Legacy SHA1 hash: verified, now transparently upgraded.
-            $valid = true;
-            execute(
-                "UPDATE system_users SET password = ? WHERE user_id = ?",
-                [password_hash($password, PASSWORD_DEFAULT), $user["user_id"]]
-            );
-        }
-    }
-
-    if ($valid) {
+    if ($user !== null) {
         session_regenerate_id(true);          // prevent session fixation
-        $_SESSION["user_id"] = $user["user_id"];
-        $_SESSION["role"]    = $user["role"];
-        redirect($user["role"] . "/");
+        $_SESSION["user_id"] = $user->id;
+        $_SESSION["role"]    = $user->role;
+        redirect($user->role . "/");
     }
 
-    $_SESSION["errors"][] = "Invalid email/password";
+    $_SESSION["errors"][] = "Invalid email or password.";
     redirect($_SERVER["PHP_SELF"]);
 }
 
@@ -47,10 +37,11 @@ if (isset($_POST["request_register"])) {
     $category  = trim($_POST["category"] ?? "");
     $max_voter = (int) ($_POST["max_voter"] ?? 0);
     $is_adult  = (($_POST["is_adult_voter"] ?? "No") === "Yes") ? "Yes" : "No";
-    $expire    = trim($_POST["expire_timestamp"] ?? "");
+    $raw_expire = trim($_POST["expire_timestamp"] ?? "");
+    $expire    = $raw_expire !== "" ? date("Y-m-d H:i:s", strtotime($raw_expire)) : "";
 
     if ($full_name === "" || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $_SESSION["errors"][] = "Please provide a valid name and email.";
+        $_SESSION["errors"][] = "Please provide a valid name and email address.";
         redirect($_SERVER["PHP_SELF"]);
     }
 
@@ -60,128 +51,139 @@ if (isset($_POST["request_register"])) {
          VALUES (?, ?, ?, ?, ?, ?)",
         [$full_name, $email, $category, $max_voter, $is_adult, $expire]
     );
-    $_SESSION["messages"][] = "Request Registered Successfully";
+    $_SESSION["messages"][] = "Election registration request submitted successfully. An administrator will review your application.";
     redirect($_SERVER["PHP_SELF"]);
 }
 
 require_once __DIR__ . "/includes/header.php";
 ?>
-<div class="container">
-	<div class="col-md-12 text-center">
-		<h1>e-Voting</h1>
-		<hr>
-	</div>
-	<div class="row">
 
-		<div class="col-sm-6">
-			<?php require_once("includes/view_messages_and_errors.php"); ?>
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<div class="title">Register User Can Login Here !</div>
-				</div>
-				<div class="panel-body">
-					<form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
-						<?php echo csrf_field(); ?>
-						<div class="form-group">
-							<label class="control-label col-sm-4 highlight" for="email">Email Address</label>
-							<input type="email" class="form-control" name="email" id="email" placeholder="Enter email address" required>
-						</div>
-						<div class="form-group">
-							<label class="control-label col-sm-4 highlight" for="password">Password</label>
-							<input type="password" class="form-control" name="password" id="password" placeholder="Enter password" required>
-						</div>
-						<button type="submit" class="btn btn-primary btn-block" name="login">Login</button>
-					</form>
-				</div>
-			</div>
-		</div>
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold text-primary">
+            <i class="bi bi-check2-circle me-2"></i>e-Voting Portal
+        </h1>
+        <p class="lead text-muted">Simple, secure online voting</p>
+    </div>
 
+    <div class="row g-4 justify-content-center">
+        <!-- Sign In Column -->
+        <div class="col-lg-5 col-md-6">
+            <?php require_once("includes/view_messages_and_errors.php"); ?>
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-semibold">
+                        <i class="bi bi-box-arrow-in-right text-primary me-2"></i>Sign In
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                        <?php echo csrf_field(); ?>
 
-		<div class="col-sm-6">
-			<?php require_once("includes/view_messages_and_errors.php"); ?>
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<div class="title">For organising your elections with our system, please <button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#register_form">Fill the Form</button></div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" name="email" id="email" placeholder="name@example.com" required>
+                            <label for="email"><i class="bi bi-envelope me-1"></i> Email Address</label>
+                        </div>
 
-				</div>
-				<div id="register_form" class="panel-body collapse">
-					<form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
-						<?php echo csrf_field(); ?>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+                            <label for="password"><i class="bi bi-shield-lock me-1"></i> Password</label>
+                        </div>
 
-						<div class="form-group">
-							<label class="control-label col-sm-4 highlight" for="full_name">Full Name</label>
-							<input type="text" class="form-control" name="full_name" id="full_name" placeholder="Enter your full name" required>
-						</div>
-						<div class="form-group">
-							<label class="control-label col-sm-4 highlight" for="email">Email</label>
-							<input type="email" class="form-control" name="email" id="email" placeholder="Enter email" required>
-						</div>
-						<div class="form-group">
-							<label class="control-label col-sm-4 highlight" for="category">Election Category</label>
-							<input type="text" class="form-control" name="category" id="category" placeholder="Enter election category" required>
-						</div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fs-6 fw-semibold shadow-sm" name="login">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                        </button>
+                    </form>
 
-						<div class="form-group">
-							<label class="control-label col-sm-4 highlight" for="expire_timestamp">Voting Expire Time</label>
+                    <div class="mt-4 pt-3 border-top text-center">
+                        <small class="text-muted d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-shield-check text-success"></i>
+                            <span>Secure &amp; confidential online voting</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-							<div class="input-group date form_datetime col-md-7" data-date="2020-09-18T11:00:00Z" data-date-format="yyyy-mm-dd HH:mm:ss" data-link-field="expire_timestamp" required>
-								<input class="form-control" size="16" type="text" id="expire_timestamp" name="expire_timestamp" required readonly>
-								<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-								<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-							</div>
+        <!-- Registration Request Column -->
+        <div class="col-lg-7 col-md-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-semibold">
+                        <i class="bi bi-calendar-plus text-primary me-2"></i>Host an Election
+                    </h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#register_form" aria-expanded="false" aria-controls="register_form">
+                        <i class="bi bi-pencil-square me-1"></i>Request Form
+                    </button>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted">
+                        Need to conduct a democratic vote for your institution, department, or organization? Submit an election request to receive administrator credentials.
+                    </p>
 
-						</div>
+                    <div id="register_form" class="collapse">
+                        <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" class="mt-3">
+                            <?php echo csrf_field(); ?>
 
-						<div class="form-group">
-							<label class="control-label col-sm-4 highlight" for="max_voter">Maximum Voter</label>
-							<select class="form-control" id="max_voter" name="max_voter" required>
-								<option>10</option>
-								<option>20</option>
-								<option>30</option>
-								<option>40</option>
-								<option>50</option>
-								<option>60</option>
-								<option>70</option>
-								<option>80</option>
-								<option>90</option>
-								<option>100</option>
-							</select>
-						</div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label highlight fw-semibold" for="full_name">Organiser Full Name</label>
+                                    <input type="text" class="form-control" name="full_name" id="full_name" placeholder="Full Name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label highlight fw-semibold" for="req_email">Email Address</label>
+                                    <input type="email" class="form-control" name="email" id="req_email" placeholder="name@domain.com" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label highlight fw-semibold" for="category">Election Category Name</label>
+                                    <input type="text" class="form-control" name="category" id="category" placeholder="e.g. Student Council 2026" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label highlight fw-semibold" for="expire_timestamp">Voting Expiry Time</label>
+                                    <input type="datetime-local" class="form-control" name="expire_timestamp" id="expire_timestamp" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label highlight fw-semibold" for="max_voter">Maximum Eligible Voters</label>
+                                    <select class="form-select" id="max_voter" name="max_voter" required>
+                                        <option value="10">10 Voters</option>
+                                        <option value="20">20 Voters</option>
+                                        <option value="30">30 Voters</option>
+                                        <option value="50" selected>50 Voters</option>
+                                        <option value="100">100 Voters</option>
+                                        <option value="250">250 Voters</option>
+                                        <option value="500">500 Voters</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label highlight fw-semibold">Are Voters 18+?</label>
+                                    <div class="d-flex gap-3 pt-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="is_adult_voter" id="adult_yes" value="Yes">
+                                            <label class="form-check-label" for="adult_yes">Yes (Adults)</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="is_adult_voter" id="adult_no" value="No" checked>
+                                            <label class="form-check-label" for="adult_no">No (Under 18)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <button type="submit" class="btn btn-primary w-100 py-2 mt-4 fw-semibold" name="request_register">
+                                <i class="bi bi-send-fill me-1"></i> Submit Election Request
+                            </button>
+                        </form>
+                    </div>
 
-						<div class="form-group">
-							<label class="control-label col-sm-4 highlight" for="is_adult_voter">Are Voter 18+ ?</label>
-							<div class="radio">
-								<label><input type="radio" name="is_adult_voter" value="Yes">Yes</label>
-								<label><input type="radio" name="is_adult_voter" value="No" checked>No</label>
-							</div>
-						</div>
-
-						<button type="submit" class="btn btn-primary  btn-block" name="request_register">Request to Create Election System</button>
-
-					</form>
-				</div>
-			</div>
-
-
-		</div>
-	</div>
+                    <div class="alert alert-light border mt-3 mb-0 small text-muted">
+                        <i class="bi bi-info-circle text-primary me-1"></i>
+                        Once approved by an administrator, an organiser account and election category credentials will be dispatched to your registered email.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<script type="text/javascript" src="assets/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
-<script type="text/javascript" src="assets/js/locales/bootstrap-datetimepicker.fr.js" charset="UTF-8"></script>
-
-<script type="text/javascript">
-	$('.form_datetime').datetimepicker({
-		weekStart: 1,
-		todayBtn: 1,
-		autoclose: 1,
-		todayHighlight: 1,
-		startView: 2,
-		forceParse: 0,
-		showMeridian: 1
-	});
-</script>
 
 <?php
 require_once("includes/footer.php");

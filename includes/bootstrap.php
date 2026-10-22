@@ -11,6 +11,9 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/security.php';
 
+// Set application-wide default timezone
+date_default_timezone_set('Asia/Kolkata');
+
 // Prefer Composer's autoloader (also pulls in dev tooling); otherwise fall back
 // to a minimal PSR-4 loader so the application runs with no Composer install.
 $composer = __DIR__ . '/../vendor/autoload.php';

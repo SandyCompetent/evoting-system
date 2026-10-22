@@ -6,6 +6,7 @@ namespace App\Repository\Pdo;
 use App\Domain\Election;
 use App\Repository\CategoryRepository;
 use PDO;
+use PDOException;
 
 final class PdoCategoryRepository implements CategoryRepository
 {
@@ -32,6 +33,61 @@ final class PdoCategoryRepository implements CategoryRepository
         $stmt->execute([$categoryId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ? $this->hydrate($row) : null;
+    }
+
+    /**
+     * @return Election[]
+     */
+    public function all(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT id, name, vote_start_time, vote_end_time FROM election_category ORDER BY name ASC'
+        );
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_map(fn(array $r) => $this->hydrate($r), $rows);
+    }
+
+    public function countVoters(int $categoryId): int
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT COUNT(*) FROM system_users WHERE role = 'voter' AND election_category_id = ?"
+        );
+        $stmt->execute([$categoryId]);
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function updateVotingWindow(int $id, string $start, string $end): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE election_category SET vote_start_time = ?, vote_end_time = ? WHERE id = ?'
+        );
+        $stmt->execute([$start, $end, $id]);
+    }
+
+    public function deleteWithCascade(int $id): void
+    {
+        try {
+            $this->pdo->beginTransaction();
+            $stmt1 = $this->pdo->prepare('DELETE FROM vote WHERE category_id = ?');
+            $stmt1->execute([$id]);
+
+            $stmt2 = $this->pdo->prepare('DELETE FROM candidate WHERE category_id = ?');
+            $stmt2->execute([$id]);
+
+            $stmt3 = $this->pdo->prepare("DELETE FROM system_users WHERE election_category_id = ? AND role <> 'admin'");
+            $stmt3->execute([$id]);
+
+            $stmt4 = $this->pdo->prepare('DELETE FROM election_category WHERE id = ?');
+            $stmt4->execute([$id]);
+
+            $this->pdo->commit();
+        } catch (PDOException $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $e;
+        }
     }
 
     private function hydrate(array $row): Election

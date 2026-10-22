@@ -2,9 +2,13 @@
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("organiser");
 
-$user_id   = (int) $_SESSION["user_id"];
-$organiser = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
+use App\Repository\Pdo\PdoCandidateRepository;
+
+$user_id     = (int) $_SESSION["user_id"];
+$organiser   = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
 $category_id = (int) ($organiser["election_category_id"] ?? 0);
+
+$candidateRepo = new PdoCandidateRepository(db());
 
 if (isset($_POST["submit"])) {
     csrf_verify();
@@ -16,13 +20,9 @@ if (isset($_POST["submit"])) {
     try {
         $photo  = store_uploaded_image($_FILES["uploadPhoto"]  ?? [], __DIR__ . "/../upload/photo");
         $symbol = store_uploaded_image($_FILES["uploadSymbol"] ?? [], __DIR__ . "/../upload/symbol");
-        // Votes now live in the `vote` table (one row per ballot), so a candidate
-        // no longer needs a pre-seeded counter row. The tally is derived on read.
-        execute(
-            "INSERT INTO candidate (full_name, photo, symbol, category_id) VALUES (?, ?, ?, ?)",
-            [$candidate_name, $photo, $symbol, $category_id]
-        );
-        $_SESSION["messages"][] = "Candidate added successfully.";
+
+        $candidateRepo->create($candidate_name, $photo, $symbol, $category_id);
+        $_SESSION["messages"][] = "Candidate '{$candidate_name}' added successfully.";
     } catch (Throwable $ex) {
         error_log("Candidate create failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Could not add candidate: " . $ex->getMessage();
@@ -33,49 +33,50 @@ if (isset($_POST["submit"])) {
 require_once __DIR__ . "/nav.php";
 ?>
 
-<div class="page-section">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<?php require_once("../includes/view_messages_and_errors.php"); ?>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="title">Add Candidate</div>
-					</div>
-					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
-							<?php echo csrf_field(); ?>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="candidate_name">Candidate Name</label>
-								<div class="col-sm-8">
-									<input type="text" class="form-control" id="candidate_name" name="candidate_name" placeholder="Enter candidate name" required>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="uploadPhoto">Candidate Photo</label>
-								<div class="col-sm-8">
-									Select photo to upload (JPG/PNG/GIF, max 2 MB):
-									<input type="file" name="uploadPhoto" id="uploadPhoto" accept="image/*" required><br />
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="uploadSymbol">Candidate Symbol</label>
-								<div class="col-sm-8">
-									Select symbol to upload (JPG/PNG/GIF, max 2 MB):
-									<input type="file" name="uploadSymbol" id="uploadSymbol" accept="image/*" required><br />
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="col-sm-offset-3 col-sm-10">
-									<button type="submit" class="btn btn-primary btn-sm" id="submit" name="submit">Create</button>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <?php require_once("../includes/view_messages_and_errors.php"); ?>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-semibold text-primary">
+                        <i class="bi bi-person-plus-fill me-2"></i>Add Election Candidate
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
+
+                        <div class="mb-3">
+                            <label class="form-label highlight fw-semibold" for="candidate_name">Full Name</label>
+                            <input type="text" class="form-control" id="candidate_name" name="candidate_name" placeholder="Enter candidate's full legal name" required>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label highlight fw-semibold" for="uploadPhoto">Candidate Portrait Photo</label>
+                                <input type="file" class="form-control" name="uploadPhoto" id="uploadPhoto" accept="image/*" required>
+                                <div class="form-text">JPG, PNG, or GIF up to 2 MB. Square portrait recommended.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label highlight fw-semibold" for="uploadSymbol">Party / Candidate Symbol</label>
+                                <input type="file" class="form-control" name="uploadSymbol" id="uploadSymbol" accept="image/*" required>
+                                <div class="form-text">Emblem or logo representing candidate on the voter ballot.</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="edit_candidate_details.php" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-semibold" id="submit" name="submit">
+                                <i class="bi bi-plus-circle me-1"></i> Add Candidate
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php

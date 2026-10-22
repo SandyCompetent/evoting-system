@@ -1,17 +1,9 @@
-	<nav class="navbar navbar-inverse navbar-fixed-bottom">
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<p class="navbar-brand">eVoting System Portal By Sandeep, Ruchika, Vaibhavi</p>
-		
-		</div>
-	</div>
-	</nav>
-
-
-
-	<?php
-	ob_end_flush();
-	?>
-	</body>
-
-	</html>
+    <footer class="mt-auto py-3 bg-white border-top text-center text-muted small">
+        <div class="container-fluid">
+            <span>&copy; <?= date('Y') ?> e-Voting Portal &bull; Online Voting System</span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <?php ob_end_flush(); ?>
+</body>
+</html>

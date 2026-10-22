@@ -6,37 +6,47 @@ require_once __DIR__ . "/nav.php";
 $fromEmail = env("MAIL_FROM", "no-reply@evoting.local");
 ?>
 
-<div class="page-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <?php require_once("../includes/view_messages_and_errors.php"); ?>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <div class="title">Send Mail to User</div>
-                    </div>
-                    <div class="panel-body">
-                        <form action="email_script.php" method="post" class="form-signin">
-                            <?php echo csrf_field(); ?>
-                            <div class="form-label-group">
-                                <label for="fromEmail">From</label>
-                                <input type="text" id="fromEmail" class="form-control" value="<?php echo e($fromEmail); ?>" readonly>
-                            </div> <br />
-                            <div class="form-label-group">
-                                <label for="toEmail">To <span style="color:#FF0000">*</span></label>
-                                <input type="email" name="toEmail" id="toEmail" class="form-control" placeholder="Email address" required>
-                            </div> <br />
-                            <label for="subject">Subject <span style="color:#FF0000">*</span></label>
-                            <div class="form-label-group">
-                                <input type="text" id="subject" name="subject" class="form-control" placeholder="Subject" required>
-                            </div><br />
-                            <label for="message">Message <span style="color:#FF0000">*</span></label>
-                            <div class="form-label-group">
-                                <textarea id="message" name="message" class="form-control" placeholder="Message" required></textarea>
-                            </div> <br />
-                            <button type="submit" name="sendMailBtn" class="btn btn-lg btn-primary btn-block text-uppercase">Send Email</button>
-                        </form>
-                    </div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <?php require_once("../includes/view_messages_and_errors.php"); ?>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-semibold text-primary">
+                        <i class="bi bi-envelope-paper-fill me-2"></i>Send Direct Email Notification
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="email_script.php" method="post">
+                        <?php echo csrf_field(); ?>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="fromEmail">Sender Address (From)</label>
+                            <input type="text" id="fromEmail" class="form-control text-muted bg-light" value="<?php echo e($fromEmail); ?>" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label highlight fw-semibold" for="toEmail">Recipient Address (To)</label>
+                            <input type="email" name="toEmail" id="toEmail" class="form-control" placeholder="user@domain.com" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label highlight fw-semibold" for="subject">Email Subject</label>
+                            <input type="text" id="subject" name="subject" class="form-control" placeholder="Notification Subject" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label highlight fw-semibold" for="message">Message Body</label>
+                            <textarea id="message" name="message" class="form-control" rows="5" placeholder="Compose notification message..." required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" name="sendMailBtn" class="btn btn-primary px-4 fw-semibold">
+                                <i class="bi bi-send-fill me-1"></i> Send Email
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

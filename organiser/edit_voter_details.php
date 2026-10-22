@@ -9,72 +9,95 @@ $category_id = (int) ($organiser["election_category_id"] ?? 0);
 if (($editId = pressed_action("edit")) !== null) {
     csrf_verify();
     $_SESSION["voter_refID"] = $editId;
-    redirect("update_voter_details.php");
+    redirect("update_voter_details.php?id=" . $editId);
 }
 
-if (($delId = pressed_action("delete")) !== null) {
+$delId = pressed_action("delete");
+if ($delId === null && isset($_POST["delete_id"])) {
+    $delId = (int)$_POST["delete_id"];
+}
+if ($delId !== null && $delId > 0) {
     csrf_verify();
     $n = execute(
         "DELETE FROM system_users WHERE user_id = ? AND role = 'voter' AND election_category_id = ?",
         [$delId, $category_id]
     );
-    $_SESSION[$n ? "messages" : "errors"][] = $n ? "Voter deleted." : "Delete failed.";
+    $_SESSION[$n ? "messages" : "errors"][] = $n ? "Voter removed successfully." : "Delete failed.";
     redirect($_SERVER["PHP_SELF"]);
 }
 
 require_once __DIR__ . "/nav.php";
 
-$voters = fetchAll(
-    "SELECT * FROM system_users WHERE role = 'voter' AND election_category_id = ? ORDER BY full_name",
-    [$category_id]
-);
+use App\Repository\Pdo\PdoUserRepository;
+
+$userRepo = new PdoUserRepository(db());
+$voters = $userRepo->findVotersByCategory($category_id);
 ?>
 
-<div class="page-section">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<?php require_once("../includes/view_messages_and_errors.php"); ?>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="title">Edit Voter Details</div>
-					</div>
-					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
-							<?php echo csrf_field(); ?>
-							<div class="form-group">
-								<table class="table">
-									<thead>
-										<tr>
-											<th width="20%">Full Name</th>
-											<th width="25%">Email</th>
-											<th width="15%">Voted</th>
-											<th width="25%">Account Create Timestamp</th>
-											<th width="15%">Action</th>
-										</tr>
-									</thead>
-									<tbody>
-										<?php foreach ($voters as $value): ?>
-											<tr>
-												<td><?php echo e($value['full_name']); ?></td>
-												<td><?php echo e($value['email']); ?></td>
-												<td><?php echo e($value['voted']); ?></td>
-												<td><?php echo e($value['created_timestamp'] ?? ''); ?></td>
-												<td>
-													<button type="submit" class="btn btn-primary btn-sm" name="edit<?php echo (int) $value['user_id']; ?>">Edit</button>&emsp;
-													<button type="submit" class="btn btn-danger btn-sm" name="delete<?php echo (int) $value['user_id']; ?>" onclick="return confirm('Delete this voter?');">Delete</button>
-												</td>
-											</tr>
-										<?php endforeach; ?>
-									</tbody>
-								</table>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<div class="container py-4">
+    <?php require_once("../includes/view_messages_and_errors.php"); ?>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 fw-semibold text-primary">
+                <i class="bi bi-people-fill me-2"></i>Registered Voters
+            </h5>
+            <a href="create_voter_account.php" class="btn btn-sm btn-primary">
+                <i class="bi bi-person-plus me-1"></i> Add New Voter
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                <?php echo csrf_field(); ?>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="ps-3">Full Name</th>
+                                <th scope="col">Email Address</th>
+                                <th scope="col">Voted Status</th>
+                                <th scope="col">Registration Date</th>
+                                <th scope="col" class="text-end pe-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($voters)): ?>
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">No voters registered in this category.</td>
+                                </tr>
+                            <?php endif; ?>
+                            <?php foreach ($voters as $voter):
+                                $hasVoted = $voter->voted === 'Yes';
+                            ?>
+                                <tr>
+                                    <td class="ps-3 fw-medium">
+                                        <i class="bi bi-person text-secondary me-2"></i><?= e($voter->fullName); ?>
+                                    </td>
+                                    <td><?= e($voter->email); ?></td>
+                                    <td>
+                                        <?php if ($hasVoted): ?>
+                                            <span class="badge bg-success"><i class="bi bi-check2 me-1"></i>Voted</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-light text-muted border">Pending</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="text-muted small"><?= e($voter->createdTimestamp ?? 'N/A'); ?></td>
+                                    <td class="text-end pe-3">
+                                        <a href="update_voter_details.php?id=<?= $voter->id ?>" class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                        <button type="submit" name="delete_id" value="<?= $voter->id ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete voter \'<?= addslashes(e($voter->fullName)) ?>\'?');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <?php

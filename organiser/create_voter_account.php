@@ -6,7 +6,7 @@ if (($_SESSION["role"] ?? "") !== "organiser") {
     redirect("../index.php");
 }
 
-$user_id  = (int) $_SESSION["user_id"];
+$user_id   = (int) $_SESSION["user_id"];
 $organiser = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
 $category_id = (int) ($organiser["election_category_id"] ?? 0);
 
@@ -61,8 +61,6 @@ if (isset($_POST["upload_csv"])) {
         redirect($_SERVER["PHP_SELF"]);
     }
 
-    // Read directly from the temp upload; never move an uploaded file into a
-    // web-served directory.
     $handle = fopen($tmp, "r");
     if ($handle === false) {
         $_SESSION["errors"][] = "Could not read the uploaded file.";
@@ -83,7 +81,6 @@ if (isset($_POST["upload_csv"])) {
     try {
         while (($cols = fgetcsv($handle, 10000, ",")) !== false) {
             $rowNum++;
-            // Skip an optional header row.
             if ($rowNum === 1 && stripos((string) ($cols[0] ?? ""), "name") !== false) {
                 continue;
             }
@@ -114,131 +111,111 @@ if (isset($_POST["upload_csv"])) {
     fclose($handle);
 
     $_SESSION["messages"][] = "Imported {$imported} voter(s); skipped {$skipped} invalid row(s).";
-    // Stash generated credentials to show once on the next render.
     $_SESSION["csv_credentials"] = $created_credentials;
     redirect($_SERVER["PHP_SELF"]);
 }
 
 require_once __DIR__ . "/nav.php";
 
-// Pull any one-time credentials produced by a just-finished CSV import.
 $csv_credentials = $_SESSION["csv_credentials"] ?? [];
 unset($_SESSION["csv_credentials"]);
 ?>
 
-<div class="page-section">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<?php require_once("../includes/view_messages_and_errors.php"); ?>
+<div class="container py-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <?php require_once("../includes/view_messages_and_errors.php"); ?>
 
-				<?php if (!empty($csv_credentials)): ?>
-					<div class="alert alert-warning">
-						<strong>Temporary passwords (shown once):</strong>
-						<ul>
-							<?php foreach ($csv_credentials as $line): ?>
-								<li><?php echo e($line); ?></li>
-							<?php endforeach; ?>
-						</ul>
-					</div>
-				<?php endif; ?>
+            <?php if (!empty($csv_credentials)): ?>
+                <div class="alert alert-warning border shadow-sm">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-key-fill me-1"></i> Generated Temporary Passwords (Displayed Once):</h6>
+                    <p class="small text-muted mb-2">Save these credentials now; they will not be shown again.</p>
+                    <ul class="mb-0 font-monospace small">
+                        <?php foreach ($csv_credentials as $line): ?>
+                            <li><?= e($line); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
 
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="title">Create New Voter (Manual Entry)</div>
-					</div>
-					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
-							<?php echo csrf_field(); ?>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="first_name">Full Name</label>
-								<div class="col-sm-8">
-									<input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter full name" required>
-								</div>
-							</div>
+            <!-- Manual Single Voter Creation Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-semibold text-primary">
+                        <i class="bi bi-person-plus-fill me-2"></i>Create New Voter (Single Entry)
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                        <?php echo csrf_field(); ?>
 
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="email">Email Address</label>
-								<div class="col-sm-8">
-									<input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="password">Password</label>
-								<div class="col-sm-8">
-									<input type="text" class="form-control" id="password" value="(auto-generated and shown after creation)" readonly>
-								</div>
-							</div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label highlight fw-semibold" for="first_name">Full Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Voter's full name" required>
+                            </div>
 
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="dob">Date of Birth</label>
-								<div class="col-sm-7">
-									<div class="input-group date form_datetime col-md-7" data-date="2020-09-20" data-date-format="yyyy-mm-dd" data-link-field="dob">
-										<input class="form-control" size="16" type="text" id="dob" name="dob" readonly>
-										<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-										<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-									</div>
-								</div>
-							</div>
+                            <div class="col-md-6">
+                                <label class="form-label highlight fw-semibold" for="email">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="voter@domain.com" required>
+                            </div>
 
-							<div class="form-group">
-								<div class="col-sm-offset-3 col-sm-10">
-									<button type="submit" class="btn btn-primary btn-sm" id="submit" name="submit">Create</button>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="title">Create New Voter (Upload CSV File)</div>
-					</div>
-					<div class="panel-body">
-						<form class="form-horizontal" action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
-							<?php echo csrf_field(); ?>
+                            <div class="col-md-6">
+                                <label class="form-label highlight fw-semibold" for="dob">Date of Birth</label>
+                                <input type="date" class="form-control" id="dob" name="dob" max="<?= date('Y-m-d') ?>" required>
+                            </div>
 
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight" for="csv_file">Import CSV file</label>
-								<div class="col-sm-8">
-									<input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
-								</div>
-							</div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="password_note">Initial Password</label>
+                                <input type="text" class="form-control text-muted bg-light" id="password_note" value="Auto-generated temporary password" readonly>
+                                <div class="form-text">A temporary password will be generated for the voter.</div>
+                            </div>
+                        </div>
 
-							<div class="form-group">
-								<label class="control-label col-sm-3 highlight">CSV Template</label>
-								<div class="col-sm-8">
-									<img src="assets/template.png" alt="CSV template: full_name, email, date_of_birth">
-								</div>
-							</div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-primary px-4" id="submit" name="submit">
+                                <i class="bi bi-person-check-fill me-1"></i> Create Voter Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-							<div class="form-group">
-								<div class="col-sm-offset-3 col-sm-10">
-									<button type="submit" class="btn btn-primary btn-sm" id="upload_csv" name="upload_csv">Upload</button>
-								</div>
-							</div>
+            <!-- CSV Bulk Import Card -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="card-title mb-0 fw-semibold text-primary">
+                        <i class="bi bi-file-earmark-spreadsheet-fill me-2"></i>Bulk Voter Import (CSV)
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
 
-						</form>
-					</div>
-				</div>
-				<br/><br/><br/>
-			</div>
-		</div>
-	</div>
+                        <div class="mb-3">
+                            <label class="form-label highlight fw-semibold" for="csv_file">Select CSV File</label>
+                            <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
+                            <div class="form-text">Columns format: <code>Full Name, Email Address, Date of Birth (YYYY-MM-DD)</code>.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">Required Template Format:</label>
+                            <div>
+                                <img src="../assets/template.png" class="img-fluid border rounded shadow-sm" alt="CSV template: full_name, email, date_of_birth" style="max-height: 120px;">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="submit" class="btn btn-primary px-4" id="upload_csv" name="upload_csv">
+                                <i class="bi bi-upload me-1"></i> Upload & Import CSV
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<script type="text/javascript" src="assets/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
-
-<script type="text/javascript">
-	$('.form_datetime').datetimepicker({
-		format: 'yyyy-mm-dd',
-		weekStart: 1,
-		todayBtn: 1,
-		autoclose: 1,
-		todayHighlight: 1,
-		startView: 2,
-		forceParse: 0,
-	});
-</script>
 
 <?php
 require_once("../includes/footer.php");
