@@ -114,7 +114,7 @@ This project includes a dedicated showcase portfolio package located in [`portfo
   1. In your GitHub repository, navigate to **Settings** > **Pages**.
   2. Under **Build and deployment** > **Source**, select **GitHub Actions**.
   3. Push to `main`, and the portfolio will be live at:
-     `https://sandycompetent.github.io/evoting-system/`
+     `http://evoting-system.freehosting.dev`
 
 ---
 
