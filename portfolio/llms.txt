@@ -1,0 +1,20 @@
+# e-Voting System
+
+> A secure, modern online voting platform built with PHP and MySQL, engineered for academic institutions, student councils, and clubs to conduct transparent and auditable elections.
+
+## Architecture Highlights
+- **Layered Architecture**: Decoupled Domain Entities (`Candidate`, `Turnout`, `User`, `Election`), Service Layer (`VoteService`, `AuthService`, `DemoDataSeeder`), and Repositories (`CandidateRepository`, `CategoryRepository`, `UserRepository`, `VoteRepository`).
+- **Ballot Integrity**: Database-level `UNIQUE(voter_id, category_id)` constraint prevents double-voting, even under concurrent race conditions.
+- **Modern Interface**: Bootstrap 5.3.3 + Bootswatch Zephyr with responsive candidate card grids, HTML5 date/time window schedulers, and synchronized UTC countdown timers.
+- **Security Hardening**: PDO prepared statements, Bcrypt password hashing (`PASSWORD_BCRYPT`), CSRF token validation on all POST requests, and session fixation safeguards.
+- **Automated Verification**: Pure-PHP domain unit test runner with 53 passing unit tests and 134 assertions.
+
+## Roles & Portals
+- **Administrator**: Oversees system configuration, reviews and approves election host applications, manages global categories, and provisions demo data.
+- **Organiser**: Configures voting window schedules, oversees candidate rosters, manages registered student voters, and monitors live turnout percentages.
+- **Voter**: Accesses live candidate card ballot, submits secure ballot, and reviews certified winner results with graphical vote distribution.
+
+## Key Links
+- GitHub Repository: https://github.com/SandyCompetent/evoting-system
+- Live Demonstration: http://evoting-system.freehosting.dev
+- Interactive Portfolio: https://sandycompetent.github.io/evoting-system/

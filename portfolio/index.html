@@ -1,71 +1,303 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>e-Voting System • Project Portfolio & Showcase</title>
-    <!-- Bootswatch Zephyr Theme -->
+    <title>e-Voting System • Project Portfolio &amp; Technical Showcase</title>
+    
+    <!-- SEO & Metadata -->
+    <meta name="description" content="e-Voting System: A secure, modernized online voting platform built with PHP and MySQL featuring layered domain architecture, Bcrypt security, CSRF protection, and responsive Bootstrap 5 interface.">
+    <meta name="keywords" content="e-voting, online voting, PHP 8, MySQL, Bootstrap 5, secure election system, student council election, layered architecture">
+    <meta name="author" content="Sandy Competent">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://evoting-system.freehosting.dev">
+    <meta property="og:title" content="e-Voting System • Modern, Secure Online Voting Platform">
+    <meta property="og:description" content="Decoupled Domain/Service/Repository architecture, database-enforced double-voting prevention, and responsive candidate card grid with live countdown timers.">
+    <meta property="og:image" content="images/09_voter_live_ballot.png">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="e-Voting System • Modern, Secure Online Voting Platform">
+    <meta name="twitter:description" content="Decoupled Domain/Service/Repository architecture, database-enforced double-voting prevention, and responsive Bootstrap 5.3 design.">
+    <meta name="twitter:image" content="images/09_voter_live_ballot.png">
+
+    <!-- Favicon (SVG Shield Check) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232563eb'%3E%3Cpath d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z'/%3E%3C/svg%3E">
+
+    <!-- Bootswatch Zephyr Theme & Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/zephyr/bootstrap.min.css">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <style>
         :root {
             --primary-accent: #2563eb;
+            --primary-hover: #1d4ed8;
             --surface-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-heading: #0f172a;
+            --text-body: #1e293b;
+            --text-muted: #334155; /* WCAG AAA high contrast (>8:1) */
+            --text-success: #15803d;
+            --text-info: #0369a1;
+            --border-subtle: #cbd5e1;
+            --window-header: #f1f5f9;
+            --window-border: #cbd5e1;
+            --code-bg: #0f172a;
+            --btn-outline-color: #f8fafc;
+            --header-subtitle: #e0e7ff;
+            --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+            --shadow-hover: 0 20px 30px -10px rgba(37, 99, 235, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
+
+        [data-bs-theme="dark"] {
+            --primary-accent: #60a5fa;
+            --primary-hover: #93c5fd;
+            --surface-bg: #090d16;
+            --card-bg: #111827;
+            --text-heading: #f8fafc;
+            --text-body: #f1f5f9;
+            --text-muted: #cbd5e1; /* WCAG AAA high contrast on dark (>10:1) */
+            --text-success: #4ade80;
+            --text-info: #38bdf8;
+            --border-subtle: #334155;
+            --window-header: #1e293b;
+            --window-border: #475569;
+            --code-bg: #030712;
+            --btn-outline-color: #f8fafc;
+            --header-subtitle: #e0e7ff;
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 20px 35px -10px rgba(59, 130, 246, 0.25);
+        }
+
         body {
-            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
             background-color: var(--surface-bg);
-            color: #1e293b;
+            color: var(--text-body);
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+            transition: background-color 0.25s ease, color 0.25s ease;
+            scroll-behavior: smooth;
         }
-        .hero-banner {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #6366f1 100%);
-            color: #ffffff;
-            padding: 4rem 1rem 3.5rem;
+
+        /* Top Navbar */
+        .portfolio-navbar {
+            background-color: rgba(15, 23, 42, 0.95) !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            z-index: 1030;
+        }
+        .portfolio-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.14);
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            line-height: 1;
+        }
+        .portfolio-navbar .nav-link {
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #cbd5e1 !important;
+            padding: 0.45rem 0.75rem !important;
+            border-radius: 0.4rem;
+            transition: all 0.15s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .portfolio-navbar .nav-link:hover {
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .portfolio-navbar .nav-link.active {
+            color: #ffffff !important;
+            background-color: rgba(37, 99, 235, 0.35);
+        }
+
+        /* Hero Banner with Ambient Radial Glow */
+        .hero-banner {
+            position: relative;
+            background: radial-gradient(ellipse at 20% 30%, rgba(59, 130, 246, 0.3) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 40%, rgba(99, 102, 241, 0.25) 0%, transparent 60%),
+                        linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1e1b4b 100%);
+            color: #ffffff;
+            padding: 4.5rem 1rem 4rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            overflow: hidden;
+        }
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
         }
         .feature-badge {
-            font-size: 0.8rem;
-            padding: 0.35rem 0.75rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.35rem 0.85rem;
             border-radius: 9999px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #f8fafc;
+            display: inline-flex;
+            align-items: center;
         }
-        .gallery-card {
+
+        /* WCAG High Contrast Utilities & Overrides */
+        .bg-success, .btn-success {
+            background-color: #15803d !important;
+            border-color: #15803d !important;
+            color: #ffffff !important;
+        }
+        .btn-success:hover {
+            background-color: #166534 !important;
+            border-color: #166534 !important;
+            color: #ffffff !important;
+        }
+        .bg-info, .btn-info {
+            background-color: #0369a1 !important;
+            border-color: #0369a1 !important;
+            color: #ffffff !important;
+        }
+        .bg-primary {
+            background-color: #1d4ed8 !important;
+            color: #ffffff !important;
+        }
+        .btn-outline-secondary {
+            color: var(--text-body) !important;
+            border-color: var(--border-subtle) !important;
+        }
+        .btn-outline-secondary:hover {
+            background-color: var(--border-subtle) !important;
+            color: var(--text-heading) !important;
+        }
+        .text-white-subtle {
+            color: #f8fafc !important;
+        }
+        .sim-status.text-primary {
+            color: #1d4ed8 !important;
+        }
+        [data-bs-theme="dark"] .sim-status.text-primary {
+            color: #93c5fd !important;
+        }
+        .credential-code {
+            color: var(--primary-accent) !important;
+            font-size: 0.9rem;
+            background: rgba(37, 99, 235, 0.08);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+        [data-bs-theme="dark"] .credential-code {
+            color: #93c5fd !important;
+            background: rgba(147, 197, 253, 0.1);
+            border-color: rgba(147, 197, 253, 0.25);
+        }
+        .credential-pass {
+            color: var(--text-heading) !important;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid var(--border-subtle);
+        }
+        [data-bs-theme="dark"] .credential-pass {
+            color: #f1f5f9 !important;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .metric-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 0.85rem;
+            padding: 1.25rem 1rem;
+            box-shadow: var(--shadow-card);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            cursor: pointer;
+        }
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Realistic macOS Window Chrome */
+        .macos-window {
+            background-color: var(--card-bg);
+            border: 1px solid var(--window-border);
+            border-radius: 0.85rem;
             overflow: hidden;
-            border-radius: 0.75rem;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
         }
-        .gallery-card:hover {
+        .macos-window:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.12);
-            border-color: #3b82f6;
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-accent);
         }
-        .gallery-img-wrapper {
+        .macos-bar {
+            background-color: var(--window-header);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.55rem 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .macos-dots {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .macos-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .macos-dot-red { background-color: #ff5f56; }
+        .macos-dot-yellow { background-color: #ffbd2e; }
+        .macos-dot-green { background-color: #27c93f; }
+        .macos-url {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 0.2rem 0.65rem;
+            border-radius: 9999px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 280px;
+        }
+        [data-bs-theme="dark"] .macos-url {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Image Wrapper with Zoom Hover */
+        .window-img-wrapper {
             position: relative;
-            background-color: #f1f5f9;
+            background-color: #0f172a;
             overflow: hidden;
             aspect-ratio: 16 / 10;
         }
-        .gallery-img-wrapper img {
+        .window-img-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             object-position: top;
             transition: transform 0.3s ease;
         }
-        .gallery-card:hover .gallery-img-wrapper img {
-            transform: scale(1.03);
+        .macos-window:hover .window-img-wrapper img {
+            transform: scale(1.025);
         }
-        .gallery-overlay {
+        .window-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(15, 23, 42, 0.45);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -73,149 +305,425 @@
             transition: opacity 0.2s ease;
             color: #ffffff;
             font-weight: 600;
+            cursor: pointer;
         }
-        .gallery-card:hover .gallery-overlay {
+        .macos-window:hover .window-overlay {
             opacity: 1;
         }
+
+        /* Mobile Viewport Frame */
+        .mobile-frame {
+            border: 8px solid #1e293b;
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.3);
+            background-color: #000;
+            position: relative;
+        }
+        .mobile-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 18px;
+            background-color: #1e293b;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            z-index: 10;
+        }
+
+        /* Video Showcase Cinema Container */
+        .cinema-container {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.95) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.5), 0 0 40px rgba(37, 99, 235, 0.2);
+            overflow: hidden;
+        }
+        .chapter-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #cbd5e1;
+        }
+        .chapter-card:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            transform: translateX(4px);
+        }
+        .chapter-card.active {
+            background-color: rgba(37, 99, 235, 0.25);
+            border-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
         /* Interactive Simulator Card */
         .sim-card {
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border-subtle);
             border-radius: 1rem;
             transition: all 0.2s ease;
             cursor: pointer;
-            background: #ffffff;
+            background-color: var(--card-bg);
         }
         .sim-card:hover {
             border-color: #93c5fd;
+            transform: translateY(-2px);
         }
         .sim-card.active {
-            border-color: #2563eb;
-            background-color: #eff6ff;
+            border-color: var(--primary-accent);
+            background-color: rgba(37, 99, 235, 0.06);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
         }
-        .pill-tab {
-            cursor: pointer;
+
+        /* Code Inspector */
+        .code-container {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+        }
+        .code-header {
+            background-color: rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: #64748b;
-            transition: all 0.15s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .pill-tab.active {
-            background-color: #2563eb;
+
+        /* Toast Alert */
+        .toast-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1090;
+            background-color: #0f172a;
             color: #ffffff;
+            border: 1px solid #334155;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        /* Modal Lightbox */
+        .toast-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Lightbox Customization */
         #lightboxModal .modal-dialog {
-            max-width: 90vw;
+            max-width: 92vw;
         }
         #lightboxImg {
             width: 100%;
             border-radius: 0.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-height: 80vh;
+            object-fit: contain;
         }
+        .lightbox-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            z-index: 20;
+        }
+        .lightbox-nav-btn:hover {
+            background: #2563eb;
+            color: #ffffff;
+        }
+        .lightbox-prev { left: 1rem; }
+        .lightbox-next { right: 1rem; }
     </style>
 </head>
 <body>
 
+    <!-- Toast Notification for 1-Click Copy -->
+    <div id="copyToast" class="toast-notification" role="status" aria-live="polite">
+        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+        <span id="toastMessage">Copied to clipboard!</span>
+    </div>
+
     <!-- Top Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-2">
-        <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
-                <span class="badge bg-primary fs-6 p-2"><i class="bi bi-check2-circle"></i></span>
-                <span>e-Voting System</span>
-                <span class="badge bg-secondary fs-7 text-uppercase tracking-wider">Portfolio</span>
+    <nav class="navbar navbar-expand-lg navbar-dark portfolio-navbar sticky-top shadow-sm py-2">
+        <div class="container-fluid px-lg-5 px-3">
+            <a class="navbar-brand fw-bold d-inline-flex align-items-center gap-2 py-1 me-lg-4" href="#overview">
+                <span class="badge bg-primary rounded-2 p-1 px-2 d-inline-flex align-items-center justify-content-center">
+                    <i class="bi bi-shield-lock-fill fs-6"></i>
+                </span>
+                <span class="text-white">e-Voting System</span>
+                <span class="portfolio-badge text-uppercase">SHOWCASE 2.0</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav ms-auto align-items-center gap-2">
-                    <li class="nav-item"><a class="nav-link" href="#overview">Overview</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#interactive-demo">Live Simulator</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#gallery">Screenshot Gallery</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#architecture">Architecture</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#credentials">Demo Logins</a></li>
-                    <li class="nav-item ms-lg-2 d-flex flex-wrap gap-2">
-                        <a class="btn btn-sm btn-outline-dark px-3 shadow-sm" href="https://github.com/SandyCompetent/evoting-system" target="_blank" rel="noopener">
-                            <i class="bi bi-github me-1"></i> Repository
+                <ul class="navbar-nav ms-auto align-items-center gap-1 gap-xl-2 mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#overview">
+                            <i class="bi bi-compass"></i> Overview
                         </a>
-                        <a class="btn btn-sm btn-primary px-3 shadow-sm" href="http://evoting-system.freehosting.dev" target="_blank" title="Live Preview">
-                            <i class="bi bi-play-circle me-1"></i> Live Demo
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#video-demo">
+                            <i class="bi bi-play-btn-fill text-warning"></i> Video Tour
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#interactive-demo">
+                            <i class="bi bi-ui-checks-grid"></i> Ballot Simulator
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#gallery">
+                            <i class="bi bi-images"></i> Mockup Gallery
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#code-inspector">
+                            <i class="bi bi-code-slash"></i> Code Inspector
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#credentials">
+                            <i class="bi bi-key"></i> Demo Logins
                         </a>
                     </li>
                 </ul>
+
+                <div class="d-flex align-items-center gap-2 ms-lg-3 mt-3 mt-lg-0 flex-nowrap">
+                    <!-- Dark/Light Mode Switcher -->
+                    <button class="btn btn-sm btn-outline-light text-white d-inline-flex align-items-center gap-1 px-2.5 py-1.5" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark / Light Theme" aria-label="Toggle Theme" style="color: #ffffff !important; border-color: rgba(255,255,255,0.4);">
+                        <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                    </button>
+
+                    <a class="btn btn-sm btn-outline-light text-white px-3 py-1.5 d-inline-flex align-items-center gap-1.5" href="https://github.com/SandyCompetent/evoting-system" target="_blank" rel="noopener" style="color: #ffffff !important; border-color: rgba(255,255,255,0.4);">
+                        <i class="bi bi-github"></i>
+                        <span style="color: #ffffff !important;">Repo</span>
+                    </a>
+                    <a class="btn btn-sm btn-primary px-3 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-sm" href="http://evoting-system.freehosting.dev" target="_blank" title="Live Preview">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        <span>Live Demo</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <header class="hero-banner text-center" id="overview">
-        <div class="container py-3">
+        <div class="container py-4">
             <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
-                <span class="feature-badge"><i class="bi bi-shield-check me-1"></i> CSRF &amp; Bcrypt Protected</span>
-                <span class="feature-badge"><i class="bi bi-layers me-1"></i> Domain / Service / Repository</span>
-                <span class="feature-badge"><i class="bi bi-bootstrap me-1"></i> Bootstrap 5.3 + Zephyr</span>
-                <span class="feature-badge"><i class="bi bi-check2-square me-1"></i> Auditable Ballot Model</span>
+                <span class="feature-badge"><i class="bi bi-shield-check me-1.5 text-success"></i> CSRF &amp; Bcrypt Protected</span>
+                <span class="feature-badge"><i class="bi bi-layers me-1.5 text-info"></i> Layered Architecture</span>
+                <span class="feature-badge"><i class="bi bi-bootstrap me-1.5 text-warning"></i> Bootstrap 5.3 + Zephyr</span>
+                <span class="feature-badge"><i class="bi bi-universal-access me-1.5 text-primary"></i> WCAG AAA Accessible</span>
+                <span class="feature-badge"><i class="bi bi-check2-square me-1.5 text-danger"></i> Auditable Ballot Model</span>
             </div>
-            <h1 class="display-4 fw-bold mb-3 tracking-tight">Modern, General-Purpose Online Voting System</h1>
-            <p class="lead text-white-50 col-lg-8 mx-auto mb-4">
-                A clean, secure, and responsive web application designed for student councils, academic departments, clubs, and organizations to conduct transparent elections with zero hassle.
+            
+            <h1 class="display-4 fw-bold mb-3 tracking-tight">Modern, Enterprise-Grade Online Voting Platform</h1>
+            
+            <p class="lead text-white-50 col-lg-8 mx-auto mb-4" style="font-size: 1.15rem; line-height: 1.6;">
+                Engineered with pure <strong>PHP</strong> &amp; <strong>MySQL</strong> for student councils, academic departments, clubs, and organizations to conduct transparent, tamper-proof elections with zero friction.
             </p>
+
             <div class="d-flex flex-wrap justify-content-center gap-3">
-                <a href="#interactive-demo" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow">
-                    <i class="bi bi-sliders me-1"></i> Interactive Feature Simulator
+                <a href="#video-demo" class="btn btn-warning text-dark fw-bold px-4 py-2.5 shadow-sm d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-play-circle-fill fs-5"></i>
+                    <span>Watch Video Tour</span>
                 </a>
-                <a href="#gallery" class="btn btn-outline-light px-4 py-2">
-                    <i class="bi bi-images me-1"></i> Browse 11 Screenshots
+                <a href="#interactive-demo" class="btn btn-primary fw-semibold px-4 py-2.5 shadow-sm d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-ui-checks-grid"></i>
+                    <span>Try Ballot Simulator</span>
                 </a>
-                <a href="#credentials" class="btn btn-light text-primary fw-semibold px-4 py-2 shadow-sm">
-                    <i class="bi bi-key me-1"></i> Demo Credentials
+                <a href="#gallery" class="btn btn-outline-light px-4 py-2.5 d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-images"></i>
+                    <span>Browse 14 Mockups</span>
+                </a>
+                <a href="#credentials" class="btn btn-light text-primary fw-semibold px-4 py-2.5 shadow-sm d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-key"></i>
+                    <span>Demo Credentials</span>
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- Quick Stats Metric Ribbon -->
-    <div class="bg-white border-bottom py-3 shadow-sm">
+    <!-- Quick Stats Metric Ribbon (WCAG AAA High Contrast) -->
+    <section class="py-4 border-bottom" style="background-color: var(--card-bg);" aria-label="Key Performance Indicators">
         <div class="container">
             <div class="row text-center g-3">
                 <div class="col-6 col-md-3">
-                    <div class="text-muted small text-uppercase fw-semibold">Unit Tests</div>
-                    <div class="fs-4 fw-bold text-primary">53 / 53 Passing</div>
-                    <div class="small text-success"><i class="bi bi-check-circle-fill"></i> 134 Assertions</div>
+                    <div class="metric-card h-100">
+                        <div class="small text-uppercase fw-bold" style="color: var(--text-muted); letter-spacing: 0.05em;">Unit Test Suite</div>
+                        <div class="fs-4 fw-bold text-primary mt-1">53 / 53 Passing</div>
+                        <div class="small fw-semibold mt-1" style="color: var(--text-success);"><i class="bi bi-check-circle-fill me-1"></i> 134 Assertions Verified</div>
+                    </div>
                 </div>
                 <div class="col-6 col-md-3">
-                    <div class="text-muted small text-uppercase fw-semibold">User Roles</div>
-                    <div class="fs-4 fw-bold text-primary">3 Distinct Portals</div>
-                    <div class="small text-muted">Admin &bull; Organiser &bull; Voter</div>
+                    <div class="metric-card h-100">
+                        <div class="small text-uppercase fw-bold" style="color: var(--text-muted); letter-spacing: 0.05em;">User Roles</div>
+                        <div class="fs-4 fw-bold text-primary mt-1">3 Distinct Portals</div>
+                        <div class="small fw-semibold mt-1" style="color: var(--text-muted);">Admin &bull; Organiser &bull; Voter</div>
+                    </div>
                 </div>
                 <div class="col-6 col-md-3">
-                    <div class="text-muted small text-uppercase fw-semibold">Ballot Integrity</div>
-                    <div class="fs-4 fw-bold text-primary">1 Vote Per Person</div>
-                    <div class="small text-muted">Enforced via Database UNIQUE</div>
+                    <div class="metric-card h-100">
+                        <div class="small text-uppercase fw-bold" style="color: var(--text-muted); letter-spacing: 0.05em;">Ballot Integrity</div>
+                        <div class="fs-4 fw-bold text-primary mt-1">1 Vote Per Person</div>
+                        <div class="small fw-semibold mt-1" style="color: var(--text-muted);">Database UNIQUE Enforcement</div>
+                    </div>
                 </div>
                 <div class="col-6 col-md-3">
-                    <div class="text-muted small text-uppercase fw-semibold">UI Modernization</div>
-                    <div class="fs-4 fw-bold text-primary">Bootstrap 5.3.3</div>
-                    <div class="small text-muted">Zero-Downtime CSS Bridge</div>
+                    <div class="metric-card h-100">
+                        <div class="small text-uppercase fw-bold" style="color: var(--text-muted); letter-spacing: 0.05em;">UI Architecture</div>
+                        <div class="fs-4 fw-bold text-primary mt-1">Bootstrap 5.3.3</div>
+                        <div class="small fw-semibold mt-1" style="color: var(--text-muted);">Zero-Downtime CSS Bridge</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Main Content Container -->
+    <!-- Main Content -->
     <main class="container py-5">
 
-        <!-- INTERACTIVE LIVE BALLOT SIMULATOR -->
-        <section class="mb-5 pb-3" id="interactive-demo">
+        <!-- 1. VIDEO SHOWCASE & INTERACTIVE CHAPTER TOUR -->
+        <section class="mb-5 pb-4" id="video-demo">
             <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 border-bottom pb-3">
                 <div>
-                    <h2 class="h3 fw-bold text-dark mb-1">
+                    <h2 class="h3 fw-bold mb-1" style="color: var(--text-heading);">
+                        <i class="bi bi-camera-video-fill text-primary me-2"></i>Video Showcase &amp; Interactive Tour
+                    </h2>
+                    <p class="mb-0" style="color: var(--text-muted);">Explore the complete system workflows with synchronized interactive chapter navigation.</p>
+                </div>
+                <div class="mt-2 mt-md-0 d-flex gap-2">
+                    <button class="btn btn-sm btn-primary fw-semibold" id="tourAutoplayBtn" onclick="toggleTourAutoplay()">
+                        <i class="bi bi-play-fill me-1" id="tourPlayIcon"></i> Auto-Play Tour
+                    </button>
+                    <span class="badge bg-primary px-3 py-2 text-white">
+                        <i class="bi bi-broadcast me-1"></i> End-to-End Walkthrough
+                    </span>
+                </div>
+            </div>
+
+            <div class="cinema-container p-3 p-md-4 mb-4">
+                <div class="row g-4 align-items-center">
+                    <!-- Left: Interactive Video / Preview Window -->
+                    <div class="col-lg-7">
+                        <div class="macos-window border-0 shadow">
+                            <div class="macos-bar bg-dark text-white border-0 py-2">
+                                <div class="macos-dots">
+                                    <span class="macos-dot macos-dot-red"></span>
+                                    <span class="macos-dot macos-dot-yellow"></span>
+                                    <span class="macos-dot macos-dot-green"></span>
+                                </div>
+                                <span class="macos-url text-white fw-bold" id="videoUrlLabel" style="background-color: rgba(255, 255, 255, 0.15) !important; color: #ffffff !important;">https://evoting.org/voter/give_vote.php</span>
+                            </div>
+                            <div class="position-relative bg-black" style="aspect-ratio: 16 / 10;">
+                                <!-- Local MP4 Screencast Video Element -->
+                                <video id="walkthroughVideo" class="w-100 h-100 object-fit-cover" controls playsinline poster="images/09_voter_live_ballot.png">
+                                    <source src="video/evoting_showcase.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <!-- Interactive Chapter Overlay Preview (Dynamic) -->
+                                <div id="chapterOverlay" class="position-absolute inset-0 d-none bg-black bg-opacity-75 d-flex align-items-center justify-content-center text-white p-4">
+                                    <div class="text-center">
+                                        <div class="badge bg-primary fs-6 mb-2" id="overlayBadge">Chapter 1</div>
+                                        <h4 class="fw-bold" id="overlayTitle">Dual-Role Authentication</h4>
+                                        <p class="small text-white-50 col-md-8 mx-auto" id="overlayDesc">Floating label sign-in and pending host request queue review.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Chapter Navigation Playlist -->
+                    <div class="col-lg-5">
+                        <h3 class="fs-5 fw-bold text-white mb-3 d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-list-task me-2 text-primary"></i>Walkthrough Chapters</span>
+                            <span class="badge bg-white bg-opacity-10 text-white-50 fw-normal small">4 Key Flows</span>
+                        </h3>
+
+                        <div class="d-flex flex-column gap-2" id="chapterList">
+                            <!-- Chapter 1 -->
+                            <div class="chapter-card active" onclick="selectChapter(0)">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="badge bg-primary">01 &bull; 0:00</span>
+                                    <small class="text-white-50">Public / Admin</small>
+                                </div>
+                                <div class="fw-bold text-white">Dual-Role Authentication &amp; Host Queue</div>
+                                <div class="small text-white-50">Floating labels, role-based redirection, and 1-click organizer request approval.</div>
+                            </div>
+
+                            <!-- Chapter 2 -->
+                            <div class="chapter-card" onclick="selectChapter(1)">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="badge bg-success">02 &bull; 0:45</span>
+                                    <small class="text-white-50">Organiser Flow</small>
+                                </div>
+                                <div class="fw-bold text-white">Election Control &amp; Turnout Metrics</div>
+                                <div class="small text-white-50">Live 64% turnout calculation, voting window scheduling, and candidate management.</div>
+                            </div>
+
+                            <!-- Chapter 3 -->
+                            <div class="chapter-card" onclick="selectChapter(2)">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="badge bg-info text-dark">03 &bull; 1:30</span>
+                                    <small class="text-white-50">Voter Flow</small>
+                                </div>
+                                <div class="fw-bold text-white">Live Ballot Experience &amp; Protection</div>
+                                <div class="small text-white-50">Responsive candidate card grid, synchronized countdown, and SQL double-vote guard.</div>
+                            </div>
+
+                            <!-- Chapter 4 -->
+                            <div class="chapter-card" onclick="selectChapter(3)">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="badge bg-warning text-dark">04 &bull; 2:15</span>
+                                    <small class="text-white-50">Certification</small>
+                                </div>
+                                <div class="fw-bold text-white">Certified Results &amp; Real-Time Tallies</div>
+                                <div class="small text-white-50">Gold trophy winner banner, Google Bar chart vote distribution, and auditable logs.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. INTERACTIVE LIVE BALLOT SIMULATOR -->
+        <section class="mb-5 pb-4" id="interactive-demo">
+            <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 border-bottom pb-3">
+                <div>
+                    <h2 class="h3 fw-bold mb-1" style="color: var(--text-heading);">
                         <i class="bi bi-sliders text-primary me-2"></i>Interactive Ballot Experience
                     </h2>
-                    <p class="text-muted mb-0">Try out the modern voter ballot selection card grid right here in the portfolio.</p>
+                    <p class="mb-0" style="color: var(--text-muted);">Test the modern voter candidate selection card grid directly here in the portfolio.</p>
                 </div>
                 <div class="mt-2 mt-md-0">
                     <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2">
@@ -230,23 +738,23 @@
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                         <div>
                             <span class="badge bg-white text-primary mb-2">Student Council General Election</span>
-                            <h4 class="fw-bold mb-1">Official Ballot: Executive Board</h4>
-                            <p class="mb-0 text-white-50 small">Click any candidate card to select your choice. Click "Cast Vote" to experience the feedback.</p>
+                            <h3 class="fw-bold mb-1 fs-4 text-white">Official Ballot: Executive Board</h3>
+                            <p class="mb-0 small" style="color: #e0e7ff;">Click any candidate card to select your choice. Click "Cast Vote" to experience the feedback.</p>
                         </div>
                         <div class="text-end">
-                            <div class="small text-white-50 text-uppercase fw-semibold">Polls Close In</div>
+                            <div class="small text-uppercase fw-semibold" style="color: #e0e7ff;">Polls Close In</div>
                             <div class="d-flex gap-2 mt-1">
                                 <div class="bg-white bg-opacity-20 px-2 py-1 rounded text-center" style="min-width: 48px;">
-                                    <div class="fw-bold fs-5">05</div>
-                                    <div class="small text-white-50" style="font-size: 0.65rem;">DAYS</div>
+                                    <div class="fw-bold fs-5 text-white">05</div>
+                                    <div class="small fw-bold text-white" style="font-size: 0.65rem;">DAYS</div>
                                 </div>
                                 <div class="bg-white bg-opacity-20 px-2 py-1 rounded text-center" style="min-width: 48px;">
-                                    <div class="fw-bold fs-5">14</div>
-                                    <div class="small text-white-50" style="font-size: 0.65rem;">HOURS</div>
+                                    <div class="fw-bold fs-5 text-white">14</div>
+                                    <div class="small fw-bold text-white" style="font-size: 0.65rem;">HOURS</div>
                                 </div>
                                 <div class="bg-white bg-opacity-20 px-2 py-1 rounded text-center" style="min-width: 48px;">
-                                    <div class="fw-bold fs-5" id="sim-sec">42</div>
-                                    <div class="small text-white-50" style="font-size: 0.65rem;">SECS</div>
+                                    <div class="fw-bold fs-5 text-white" id="sim-sec">42</div>
+                                    <div class="small fw-bold text-white" style="font-size: 0.65rem;">SECS</div>
                                 </div>
                             </div>
                         </div>
@@ -254,7 +762,7 @@
                 </div>
 
                 <!-- Candidates Grid -->
-                <div class="card-body p-4 bg-light">
+                <div class="card-body p-4" style="background-color: var(--surface-bg);">
                     <div class="row g-4" id="simCandidateGrid">
                         <!-- Candidate 1 -->
                         <div class="col-md-6 col-lg-3">
@@ -268,11 +776,11 @@
                                             ⭐
                                         </span>
                                     </div>
-                                    <h5 class="fw-bold text-dark mb-1">Alex Rivera</h5>
-                                    <p class="small text-muted mb-2">Student Action Slate</p>
-                                    <p class="small text-secondary" style="font-size: 0.8rem;">Focusing on campus sustainability &amp; student club funding transparency.</p>
+                                    <h3 class="fs-5 fw-bold mb-1" style="color: var(--text-heading);">Alex Rivera</h3>
+                                    <p class="small mb-2" style="color: var(--text-muted);">Student Action Slate</p>
+                                    <p class="small" style="color: var(--text-muted); font-size: 0.82rem;">Focusing on campus sustainability &amp; student club funding transparency.</p>
                                 </div>
-                                <div class="pt-3 border-top mt-3">
+                                <div class="pt-3 border-top mt-3" style="border-color: var(--border-subtle) !important;">
                                     <div class="sim-status text-primary fw-semibold small">
                                         <i class="bi bi-check-circle-fill me-1"></i> Selected
                                     </div>
@@ -285,19 +793,19 @@
                             <div class="sim-card p-4 text-center h-100 d-flex flex-column justify-content-between" onclick="selectCandidate(this, 'Jane Doe')">
                                 <div>
                                     <div class="position-relative d-inline-block mx-auto mb-3">
-                                        <div class="rounded-circle bg-indigo text-white d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 80px; height: 80px; font-size: 1.8rem; font-weight: bold; background-color: #6366f1;">
+                                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 80px; height: 80px; font-size: 1.8rem; font-weight: bold; background-color: #6366f1;">
                                             JD
                                         </div>
                                         <span class="position-absolute bottom-0 end-0 badge bg-white border text-primary rounded-circle p-2 shadow-sm">
                                             🦅
                                         </span>
                                     </div>
-                                    <h5 class="fw-bold text-dark mb-1">Jane Doe</h5>
-                                    <p class="small text-muted mb-2">Campus Voice Coalition</p>
-                                    <p class="small text-secondary" style="font-size: 0.8rem;">Advocating for 24/7 library access &amp; expanded student healthcare services.</p>
+                                    <h3 class="fs-5 fw-bold mb-1" style="color: var(--text-heading);">Jane Doe</h3>
+                                    <p class="small mb-2" style="color: var(--text-muted);">Campus Voice Coalition</p>
+                                    <p class="small" style="color: var(--text-muted); font-size: 0.82rem;">Advocating for 24/7 library access &amp; expanded student healthcare services.</p>
                                 </div>
-                                <div class="pt-3 border-top mt-3">
-                                    <div class="sim-status text-muted small">
+                                <div class="pt-3 border-top mt-3" style="border-color: var(--border-subtle) !important;">
+                                    <div class="sim-status small" style="color: var(--text-muted);">
                                         Click to Select
                                     </div>
                                 </div>
@@ -316,12 +824,12 @@
                                             ☀️
                                         </span>
                                     </div>
-                                    <h5 class="fw-bold text-dark mb-1">Michael Chang</h5>
-                                    <p class="small text-muted mb-2">Tech &amp; Innovation Front</p>
-                                    <p class="small text-secondary" style="font-size: 0.8rem;">Modernizing university digital portals and automated internship fairs.</p>
+                                    <h3 class="fs-5 fw-bold mb-1" style="color: var(--text-heading);">Michael Chang</h3>
+                                    <p class="small mb-2" style="color: var(--text-muted);">Tech &amp; Innovation Front</p>
+                                    <p class="small" style="color: var(--text-muted); font-size: 0.82rem;">Modernizing university digital portals and automated internship fairs.</p>
                                 </div>
-                                <div class="pt-3 border-top mt-3">
-                                    <div class="sim-status text-muted small">
+                                <div class="pt-3 border-top mt-3" style="border-color: var(--border-subtle) !important;">
+                                    <div class="sim-status small" style="color: var(--text-muted);">
                                         Click to Select
                                     </div>
                                 </div>
@@ -340,12 +848,12 @@
                                             🌲
                                         </span>
                                     </div>
-                                    <h5 class="fw-bold text-dark mb-1">Chloe Bennett</h5>
-                                    <p class="small text-muted mb-2">Community First Alliance</p>
-                                    <p class="small text-secondary" style="font-size: 0.8rem;">Promoting mental health wellness weeks &amp; inclusive social events.</p>
+                                    <h3 class="fs-5 fw-bold mb-1" style="color: var(--text-heading);">Chloe Bennett</h3>
+                                    <p class="small mb-2" style="color: var(--text-muted);">Community First Alliance</p>
+                                    <p class="small" style="color: var(--text-muted); font-size: 0.82rem;">Promoting mental health wellness weeks &amp; inclusive social events.</p>
                                 </div>
-                                <div class="pt-3 border-top mt-3">
-                                    <div class="sim-status text-muted small">
+                                <div class="pt-3 border-top mt-3" style="border-color: var(--border-subtle) !important;">
+                                    <div class="sim-status small" style="color: var(--text-muted);">
                                         Click to Select
                                     </div>
                                 </div>
@@ -354,22 +862,27 @@
                     </div>
 
                     <!-- Simulator Submit Button -->
-                    <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pt-3 border-top">
-                        <div class="text-muted small">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pt-3 border-top" style="border-color: var(--border-subtle) !important;">
+                        <div class="small fw-semibold" style="color: var(--text-muted);">
                             <i class="bi bi-shield-check text-success me-1"></i> Selection is confidential &bull; One vote per registered student
                         </div>
-                        <button type="button" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm" onclick="castSimulatedVote()">
-                            <i class="bi bi-check2-circle me-1"></i> Cast Vote for <span id="selectedCandidateName">Alex Rivera</span>
-                        </button>
+                        <div class="d-flex gap-2 mt-2 mt-sm-0">
+                            <button type="button" class="btn btn-outline-secondary px-3 py-2 fw-semibold" onclick="resetSimulatedVote()">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                            </button>
+                            <button type="button" class="btn btn-primary px-4 py-2 fw-semibold shadow-sm" onclick="castSimulatedVote()">
+                                <i class="bi bi-check2-circle me-1"></i> Cast Vote for <span id="selectedCandidateName">Alex Rivera</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Simulator Success Banner -->
-                    <div id="simSuccessMsg" class="alert alert-success mt-4 mb-0 d-none">
+                    <div id="simSuccessMsg" class="alert alert-success mt-4 mb-0 d-none" role="alert">
                         <div class="d-flex align-items-center">
                             <i class="bi bi-check-circle-fill fs-3 text-success me-3"></i>
                             <div>
-                                <h5 class="alert-heading mb-1 fw-bold">Ballot Cast Successfully!</h5>
-                                <p class="mb-0 small">In the live system, your choice is atomically stored in the database, your voter record is updated to prevent duplicate voting, and official tallies update immediately.</p>
+                                <h4 class="alert-heading mb-1 fs-5 fw-bold">Ballot Cast Successfully!</h4>
+                                <p class="mb-0 small">In the live system, your choice is atomically stored via PDO prepared statements, your voter record is locked against duplicate submissions via database <code>UNIQUE(voter_id, category_id)</code>, and official tallies update immediately.</p>
                             </div>
                         </div>
                     </div>
@@ -377,255 +890,491 @@
             </div>
         </section>
 
-        <!-- SCREENSHOT GALLERY -->
-        <section class="mb-5 pb-3" id="gallery">
+        <!-- 3. SCREENSHOT GALLERY & DEVICE MOCKUPS -->
+        <section class="mb-5 pb-4" id="gallery">
             <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 border-bottom pb-3">
                 <div>
-                    <h2 class="h3 fw-bold text-dark mb-1">
-                        <i class="bi bi-images text-primary me-2"></i>Application Screenshots
+                    <h2 class="h3 fw-bold mb-1" style="color: var(--text-heading);">
+                        <i class="bi bi-images text-primary me-2"></i>Application Mockups &amp; Screenshots
                     </h2>
-                    <p class="text-muted mb-0">High-resolution 1440x900 screenshots captured directly from the running project.</p>
+                    <p class="mb-0" style="color: var(--text-muted);">High-resolution captures framed in realistic macOS window chrome and mobile viewports.</p>
                 </div>
                 <!-- Gallery Filter Buttons -->
-                <div class="d-flex gap-1 mt-2 mt-md-0 bg-white p-1 rounded border">
-                    <button class="btn btn-sm btn-primary active" onclick="filterGallery('all', this)">All (11)</button>
-                    <button class="btn btn-sm btn-light" onclick="filterGallery('voter', this)">Voter (3)</button>
-                    <button class="btn btn-sm btn-light" onclick="filterGallery('organiser', this)">Organiser (3)</button>
-                    <button class="btn btn-sm btn-light" onclick="filterGallery('admin', this)">Admin (4)</button>
-                    <button class="btn btn-sm btn-light" onclick="filterGallery('public', this)">Public (1)</button>
+                <div class="d-flex flex-wrap gap-1 mt-2 mt-md-0 p-1 rounded border" style="background-color: var(--card-bg); border-color: var(--border-subtle) !important;">
+                    <button class="btn btn-sm btn-primary active" onclick="filterGallery('all', this)">All (14)</button>
+                    <button class="btn btn-sm btn-light" onclick="filterGallery('voter', this)">Voter Flow (4)</button>
+                    <button class="btn btn-sm btn-light" onclick="filterGallery('organiser', this)">Organiser Flow (3)</button>
+                    <button class="btn btn-sm btn-light" onclick="filterGallery('admin', this)">Admin Flow (4)</button>
+                    <button class="btn btn-sm btn-light" onclick="filterGallery('mobile', this)">Mobile Responsive (3)</button>
                 </div>
             </div>
 
             <!-- Gallery Cards Grid -->
             <div class="row g-4" id="galleryGrid">
+
                 <!-- 01: Login -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="public">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/01_portal_login.png', 'Portal Login Screen', 'Modern floating label authentication form with clean trust indicators.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/01_portal_login.png', 'Portal Login & Host Registration', 'Modern floating label authentication form with clean trust indicators and election hosting application.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/index.php</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/01_portal_login.png" alt="Portal Login" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-secondary">Public Portal</span>
-                                <small class="text-muted">index.php</small>
+                                <small style="color: var(--text-muted);">index.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">Portal Authentication &amp; Host Form</h6>
-                            <p class="small text-muted mb-0">Floating input labels, responsive card layout, and election hosting application.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Portal Authentication &amp; Host Form</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Floating input labels, responsive card layout, and election hosting application.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 02: Admin Requests -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="admin">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/02_admin_requests.png', 'Election Host Requests', 'Admin management queue for reviewing and approving pending election host requests.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/02_admin_requests.png', 'Election Host Requests Queue', 'Administrator queue for reviewing and approving pending election host requests.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/request_to_register.php</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/02_admin_requests.png" alt="Admin Requests" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-primary">Admin Flow</span>
-                                <small class="text-muted">request_to_register.php</small>
+                                <small style="color: var(--text-muted);">request_to_register.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">Pending Election Host Requests</h6>
-                            <p class="small text-muted mb-0">Review incoming election applications with 1-click atomic approval creating organiser accounts.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Pending Election Host Requests</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Review incoming election applications with 1-click atomic approval creating organiser accounts.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 03: Admin Dashboard -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="admin">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/03_admin_dashboard.png', 'Administrator Dashboard', 'KPI stat metric tiles, category summaries, and user base distribution chart.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/03_admin_dashboard.png', 'Administrator Dashboard', 'KPI stat metric tiles, category summaries, and user base distribution chart.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/admin/index.php</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/03_admin_dashboard.png" alt="Admin Dashboard" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-primary">Admin Flow</span>
-                                <small class="text-muted">admin/index.php</small>
+                                <small style="color: var(--text-muted);">admin/index.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">Administrator Dashboard &amp; Chart</h6>
-                            <p class="small text-muted mb-0">Key metrics, pending request alerts, quick category overview, and responsive Google chart.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Administrator Dashboard &amp; Chart</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Key metrics, pending request alerts, quick category overview, and responsive Google chart.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 04: Demo Generator -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="admin">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/04_admin_demo_generator.png', 'Demo Data Generator', '1-Click showcase setup tool, granular voter generator, and credentials cheat-sheet.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/04_admin_demo_generator.png', '1-Click Showcase Demo Generator', '1-Click showcase setup tool, granular voter generator, and credentials cheat-sheet.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/generate_demo_data.php</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/04_admin_demo_generator.png" alt="Demo Generator" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-warning text-dark">Demo Tool</span>
-                                <small class="text-muted">generate_demo_data.php</small>
+                                <small style="color: var(--text-muted);">generate_demo_data.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">1-Click Showcase Data Generator</h6>
-                            <p class="small text-muted mb-0">Generates coherent live, upcoming, and concluded elections with current non-past timestamps.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">1-Click Showcase Data Generator</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Generates coherent live, upcoming, and concluded elections with current non-past timestamps.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 05: Admin Categories -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="admin">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/05_admin_categories.png', 'Category Management', 'Table with RESTful edit links and transactional cascading deletion.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/05_admin_categories.png', 'Election Category Management', 'Table with RESTful edit links and transactional cascading deletion.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/edit_election_category.php</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/05_admin_categories.png" alt="Admin Categories" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-primary">Admin Flow</span>
-                                <small class="text-muted">edit_election_category.php</small>
+                                <small style="color: var(--text-muted);">edit_election_category.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">Election Category Roster</h6>
-                            <p class="small text-muted mb-0">Category management table with RESTful GET links and safe transactional cascading deletions.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Election Category Roster</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Category management table with RESTful GET links and safe transactional cascading deletions.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 06: Organiser Dashboard -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="organiser">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/06_organiser_dashboard.png', 'Organiser Dashboard', 'Real-time turnout percentage, voting window date controls, and tally distribution.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/06_organiser_dashboard.png', 'Organiser Dashboard & Turnout', 'Real-time turnout percentage, voting window date controls, and tally distribution.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/organiser/index.php</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/06_organiser_dashboard.png" alt="Organiser Dashboard" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-success">Organiser Flow</span>
-                                <small class="text-muted">organiser/index.php</small>
+                                <small style="color: var(--text-muted);">organiser/index.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">Organiser Dashboard &amp; Turnout</h6>
-                            <p class="small text-muted mb-0">Turnout percentage calculations, HTML5 voting window schedulers, and candidate vote distribution.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Organiser Dashboard &amp; Turnout</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Turnout percentage calculations, HTML5 voting window schedulers, and candidate vote distribution.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 07: Organiser Candidates -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="organiser">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/07_organiser_candidates.png', 'Candidate Management', 'Organiser roster of candidate accounts with photos and party symbols.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/07_organiser_candidates.png', 'Candidate Account Roster', 'Organiser roster of candidate accounts with photos and party symbols.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/edit_candidate_details.php</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/07_organiser_candidates.png" alt="Organiser Candidates" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-success">Organiser Flow</span>
-                                <small class="text-muted">edit_candidate_details.php</small>
+                                <small style="color: var(--text-muted);">edit_candidate_details.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">Candidate Account Roster</h6>
-                            <p class="small text-muted mb-0">Manage election candidates with secure image uploads and active-election deletion guards.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Candidate Account Roster</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Manage election candidates with secure image uploads and active-election deletion guards.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 08: Organiser Voters -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="organiser">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/08_organiser_voters.png', 'Voter Roster Management', 'List of registered voters showing date of birth and voting status.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/08_organiser_voters.png', 'Voter Accounts & Turnout State', 'List of registered voters showing date of birth and voting status.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/edit_voter_details.php</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/08_organiser_voters.png" alt="Organiser Voters" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-success">Organiser Flow</span>
-                                <small class="text-muted">edit_voter_details.php</small>
+                                <small style="color: var(--text-muted);">edit_voter_details.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">Voter Accounts &amp; Turnout State</h6>
-                            <p class="small text-muted mb-0">Table displaying registered student voters, date of birth, and authoritative ballot status.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Voter Accounts &amp; Turnout State</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Table displaying registered student voters, date of birth, and authoritative ballot status.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 09: Voter Live Ballot -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="voter">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/09_voter_live_ballot.png', 'Live Voter Ballot', 'Interactive candidate card grid with avatars, symbol badges, and instant radio selection.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/09_voter_live_ballot.png', 'Live Candidate Card Ballot', 'Interactive candidate card grid with avatars, symbol badges, and instant radio selection.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/voter/give_vote.php</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/09_voter_live_ballot.png" alt="Voter Ballot" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-info text-dark">Voter Flow</span>
-                                <small class="text-muted">voter/give_vote.php</small>
+                                <small style="color: var(--text-muted);">voter/give_vote.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">Live Candidate Card Ballot</h6>
-                            <p class="small text-muted mb-0">Responsive candidate card grid with active border highlights, monograms, and symbol emblems.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Live Candidate Card Ballot</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Responsive candidate card grid with active border highlights, monograms, and symbol emblems.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 10: Voter Confirmation -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="voter">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/10_voter_cast_confirmation.png', 'Vote Submitted Confirmation', 'Thank You confirmation card and polls closing countdown.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/10_voter_cast_confirmation.png', 'Vote Submitted Confirmation', 'Thank You confirmation card and polls closing countdown.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/voter/index.php</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/10_voter_cast_confirmation.png" alt="Voter Confirmation" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-info text-dark">Voter Flow</span>
-                                <small class="text-muted">voter/index.php</small>
+                                <small style="color: var(--text-muted);">voter/index.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">Vote Confirmation &amp; Polls Timer</h6>
-                            <p class="small text-muted mb-0">Post-vote confirmation screen with glassmorphic countdown synced to UTC epoch milliseconds.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Vote Confirmation &amp; Polls Timer</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Post-vote confirmation screen with glassmorphic countdown synced to UTC epoch milliseconds.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 11: Voter Concluded Results -->
                 <div class="col-md-6 col-lg-4 gallery-item" data-category="voter">
-                    <div class="gallery-card h-100 shadow-sm" onclick="openLightbox('images/11_voter_concluded_results.png', 'Concluded Election Results', 'Gold trophy winner banner, vote count tallies, and Google Bar chart distribution.')">
-                        <div class="gallery-img-wrapper">
+                    <div class="macos-window h-100" onclick="openLightbox('images/11_voter_concluded_results.png', 'Certified Election Results & Winner Banner', 'Gold trophy winner banner, vote count tallies, and Google Bar chart distribution.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">https://evoting.org/voter/index.php?state=concluded</span>
+                        </div>
+                        <div class="window-img-wrapper">
                             <img src="images/11_voter_concluded_results.png" alt="Concluded Results" loading="lazy">
-                            <div class="gallery-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
                         </div>
                         <div class="p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="badge bg-info text-dark">Voter Flow</span>
-                                <small class="text-muted">voter/index.php</small>
+                                <small style="color: var(--text-muted);">voter/index.php</small>
                             </div>
-                            <h6 class="fw-bold mb-1">Certified Winner Banner &amp; Chart</h6>
-                            <p class="small text-muted mb-0">Post-election certification screen with winner trophy showcase and Google Bar chart.</p>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Certified Winner Banner &amp; Chart</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Post-election certification screen with winner trophy showcase and Google Bar chart.</p>
                         </div>
                     </div>
+                </div>
+
+                <!-- 12: Mobile Ballot (NEW) -->
+                <div class="col-md-6 col-lg-4 gallery-item" data-category="mobile">
+                    <div class="macos-window h-100" onclick="openLightbox('images/12_mobile_voter_ballot.png', 'Mobile Responsive Voter Ballot', 'Pixel-perfect mobile viewport capture demonstrating touch-friendly candidate card selection.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">Mobile Safari • 390x844</span>
+                        </div>
+                        <div class="window-img-wrapper">
+                            <img src="images/12_mobile_voter_ballot.png" alt="Mobile Voter Ballot" loading="lazy">
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-success">Mobile View</span>
+                                <small style="color: var(--text-muted);">iPhone Viewport</small>
+                            </div>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Mobile Ballot Selection View</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Fluid touch targets, stacked single-column candidate layout, and sticky action bar.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 13: Mobile Credentials (NEW) -->
+                <div class="col-md-6 col-lg-4 gallery-item" data-category="mobile">
+                    <div class="macos-window h-100" onclick="openLightbox('images/13_mobile_credentials.png', 'Mobile Demonstration Roster', 'Responsive table and touch buttons on handheld screens.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">Mobile Safari • 390x844</span>
+                        </div>
+                        <div class="window-img-wrapper">
+                            <img src="images/13_mobile_credentials.png" alt="Mobile Credentials" loading="lazy">
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-success">Mobile View</span>
+                                <small style="color: var(--text-muted);">iPhone Viewport</small>
+                            </div>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Mobile Role &amp; Access Controls</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Touch-friendly copy actions and horizontal table scroll wrapper preventing layout overflow.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 14: Mobile Hero Overview (NEW) -->
+                <div class="col-md-6 col-lg-4 gallery-item" data-category="mobile">
+                    <div class="macos-window h-100" onclick="openLightbox('images/14_mobile_hero_overview.png', 'Mobile Portal Overview', 'Clean stacked header and fast access buttons on phone screens.')">
+                        <div class="macos-bar">
+                            <div class="macos-dots">
+                                <span class="macos-dot macos-dot-red"></span>
+                                <span class="macos-dot macos-dot-yellow"></span>
+                                <span class="macos-dot macos-dot-green"></span>
+                            </div>
+                            <span class="macos-url">Mobile Safari • 390x844</span>
+                        </div>
+                        <div class="window-img-wrapper">
+                            <img src="images/14_mobile_hero_overview.png" alt="Mobile Overview" loading="lazy">
+                            <div class="window-overlay"><i class="bi bi-zoom-in me-1"></i> View Fullscreen</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-success">Mobile View</span>
+                                <small style="color: var(--text-muted);">iPhone Viewport</small>
+                            </div>
+                            <h3 class="fs-6 fw-bold mb-1" style="color: var(--text-heading);">Mobile Header &amp; KPI Cards</h3>
+                            <p class="small mb-0" style="color: var(--text-muted);">Seamless collapse navigation, responsive badges, and vertical metric ribbon cards.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. BRAND NEW: ARCHITECTURE & CODE INSPECTOR -->
+        <section class="mb-5 pb-4" id="code-inspector">
+            <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 border-bottom pb-3">
+                <div>
+                    <h2 class="h3 fw-bold mb-1" style="color: var(--text-heading);">
+                        <i class="bi bi-code-slash text-primary me-2"></i>Architecture &amp; Code Inspector
+                    </h2>
+                    <p class="mb-0" style="color: var(--text-muted);">Inspect clean production PHP code directly in the browser without cloning the repo.</p>
+                </div>
+                <!-- Code Selector Tabs -->
+                <div class="d-flex flex-wrap gap-1 mt-2 mt-md-0 p-1 rounded border" style="background-color: var(--card-bg); border-color: var(--border-subtle) !important;">
+                    <button class="btn btn-sm btn-primary active" id="tabCode1" onclick="switchCodeTab(1)">Domain Model (Election.php)</button>
+                    <button class="btn btn-sm btn-light" id="tabCode2" onclick="switchCodeTab(2)">VoteService Transaction</button>
+                    <button class="btn btn-sm btn-light" id="tabCode3" onclick="switchCodeTab(3)">Security &amp; CSRF</button>
+                    <button class="btn btn-sm btn-light" id="tabCode4" onclick="switchCodeTab(4)">CSS Bridge</button>
+                </div>
+            </div>
+
+            <div class="code-container shadow-sm">
+                <div class="code-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary text-white" id="codeLanguageBadge">PHP 8.5</span>
+                        <span class="text-white small fw-bold" id="codeFilePath">src/Domain/Election.php</span>
+                    </div>
+                    <button class="btn btn-sm btn-primary text-white d-inline-flex align-items-center gap-1 py-1" onclick="copyCurrentCode()">
+                        <i class="bi bi-clipboard"></i> <span class="text-white">Copy Code</span>
+                    </button>
+                </div>
+                <div class="p-3" style="overflow-x: auto;">
+                    <pre class="mb-0" id="codeDisplay" style="color: #e2e8f0; line-height: 1.5; font-size: 0.85rem;"><code>&lt;?php
+declare(strict_types=1);
+
+namespace App\Domain;
+
+use DateTimeImmutable;
+
+/**
+ * Domain entity encapsulating election window state transitions and business rules.
+ */
+final class Election
+{
+    public function __construct(
+        private int $id,
+        private string $title,
+        private DateTimeImmutable $startAt,
+        private DateTimeImmutable $endAt,
+        private string $status = 'pending'
+    ) {}
+
+    public function isOpen(DateTimeImmutable $now): bool
+    {
+        return $now &gt;= $this->startAt &amp;&amp; $now &lt;= $this->endAt;
+    }
+
+    public function isConcluded(DateTimeImmutable $now): bool
+    {
+        return $now &gt; $this->endAt;
+    }
+
+    public function secondsUntilOpen(DateTimeImmutable $now): int
+    {
+        return max(0, $this->startAt->getTimestamp() - $now->getTimestamp());
+    }
+}</code></pre>
                 </div>
             </div>
         </section>
 
-        <!-- ARCHITECTURE & SECURITY SPECIFICATIONS -->
-        <section class="mb-5 pb-3" id="architecture">
+        <!-- 5. ENGINEERING ARCHITECTURE & SECURITY SPECIFICATIONS -->
+        <section class="mb-5 pb-4" id="architecture">
             <div class="border-bottom pb-3 mb-4">
-                <h2 class="h3 fw-bold text-dark mb-1">
-                    <i class="bi bi-diagram-3-fill text-primary me-2"></i>Engineering Architecture &amp; Security
+                <h2 class="h3 fw-bold mb-1" style="color: var(--text-heading);">
+                    <i class="bi bi-diagram-3-fill text-primary me-2"></i>Engineering Architecture &amp; Security Specifications
                 </h2>
-                <p class="text-muted mb-0">Structured design principles that elevate the application above legacy procedural code.</p>
+                <p class="mb-0" style="color: var(--text-muted);">Structured design principles that elevate the application above legacy procedural code.</p>
             </div>
 
             <div class="row g-4">
                 <!-- Layered Domain Architecture -->
                 <div class="col-md-6">
-                    <div class="card h-100 shadow-sm border-0 p-4">
+                    <div class="metric-card h-100 p-4">
                         <div class="d-flex align-items-center gap-3 mb-3">
                             <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-3 fs-4">
                                 <i class="bi bi-box-seam"></i>
                             </div>
                             <div>
-                                <h5 class="fw-bold mb-0">Domain / Service / Repository Layer</h5>
-                                <small class="text-muted">PSR-4 Autoloaded Core Architecture</small>
+                                <h3 class="fs-5 fw-bold mb-0" style="color: var(--text-heading);">Domain / Service / Repository Layer</h3>
+                                <small style="color: var(--text-muted);">PSR-4 Autoloaded Core Architecture</small>
                             </div>
                         </div>
-                        <p class="text-muted small">
+                        <p class="small" style="color: var(--text-muted);">
                             Business rules are decoupled from presentation scripts into a clean, testable domain layer:
                         </p>
-                        <ul class="small text-muted mb-0 ps-3">
+                        <ul class="small mb-0 ps-3" style="color: var(--text-muted);">
                             <li><strong>Value Objects:</strong> <code>Election</code> (window checking), <code>Turnout</code> (turnout arithmetic), <code>Tally</code> (winners &amp; ties).</li>
-                            <li><strong>Services:</strong> <code>VoteService</code> (atomic ballot checking), <code>AuthService</code> (bcrypt + transparent SHA-1 upgrade), <code>DemoDataSeeder</code>.</li>
+                            <li><strong>Services:</strong> <code>VoteService</code> (atomic ballot checking), <code>AuthService</code> (bcrypt + transparent upgrade), <code>DemoDataSeeder</code>.</li>
                             <li><strong>Repositories:</strong> <code>CategoryRepository</code>, <code>CandidateRepository</code>, <code>UserRepository</code>, <code>VoteRepository</code>.</li>
                         </ul>
                     </div>
@@ -633,20 +1382,20 @@
 
                 <!-- Security Hardening -->
                 <div class="col-md-6">
-                    <div class="card h-100 shadow-sm border-0 p-4">
+                    <div class="metric-card h-100 p-4">
                         <div class="d-flex align-items-center gap-3 mb-3">
                             <div class="p-3 bg-success bg-opacity-10 text-success rounded-3 fs-4">
                                 <i class="bi bi-shield-lock"></i>
                             </div>
                             <div>
-                                <h5 class="fw-bold mb-0">Security Hardening &amp; Integrity</h5>
-                                <small class="text-muted">Auditable, Injection-Resistant Foundation</small>
+                                <h3 class="fs-5 fw-bold mb-0" style="color: var(--text-heading);">Security Hardening &amp; Integrity</h3>
+                                <small style="color: var(--text-muted);">Auditable, Injection-Resistant Foundation</small>
                             </div>
                         </div>
-                        <p class="text-muted small">
+                        <p class="small" style="color: var(--text-muted);">
                             Comprehensive hardening protects voters and prevents ballot manipulation:
                         </p>
-                        <ul class="small text-muted mb-0 ps-3">
+                        <ul class="small mb-0 ps-3" style="color: var(--text-muted);">
                             <li><strong>1-Row-Per-Vote Model:</strong> Database <code>UNIQUE(voter_id, category_id)</code> prevents double-voting even under concurrent race conditions.</li>
                             <li><strong>SQL Injection Neutralized:</strong> 100% parameterized PDO queries across all 23 controllers.</li>
                             <li><strong>CSRF &amp; XSS Defense:</strong> Cryptographic token verification on every POST; context-aware <code>e()</code> HTML escaping.</li>
@@ -657,17 +1406,17 @@
 
                 <!-- Zero-Downtime CSS Bridge -->
                 <div class="col-md-6">
-                    <div class="card h-100 shadow-sm border-0 p-4">
+                    <div class="metric-card h-100 p-4">
                         <div class="d-flex align-items-center gap-3 mb-3">
                             <div class="p-3 bg-info bg-opacity-10 text-info rounded-3 fs-4">
                                 <i class="bi bi-palette"></i>
                             </div>
                             <div>
-                                <h5 class="fw-bold mb-0">Bootstrap 3-to-5 Compatibility Bridge</h5>
-                                <small class="text-muted">Zero-Downtime Design System Upgrade</small>
+                                <h3 class="fs-5 fw-bold mb-0" style="color: var(--text-heading);">Bootstrap 3-to-5 Compatibility Bridge</h3>
+                                <small style="color: var(--text-muted);">Zero-Downtime Design System Upgrade</small>
                             </div>
                         </div>
-                        <p class="text-muted small">
+                        <p class="small" style="color: var(--text-muted);">
                             A custom CSS compatibility bridge in <code>assets/css/style.css</code> maps removed legacy classes (<code>.panel</code>, <code>.form-group</code>, <code>.btn-block</code>) to modern card tokens. This guaranteed zero broken layouts while upgrading to Bootstrap 5.3 + Bootswatch Zephyr.
                         </p>
                     </div>
@@ -675,17 +1424,17 @@
 
                 <!-- Client-Server Timezone Sync -->
                 <div class="col-md-6">
-                    <div class="card h-100 shadow-sm border-0 p-4">
+                    <div class="metric-card h-100 p-4">
                         <div class="d-flex align-items-center gap-3 mb-3">
                             <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-3 fs-4">
                                 <i class="bi bi-clock-history"></i>
                             </div>
                             <div>
-                                <h5 class="fw-bold mb-0">Timezone Synchronization</h5>
-                                <small class="text-muted">Sub-Second Accurate Countdown Timers</small>
+                                <h3 class="fs-5 fw-bold mb-0" style="color: var(--text-heading);">Timezone Synchronization</h3>
+                                <small style="color: var(--text-muted);">Sub-Second Accurate Countdown Timers</small>
                             </div>
                         </div>
-                        <p class="text-muted small">
+                        <p class="small" style="color: var(--text-muted);">
                             Countdown timers calculate offsets from server-provided UTC epoch milliseconds, eliminating desynchronization when voters in different geographic time zones access elections configured in server local time.
                         </p>
                     </div>
@@ -693,16 +1442,16 @@
             </div>
         </section>
 
-        <!-- DEMONSTRATION CREDENTIALS CHEAT SHEET -->
+        <!-- 6. DEMONSTRATION CREDENTIALS CHEAT SHEET -->
         <section class="mb-5 pb-3" id="credentials">
             <div class="border-bottom pb-3 mb-4">
-                <h2 class="h3 fw-bold text-dark mb-1">
+                <h2 class="h3 fw-bold mb-1" style="color: var(--text-heading);">
                     <i class="bi bi-key-fill text-warning me-2"></i>Showcase Demonstration Logins
                 </h2>
-                <p class="text-muted mb-0">Click any email address or password to copy it directly to your clipboard for instant testing.</p>
+                <p class="mb-0" style="color: var(--text-muted);">Click any email address or password to copy it directly to your clipboard for instant testing.</p>
             </div>
 
-            <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="card shadow-sm border-0 overflow-hidden" style="background-color: var(--card-bg);">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
@@ -716,57 +1465,57 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><span class="badge bg-primary">Admin</span></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('admin@evoting.com', this)">admin@evoting.com</code></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('12345678', this)">12345678</code></td>
-                                <td>Category management, review registration requests, access 1-Click Demo Data generator.</td>
+                                <td><span class="badge bg-primary text-white">Admin</span></td>
+                                <td><code class="cursor-pointer credential-code fw-semibold" onclick="copyText('admin@evoting.com')">admin@evoting.com</code></td>
+                                <td><code class="cursor-pointer credential-pass fw-semibold" onclick="copyText('12345678')">12345678</code></td>
+                                <td><span style="color: var(--text-muted);">Category management, review registration requests, access 1-Click Demo Data generator.</span></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="copyText('admin@evoting.com', this)">Copy Login</button>
+                                    <button class="btn btn-sm btn-primary" onclick="copyText('admin@evoting.com')"><i class="bi bi-clipboard"></i> Copy</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td><span class="badge bg-success">Organiser</span></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('council.organiser@evoting.com', this)">council.organiser@evoting.com</code></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('password123', this)">password123</code></td>
-                                <td>Live turnout metrics (64%), configure voting window, add candidate accounts.</td>
+                                <td><span class="badge bg-success text-white">Organiser</span></td>
+                                <td><code class="cursor-pointer credential-code fw-semibold" onclick="copyText('council.organiser@evoting.com')">council.organiser@evoting.com</code></td>
+                                <td><code class="cursor-pointer credential-pass fw-semibold" onclick="copyText('password123')">password123</code></td>
+                                <td><span style="color: var(--text-muted);">Live turnout metrics (64%), configure voting window, add candidate accounts.</span></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-success" onclick="copyText('council.organiser@evoting.com', this)">Copy Login</button>
+                                    <button class="btn btn-sm btn-success text-white" onclick="copyText('council.organiser@evoting.com')"><i class="bi bi-clipboard"></i> Copy</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td><span class="badge bg-info text-dark">Voter (Ready)</span></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('voter17@evoting.com', this)">voter17@evoting.com</code></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('password123', this)">password123</code></td>
-                                <td><strong>Live Ballot:</strong> Has not voted yet. Log in to experience candidate card selection and submit a vote.</td>
+                                <td><span class="badge bg-info text-white">Voter (Ready)</span></td>
+                                <td><code class="cursor-pointer credential-code fw-semibold" onclick="copyText('voter17@evoting.com')">voter17@evoting.com</code></td>
+                                <td><code class="cursor-pointer credential-pass fw-semibold" onclick="copyText('password123')">password123</code></td>
+                                <td><span style="color: var(--text-muted);"><strong>Live Ballot:</strong> Has not voted yet. Log in to experience candidate card selection and submit a vote.</span></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-info" onclick="copyText('voter17@evoting.com', this)">Copy Login</button>
+                                    <button class="btn btn-sm btn-primary" onclick="copyText('voter17@evoting.com')"><i class="bi bi-clipboard"></i> Copy</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td><span class="badge bg-secondary">Voter (Done)</span></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('voter1@evoting.com', this)">voter1@evoting.com</code></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('password123', this)">password123</code></td>
-                                <td><strong>Already Voted:</strong> Displays "Thank You for Voting" confirmation and poll close countdown.</td>
+                                <td><span class="badge bg-secondary text-white">Voter (Done)</span></td>
+                                <td><code class="cursor-pointer credential-code fw-semibold" onclick="copyText('voter1@evoting.com')">voter1@evoting.com</code></td>
+                                <td><code class="cursor-pointer credential-pass fw-semibold" onclick="copyText('password123')">password123</code></td>
+                                <td><span style="color: var(--text-muted);"><strong>Already Voted:</strong> Displays "Thank You for Voting" confirmation and poll close countdown.</span></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="copyText('voter1@evoting.com', this)">Copy Login</button>
+                                    <button class="btn btn-sm btn-secondary text-white" onclick="copyText('voter1@evoting.com')"><i class="bi bi-clipboard"></i> Copy</button>
                                 </td>
                             </tr>
                             <tr>
                                 <td><span class="badge bg-warning text-dark">Voter (Upcoming)</span></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('fvoter1@evoting.com', this)">fvoter1@evoting.com</code></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('password123', this)">password123</code></td>
-                                <td><strong>Opening Soon:</strong> Countdown timer counting down until polls open.</td>
+                                <td><code class="cursor-pointer credential-code fw-semibold" onclick="copyText('fvoter1@evoting.com')">fvoter1@evoting.com</code></td>
+                                <td><code class="cursor-pointer credential-pass fw-semibold" onclick="copyText('password123')">password123</code></td>
+                                <td><span style="color: var(--text-muted);"><strong>Opening Soon:</strong> Countdown timer counting down until polls open.</span></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-warning text-dark" onclick="copyText('fvoter1@evoting.com', this)">Copy Login</button>
+                                    <button class="btn btn-sm btn-warning text-dark fw-semibold" onclick="copyText('fvoter1@evoting.com')"><i class="bi bi-clipboard"></i> Copy</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td><span class="badge bg-dark">Voter (Concluded)</span></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('alumni1@evoting.com', this)">alumni1@evoting.com</code></td>
-                                <td><code class="copy-btn cursor-pointer" onclick="copyText('password123', this)">password123</code></td>
-                                <td><strong>Election Ended:</strong> Gold trophy winner banner, final tallies, and Google Bar chart distribution.</td>
+                                <td><span class="badge bg-dark text-white">Voter (Concluded)</span></td>
+                                <td><code class="cursor-pointer credential-code fw-semibold" onclick="copyText('alumni1@evoting.com')">alumni1@evoting.com</code></td>
+                                <td><code class="cursor-pointer credential-pass fw-semibold" onclick="copyText('password123')">password123</code></td>
+                                <td><span style="color: var(--text-muted);"><strong>Election Ended:</strong> Gold trophy winner banner, final tallies, and Google Bar chart distribution.</span></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-dark" onclick="copyText('alumni1@evoting.com', this)">Copy Login</button>
+                                    <button class="btn btn-sm btn-dark text-white" onclick="copyText('alumni1@evoting.com')"><i class="bi bi-clipboard"></i> Copy</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -778,31 +1527,43 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white-50 py-4 mt-5 border-top">
+    <footer class="bg-dark text-white-50 py-4 mt-5 border-top border-secondary">
         <div class="container text-center small">
             <div class="mb-2">
-                <span class="text-white fw-bold">e-Voting System</span> &bull; Open-Source Learning &amp; Hardening Case Study
+                <span class="text-white fw-bold">e-Voting System</span> &bull; Open-Source Engineering &amp; Modernization Case Study
             </div>
             <div>
-                Crafted with PHP 8.5 &bull; Bootstrap 5.3 &bull; MySQL &bull; 53 Automated Tests Passing
+                Crafted with PHP 8.5 &bull; Bootstrap 5.3 &bull; MySQL &bull; 53 Automated Domain Tests Passing
             </div>
         </div>
     </footer>
 
-    <!-- MODAL LIGHTBOX -->
+    <!-- MODAL LIGHTBOX 2.0 (With Keyboard Navigation) -->
     <div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-dark border-0 text-white">
                 <div class="modal-header border-secondary py-2">
-                    <h5 class="modal-title fs-6 fw-bold text-white" id="lightboxTitle">Screenshot Preview</h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary" id="lightboxIndexBadge">1 / 14</span>
+                        <h5 class="modal-title fs-6 fw-bold text-white mb-0" id="lightboxTitle">Screenshot Preview</h5>
+                    </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-2 text-center bg-black">
+                <div class="modal-body p-2 text-center bg-black position-relative">
+                    <button class="lightbox-nav-btn lightbox-prev" onclick="prevLightboxImage()" aria-label="Previous image">
+                        <i class="bi bi-chevron-left fs-5"></i>
+                    </button>
                     <img src="" id="lightboxImg" alt="Preview">
+                    <button class="lightbox-nav-btn lightbox-next" onclick="nextLightboxImage()" aria-label="Next image">
+                        <i class="bi bi-chevron-right fs-5"></i>
+                    </button>
                 </div>
                 <div class="modal-footer border-secondary py-2 justify-content-between">
                     <small class="text-white-50 text-start" id="lightboxDesc"></small>
-                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-secondary d-none d-md-inline-block">Use &larr; &rarr; keys</span>
+                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -811,13 +1572,65 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Interactive Candidate Selector
+        // 1. Dark/Light Theme Switcher with LocalStorage
+        function initTheme() {
+            const savedTheme = localStorage.getItem('evoting_theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            applyTheme(theme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('evoting_theme', theme);
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                if (theme === 'dark') {
+                    icon.className = 'bi bi-sun-fill text-warning';
+                } else {
+                    icon.className = 'bi bi-moon-stars-fill';
+                }
+            }
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-bs-theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+            showToast('Switched to ' + next.toUpperCase() + ' mode');
+        }
+
+        initTheme();
+
+        // 2. Toast Notifications
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('copyToast');
+            const textEl = document.getElementById('toastMessage');
+            if (!toast || !textEl) return;
+            textEl.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied: "' + text + '"');
+            }).catch(() => {
+                showToast('Copied to clipboard!');
+            });
+        }
+
+        // 3. Interactive Ballot Simulator
         function selectCandidate(cardEl, name) {
             document.querySelectorAll('.sim-card').forEach(c => {
                 c.classList.remove('active');
                 const status = c.querySelector('.sim-status');
                 if (status) {
-                    status.className = 'sim-status text-muted small';
+                    status.className = 'sim-status small text-muted';
                     status.innerHTML = 'Click to Select';
                 }
             });
@@ -835,9 +1648,19 @@
             const successBox = document.getElementById('simSuccessMsg');
             successBox.classList.remove('d-none');
             successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            showToast('Ballot securely recorded!');
         }
 
-        // Ticking countdown in simulator
+        function resetSimulatedVote() {
+            document.getElementById('simSuccessMsg').classList.add('d-none');
+            const cards = document.querySelectorAll('.sim-card');
+            if (cards.length > 0) {
+                selectCandidate(cards[0], 'Alex Rivera');
+            }
+            showToast('Simulator reset to initial state');
+        }
+
+        // Ticking countdown
         let sec = 42;
         setInterval(() => {
             sec = sec > 0 ? sec - 1 : 59;
@@ -845,24 +1668,93 @@
             if (el) el.textContent = String(sec).padStart(2, '0');
         }, 1000);
 
-        // Copy to clipboard helper
-        function copyText(text, btnEl) {
-            navigator.clipboard.writeText(text).then(() => {
-                const originalHtml = btnEl.innerHTML;
-                btnEl.innerHTML = '<i class="bi bi-check2 text-success"></i> Copied!';
-                setTimeout(() => {
-                    btnEl.innerHTML = originalHtml;
-                }, 1500);
+        // 4. Video & Interactive Chapter Tour Player
+        const chapterData = [
+            {
+                title: 'Dual-Role Authentication & Host Queue',
+                url: 'https://evoting.org/index.php',
+                poster: 'images/01_portal_login.png',
+                time: 0,
+                desc: 'Floating labels, role-based redirection, and 1-click organiser request approval.'
+            },
+            {
+                title: 'Election Control & Turnout Metrics',
+                url: 'https://evoting.org/organiser/index.php',
+                poster: 'images/06_organiser_dashboard.png',
+                time: 4,
+                desc: 'Real-time 64% turnout calculations, HTML5 voting window schedulers, and candidate rosters.'
+            },
+            {
+                title: 'Live Ballot Experience & Protection',
+                url: 'https://evoting.org/voter/give_vote.php',
+                poster: 'images/09_voter_live_ballot.png',
+                time: 8,
+                desc: 'Responsive candidate card grid, synchronized countdown, and SQL double-voting safeguards.'
+            },
+            {
+                title: 'Certified Results & Real-Time Tallies',
+                url: 'https://evoting.org/voter/index.php?state=concluded',
+                poster: 'images/11_voter_concluded_results.png',
+                time: 12,
+                desc: 'Gold trophy winner banner, Google Bar chart distribution, and auditable vote tallies.'
+            }
+        ];
+
+        let currentChapterIndex = 0;
+        let tourTimer = null;
+
+        function selectChapter(index) {
+            currentChapterIndex = index;
+            const data = chapterData[index];
+            document.querySelectorAll('#chapterList .chapter-card').forEach((card, idx) => {
+                if (idx === index) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
             });
+
+            document.getElementById('videoUrlLabel').textContent = data.url;
+            const video = document.getElementById('walkthroughVideo');
+            if (video) {
+                video.poster = data.poster;
+                if (!video.paused) {
+                    video.currentTime = data.time;
+                }
+            }
+            showToast('Viewing ' + data.title);
         }
 
-        // Gallery Filtering
+        function toggleTourAutoplay() {
+            const btn = document.getElementById('tourAutoplayBtn');
+            const icon = document.getElementById('tourPlayIcon');
+            if (tourTimer) {
+                clearInterval(tourTimer);
+                tourTimer = null;
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline-primary');
+                icon.className = 'bi bi-play-fill me-1';
+                showToast('Autoplay paused');
+            } else {
+                btn.classList.remove('btn-outline-primary');
+                btn.classList.add('btn-primary');
+                icon.className = 'bi bi-pause-fill me-1';
+                showToast('Autoplay tour started');
+                tourTimer = setInterval(() => {
+                    const next = (currentChapterIndex + 1) % chapterData.length;
+                    selectChapter(next);
+                }, 5000);
+            }
+        }
+
+        // 5. Gallery Filtering
         function filterGallery(category, btnEl) {
-            document.querySelectorAll('#gallery .btn-group button, #gallery button').forEach(b => b.classList.remove('btn-primary', 'active'));
             document.querySelectorAll('#gallery button').forEach(b => {
-                if (b.classList.contains('btn-primary')) b.className = 'btn btn-sm btn-light';
+                b.classList.remove('btn-primary', 'active');
+                b.classList.add('btn-light');
             });
-            btnEl.className = 'btn btn-sm btn-primary active';
+            btnEl.classList.remove('btn-light');
+            btnEl.classList.add('btn-primary', 'active');
 
             const items = document.querySelectorAll('.gallery-item');
             items.forEach(item => {
@@ -872,18 +1764,239 @@
                     item.style.display = 'none';
                 }
             });
+            showToast('Filtered: ' + category.toUpperCase());
         }
 
-        // Lightbox Modal
-        let lightboxModalInstance;
+        // 6. Lightbox 2.0 with Keyboard Navigation
+        let galleryImages = [];
+        let activeImageIndex = 0;
+        let lightboxModalInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const windows = document.querySelectorAll('.macos-window');
+            windows.forEach((win, idx) => {
+                const img = win.querySelector('img');
+                const title = win.querySelector('h3') ? win.querySelector('h3').textContent : 'Mockup';
+                const desc = win.querySelector('p') ? win.querySelector('p').textContent : '';
+                if (img) {
+                    galleryImages.push({
+                        src: img.getAttribute('src'),
+                        title: title,
+                        desc: desc
+                    });
+                }
+            });
+        });
+
         function openLightbox(src, title, desc) {
             if (!lightboxModalInstance) {
                 lightboxModalInstance = new bootstrap.Modal(document.getElementById('lightboxModal'));
             }
-            document.getElementById('lightboxImg').src = src;
-            document.getElementById('lightboxTitle').textContent = title;
-            document.getElementById('lightboxDesc').textContent = desc;
+            activeImageIndex = galleryImages.findIndex(img => img.src === src);
+            if (activeImageIndex === -1) activeImageIndex = 0;
+            renderLightbox();
             lightboxModalInstance.show();
+        }
+
+        function renderLightbox() {
+            if (activeImageIndex < 0 || activeImageIndex >= galleryImages.length) return;
+            const current = galleryImages[activeImageIndex];
+            document.getElementById('lightboxImg').src = current.src;
+            document.getElementById('lightboxTitle').textContent = current.title;
+            document.getElementById('lightboxDesc').textContent = current.desc;
+            document.getElementById('lightboxIndexBadge').textContent = (activeImageIndex + 1) + ' / ' + galleryImages.length;
+        }
+
+        function prevLightboxImage() {
+            activeImageIndex = (activeImageIndex - 1 + galleryImages.length) % galleryImages.length;
+            renderLightbox();
+        }
+
+        function nextLightboxImage() {
+            activeImageIndex = (activeImageIndex + 1) % galleryImages.length;
+            renderLightbox();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const modalEl = document.getElementById('lightboxModal');
+            if (modalEl && modalEl.classList.contains('show')) {
+                if (e.key === 'ArrowLeft') {
+                    prevLightboxImage();
+                } else if (e.key === 'ArrowRight') {
+                    nextLightboxImage();
+                }
+            }
+        });
+
+        // 7. Architecture Code Inspector Tab Switcher
+        const codeSnippets = {
+            1: {
+                lang: 'PHP 8.5',
+                path: 'src/Domain/Election.php',
+                code: `<?php
+declare(strict_types=1);
+
+namespace App\Domain;
+
+use DateTimeImmutable;
+
+/**
+ * Domain entity encapsulating election window state transitions and business rules.
+ */
+final class Election
+{
+    public function __construct(
+        private int $id,
+        private string $title,
+        private DateTimeImmutable $startAt,
+        private DateTimeImmutable $endAt,
+        private string $status = 'pending'
+    ) {}
+
+    public function isOpen(DateTimeImmutable $now): bool
+    {
+        return $now >= $this->startAt && $now <= $this->endAt;
+    }
+
+    public function isConcluded(DateTimeImmutable $now): bool
+    {
+        return $now > $this->endAt;
+    }
+
+    public function secondsUntilOpen(DateTimeImmutable $now): int
+    {
+        return max(0, $this->startAt->getTimestamp() - $now->getTimestamp());
+    }
+}`
+            },
+            2: {
+                lang: 'PHP 8.5',
+                path: 'src/Service/VoteService.php',
+                code: `<?php
+declare(strict_types=1);
+
+namespace App\Service;
+
+use App\Repository\VoteRepository;
+use App\Exception\DuplicateVoteException;
+use PDO;
+
+final class VoteService
+{
+    public function __construct(
+        private VoteRepository $voteRepo,
+        private PDO $pdo
+    ) {}
+
+    /**
+     * Atomically records a vote with database-enforced race condition prevention.
+     */
+    public function castVote(int $voterId, int $categoryId, int $candidateId): bool
+    {
+        $this->pdo->beginTransaction();
+        try {
+            if ($this->voteRepo->hasVoted($voterId, $categoryId)) {
+                throw new DuplicateVoteException("Voter has already cast a ballot for this election.");
+            }
+
+            $success = $this->voteRepo->recordVote($voterId, $categoryId, $candidateId);
+            $this->pdo->commit();
+            return $success;
+        } catch (\\Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
+    }
+}`
+            },
+            3: {
+                lang: 'PHP 8.5',
+                path: 'includes/security.php',
+                code: `<?php
+declare(strict_types=1);
+
+/**
+ * Cryptographic CSRF token validation and context-safe HTML escaping.
+ */
+function csrf_token(): string
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function verify_csrf_token(?string $token): void
+{
+    if (!$token || !hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+        http_response_code(403);
+        die('CSRF token validation failed.');
+    }
+}
+
+function e(?string $value): string
+{
+    return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}`
+            },
+            4: {
+                lang: 'CSS / Compatibility Bridge',
+                path: 'assets/css/style.css',
+                code: `/* Zero-Downtime Bootstrap 3-to-5 Compatibility Bridge */
+.panel {
+    background-color: var(--bs-card-bg, #ffffff);
+    border: 1px solid var(--bs-border-color, #e2e8f0);
+    border-radius: var(--bs-border-radius, 0.75rem);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+}
+.panel-heading {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--bs-border-color, #e2e8f0);
+    font-weight: 600;
+}
+.form-group {
+    margin-bottom: 1.25rem;
+}
+.btn-block {
+    display: block;
+    width: 100%;
+}`
+            }
+        };
+
+        let currentCodeTab = 1;
+
+        function switchCodeTab(tabIndex) {
+            currentCodeTab = tabIndex;
+            [1, 2, 3, 4].forEach(i => {
+                const btn = document.getElementById('tabCode' + i);
+                if (btn) {
+                    if (i === tabIndex) {
+                        btn.className = 'btn btn-sm btn-primary active';
+                    } else {
+                        btn.className = 'btn btn-sm btn-light';
+                    }
+                }
+            });
+
+            const data = codeSnippets[tabIndex];
+            document.getElementById('codeLanguageBadge').textContent = data.lang;
+            document.getElementById('codeFilePath').textContent = data.path;
+            
+            // Safe text insertion
+            const codeEl = document.querySelector('#codeDisplay code');
+            if (codeEl) {
+                codeEl.textContent = data.code;
+            }
+            showToast('Loaded ' + data.path);
+        }
+
+        function copyCurrentCode() {
+            const data = codeSnippets[currentCodeTab];
+            if (data) {
+                copyText(data.code);
+            }
         }
     </script>
 </body>

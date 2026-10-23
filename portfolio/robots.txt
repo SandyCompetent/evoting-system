@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: http://evoting-system.freehosting.dev/sitemap.xml
