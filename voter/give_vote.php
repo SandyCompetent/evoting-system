@@ -8,7 +8,7 @@ $candidates = $candidateRepo->findByCategory($category_id);
 ?>
 
 <div class="card shadow-sm border-0 my-4">
-    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+    <div class="card-header bg-white border-bottom py-3 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
         <div>
             <h5 class="card-title mb-0 fw-semibold text-primary">
                 <i class="bi bi-person-check me-2"></i>Official Ballot: <?= e($category_name); ?>
@@ -78,11 +78,11 @@ $candidates = $candidateRepo->findByCategory($category_id);
                     <?php endforeach; ?>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                    <span class="text-muted small">
+                <div class="d-flex flex-column-reverse flex-sm-row justify-content-between align-items-stretch align-items-sm-center gap-3 pt-3 border-top">
+                    <span class="text-muted small text-center text-sm-start">
                         <i class="bi bi-info-circle me-1"></i> Check your choice before clicking Submit.
                     </span>
-                    <button type="submit" name="submit" class="btn btn-primary btn-lg px-4 shadow-sm fw-semibold">
+                    <button type="submit" name="submit" class="btn btn-primary btn-lg w-100 w-sm-auto px-4 py-3 shadow-sm fw-semibold">
                         <i class="bi bi-check2-circle me-2"></i> Submit Your Vote
                     </button>
                 </div>

@@ -81,16 +81,16 @@ require_once __DIR__ . "/includes/header.php";
                         <?php echo csrf_field(); ?>
 
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" name="email" id="email" placeholder="name@example.com" required>
+                            <input type="email" class="form-control" name="email" id="email" placeholder="name@example.com" autocomplete="email" inputmode="email" required>
                             <label for="email"><i class="bi bi-envelope me-1"></i> Email Address</label>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Password" autocomplete="current-password" required>
                             <label for="password"><i class="bi bi-shield-lock me-1"></i> Password</label>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 py-2 fs-6 fw-semibold shadow-sm" name="login">
+                        <button type="submit" class="btn btn-primary w-100 py-2.5 fs-6 fw-semibold shadow-sm" name="login">
                             <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
                         </button>
                     </form>
@@ -108,7 +108,7 @@ require_once __DIR__ . "/includes/header.php";
         <!-- Registration Request Column -->
         <div class="col-lg-7 col-md-6">
             <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <h5 class="card-title mb-0 fw-semibold">
                         <i class="bi bi-calendar-plus text-primary me-2"></i>Host an Election
                     </h5>
@@ -128,11 +128,11 @@ require_once __DIR__ . "/includes/header.php";
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label highlight fw-semibold" for="full_name">Organiser Full Name</label>
-                                    <input type="text" class="form-control" name="full_name" id="full_name" placeholder="Full Name" required>
+                                    <input type="text" class="form-control" name="full_name" id="full_name" placeholder="Full Name" autocomplete="name" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label highlight fw-semibold" for="req_email">Email Address</label>
-                                    <input type="email" class="form-control" name="email" id="req_email" placeholder="name@domain.com" required>
+                                    <input type="email" class="form-control" name="email" id="req_email" placeholder="name@domain.com" autocomplete="email" inputmode="email" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label highlight fw-semibold" for="category">Election Category Name</label>

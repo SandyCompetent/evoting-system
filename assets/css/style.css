@@ -314,3 +314,169 @@ body {
     width: 100%;
     min-height: 280px;
 }
+
+/* ==========================================================================
+   Mobile-First & Touch Optimization System
+   ========================================================================== */
+
+/* Touch Target Minimums (WCAG 2.5.5 / 2.5.8) */
+@media (pointer: coarse) {
+    .btn,
+    .nav-link,
+    .form-control,
+    .form-select,
+    .dropdown-item {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .btn-sm {
+        min-height: 38px;
+    }
+}
+
+/* Tablet & Mobile Navbars (<= 991.98px) */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        background: rgba(15, 23, 42, 0.98);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-top: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    .navbar-collapse .nav-link {
+        padding: 0.65rem 0.85rem !important;
+        border-radius: 0.4rem;
+        color: #e2e8f0 !important;
+        transition: background-color 0.15s ease;
+    }
+    .navbar-collapse .nav-link:hover,
+    .navbar-collapse .nav-link:focus {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #ffffff !important;
+    }
+    .navbar-collapse .dropdown-menu {
+        background-color: rgba(30, 41, 59, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 0.5rem;
+        margin: 0.25rem 0.5rem 0.75rem;
+        padding: 0.35rem;
+    }
+    .navbar-collapse .dropdown-item {
+        color: #cbd5e1 !important;
+        border-radius: 0.35rem;
+        padding: 0.55rem 0.85rem;
+    }
+    .navbar-collapse .dropdown-item:hover {
+        background-color: rgba(37, 99, 235, 0.4);
+        color: #ffffff !important;
+    }
+    .mobile-nav-divider {
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        margin: 0.5rem 0;
+    }
+}
+
+/* Handheld Phones (<= 575.98px) */
+@media (max-width: 575.98px) {
+    /* Fluid Single-Line Countdown Tiles */
+    .countdown-box {
+        padding: 1.15rem 0.85rem;
+        border-radius: 0.85rem;
+    }
+    .countdown-tiles {
+        display: flex;
+        flex-wrap: nowrap !important;
+        gap: 0.35rem !important;
+        justify-content: space-between !important;
+        margin-top: 0.75rem;
+    }
+    .countdown-tile {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+        padding: 0.5rem 0.25rem !important;
+        border-radius: 0.5rem !important;
+    }
+    .countdown-tile .val {
+        font-size: 1.35rem !important;
+    }
+    .countdown-tile .lbl {
+        font-size: 0.6rem !important;
+        letter-spacing: 0.04em !important;
+        margin-top: 0.2rem !important;
+    }
+
+    /* Candidate Card Stack on Mobile */
+    .candidate-card {
+        padding: 1.15rem 1rem;
+        border-radius: 0.85rem;
+    }
+    .candidate-avatar,
+    .avatar-monogram {
+        width: 72px;
+        height: 72px;
+        font-size: 1.6rem;
+    }
+    .candidate-symbol-badge {
+        width: 32px;
+        height: 32px;
+        bottom: -4px;
+        right: -4px;
+    }
+    .candidate-check-indicator {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* 4-Stat KPI Grid 2x2 on Mobile */
+    .stat-card {
+        padding: 0.85rem !important;
+    }
+    .stat-icon {
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 1.2rem !important;
+        border-radius: 10px !important;
+        margin-right: 0.5rem !important;
+    }
+    .stat-card .fs-4 {
+        font-size: 1.25rem !important;
+    }
+
+    /* Winner Banner on Mobile */
+    .winner-banner {
+        padding: 1.25rem 1rem;
+    }
+    .winner-trophy-icon {
+        font-size: 2.25rem;
+    }
+    .winner-banner .display-6 {
+        font-size: 1.5rem;
+    }
+
+    /* Form Card & Content Padding */
+    .card-body.p-4 {
+        padding: 1.25rem !important;
+    }
+    .container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
+/* Touch Scroll Enhancements */
+.table-responsive {
+    -webkit-overflow-scrolling: touch;
+}
+.table td:last-child,
+.table th:last-child {
+    white-space: nowrap;
+}
+.table-responsive::-webkit-scrollbar {
+    height: 5px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 9999px;
+}

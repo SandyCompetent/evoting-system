@@ -32,6 +32,13 @@ function db(): PDO
         } catch (PDOException $e) {
             error_log('DB connection failed: ' . $e->getMessage());
             http_response_code(500);
+            $isDev = env('APP_ENV') === 'development'
+                || in_array($_SERVER['SERVER_NAME'] ?? '', ['localhost', '127.0.0.1'], true)
+                || php_sapi_name() === 'cli-server'
+                || php_sapi_name() === 'cli';
+            if ($isDev) {
+                exit("<!DOCTYPE html><html><head><title>Database Connection Error</title><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/zephyr/bootstrap.min.css'></head><body class='bg-light py-5'><div class='container col-md-6'><div class='card shadow-sm border-danger'><div class='card-header bg-danger text-white fw-bold'><i class='bi bi-exclamation-triangle-fill me-2'></i>Database Connection Error</div><div class='card-body'><p>Could not connect to database host: <code>" . htmlspecialchars($host, ENT_QUOTES, 'UTF-8') . "</code></p><p><strong>Details:</strong> " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</p><hr><p class='small text-muted mb-0'>Ensure MySQL is running (<code>brew services start mysql</code>) and verify credentials in your <code>.env</code> file.</p></div></div></div></body></html>");
+            }
             exit('A server error occurred. Please try again later.');
         }
     }

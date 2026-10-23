@@ -42,9 +42,10 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                     <a class="nav-link text-warning fw-semibold" href="generate_demo_data.php"><i class="bi bi-database-fill-gear me-1"></i> Demo Data</a>
                 </li>
             </ul>
+            <div class="mobile-nav-divider d-lg-none"></div>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="change_password.php"><i class="bi bi-key me-1"></i> Change Password</a></li>
-                <li class="nav-item"><a class="nav-link" href="../includes/logout.php"><i class="bi bi-box-arrow-right me-1"></i> Logout</a></li>
+                <li class="nav-item"><a class="nav-link" href="../includes/logout.php"><i class="bi bi-box-arrow-right me-1 text-danger"></i> Logout</a></li>
             </ul>
         </div>
     </div>

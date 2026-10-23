@@ -62,17 +62,17 @@ $winner = $tally->winnerLabel();
 ?>
 
 <div class="container py-3">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4 pb-2 border-bottom">
         <div>
             <h2 class="h3 fw-bold text-dark mb-1">
                 <i class="bi bi-speedometer2 text-primary me-2"></i>Organiser Dashboard
             </h2>
-            <div class="text-muted">
+            <div class="text-muted small">
                 Category: <strong class="text-dark"><?= e($categoryName) ?></strong> (ID #<?= (int)$categoryID ?>) &bull; Status: <?= $statusBadge ?>
             </div>
         </div>
-        <div class="mt-2 mt-md-0">
-            <a href="create_candidate_account.php" class="btn btn-sm btn-outline-primary me-2">
+        <div class="mt-2 mt-sm-0 d-flex flex-wrap gap-2">
+            <a href="create_candidate_account.php" class="btn btn-sm btn-outline-primary">
                 <i class="bi bi-person-plus me-1"></i>New Candidate
             </a>
             <a href="create_voter_account.php" class="btn btn-sm btn-primary">
@@ -84,8 +84,8 @@ $winner = $tally->winnerLabel();
     <?php require_once("../includes/view_messages_and_errors.php"); ?>
 
     <!-- 4-Stat KPI Grid -->
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-xl-3">
+    <div class="row g-2 g-sm-3 mb-4">
+        <div class="col-6 col-xl-3">
             <div class="card stat-card h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="stat-icon bg-info bg-opacity-10 text-info me-3">
@@ -98,7 +98,7 @@ $winner = $tally->winnerLabel();
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
+        <div class="col-6 col-xl-3">
             <div class="card stat-card h-100 p-3">
                 <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
                     <i class="bi bi-check2-circle"></i>
@@ -109,18 +109,18 @@ $winner = $tally->winnerLabel();
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
+        <div class="col-6 col-xl-3">
             <div class="card stat-card h-100 p-3">
                 <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
                     <i class="bi bi-pie-chart-fill"></i>
                 </div>
                 <div>
-                    <div class="text-muted small text-uppercase fw-semibold">Voter Turnout</div>
+                    <div class="text-muted small text-uppercase fw-semibold">Turnout</div>
                     <div class="fs-4 fw-bold text-dark"><?= $turnoutPct ?>%</div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
+        <div class="col-6 col-xl-3">
             <div class="card stat-card h-100 p-3">
                 <div class="stat-icon bg-warning bg-opacity-10 text-warning me-3">
                     <i class="bi bi-person-badge-fill"></i>

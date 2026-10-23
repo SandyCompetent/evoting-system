@@ -58,16 +58,16 @@ $totalVotesCast = $tally->totalVotes();
 
 <div class="container py-3">
     <!-- Header Welcome Card -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4 pb-2 border-bottom">
         <div>
             <h2 class="h3 fw-bold text-dark mb-1">
                 <i class="bi bi-person-circle text-primary me-2"></i>Welcome, <?= e($voterName); ?>
             </h2>
-            <div class="text-muted">
+            <div class="text-muted small">
                 Assigned Election Category: <strong class="text-dark"><?= e($category_name); ?></strong> (ID #<?= (int)$category_id; ?>)
             </div>
         </div>
-        <div class="mt-2 mt-md-0">
+        <div class="mt-2 mt-sm-0">
             <?php if ($hasVoted): ?>
                 <span class="badge bg-success py-2 px-3 fs-6">
                     <i class="bi bi-check-circle-fill me-1"></i> Ballot Cast
@@ -158,12 +158,12 @@ $totalVotesCast = $tally->totalVotes();
             // Voting is OPEN! Show countdown bar + candidate cards ballot
             ?>
             <div class="countdown-box mb-4">
-                <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
                     <div>
                         <h5 class="fw-bold mb-0 text-white"><i class="bi bi-broadcast text-danger me-2"></i>Polls Are Live</h5>
                         <small class="text-light text-opacity-75">Cast your ballot before the remaining time expires.</small>
                     </div>
-                    <div class="countdown-tiles" id="vote_end_countdown">
+                    <div class="countdown-tiles w-100 w-sm-auto" id="vote_end_countdown">
                         <!-- Populated by JavaScript -->
                     </div>
                 </div>

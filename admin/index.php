@@ -42,18 +42,18 @@ $now = time();
 ?>
 
 <div class="container py-3">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4 pb-2 border-bottom">
         <div>
             <h2 class="h3 fw-bold text-dark mb-1">
                 <i class="bi bi-speedometer2 text-primary me-2"></i>Administrator Dashboard
             </h2>
-            <div class="text-muted">System administration and election management</div>
+            <div class="text-muted small">System administration and election management</div>
         </div>
-        <div class="mt-2 mt-md-0">
-            <a href="generate_demo_data.php" class="btn btn-sm btn-outline-warning me-2">
+        <div class="mt-2 mt-sm-0 d-flex flex-wrap gap-2">
+            <a href="generate_demo_data.php" class="btn btn-sm btn-outline-warning">
                 <i class="bi bi-database-fill-gear me-1"></i>Demo Data
             </a>
-            <a href="create_election_category.php" class="btn btn-sm btn-primary me-2">
+            <a href="create_election_category.php" class="btn btn-sm btn-primary">
                 <i class="bi bi-plus-circle me-1"></i>New Category
             </a>
             <a href="create_organiser_account.php" class="btn btn-sm btn-outline-primary">
@@ -65,8 +65,8 @@ $now = time();
     <?php require_once("../includes/view_messages_and_errors.php"); ?>
 
     <!-- 4-Stat KPI Grid -->
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-xl-3">
+    <div class="row g-2 g-sm-3 mb-4">
+        <div class="col-6 col-xl-3">
             <div class="card stat-card h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
@@ -79,7 +79,7 @@ $now = time();
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
+        <div class="col-6 col-xl-3">
             <div class="card stat-card h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
@@ -92,7 +92,7 @@ $now = time();
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
+        <div class="col-6 col-xl-3">
             <div class="card stat-card h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="stat-icon bg-info bg-opacity-10 text-info me-3">
@@ -105,7 +105,7 @@ $now = time();
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
+        <div class="col-6 col-xl-3">
             <div class="card stat-card h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="stat-icon bg-warning bg-opacity-10 text-warning me-3">

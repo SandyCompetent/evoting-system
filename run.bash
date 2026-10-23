@@ -47,6 +47,20 @@ else
     echo ""
 fi
 
+# Ensure local .env file is present and configured for localhost
+if [ ! -f .env ] || grep -q "sql110.infinityfree.com" .env 2>/dev/null; then
+    echo -e "Configuring local '.env' file for MySQL..."
+    cat << 'EOF' > .env
+# Local Development Database Configuration
+DB_HOST=127.0.0.1
+DB_NAME=evoting_system
+DB_USER=root
+DB_PASS=
+APP_ENV=development
+EOF
+    echo -e "✅ Local .env configured!"
+fi
+
 # 4. Find an available port and start the Application
 PORT=8000
 while lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null ; do
