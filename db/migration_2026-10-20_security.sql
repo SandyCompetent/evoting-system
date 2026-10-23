@@ -1,6 +1,5 @@
--- Installment 1 — P0 database hygiene (non-breaking).
--- Safe to run on the existing schema; does NOT touch the vote model
--- (that comes in installment 3). Back up your database before running.
+-- Database schema and security migration (2026-10-20).
+-- Safe to run on the existing schema. Back up your database before running.
 
 -- 1. Move the remaining MyISAM tables to InnoDB so later work can use
 --    transactions and foreign keys.

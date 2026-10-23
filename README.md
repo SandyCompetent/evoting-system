@@ -81,7 +81,7 @@ All 53 unit tests run in memory using SQLite PDO and in-memory repository fakes,
 
 ## Showcase & Test Accounts
 
-The included dataset is populated with current non-past dates:
+The default dataset includes sample accounts across active, upcoming, and concluded elections:
 
 | Role | Email Login | Password | Flow to Explore |
 |---|---|---|---|

@@ -1,9 +1,7 @@
 <?php
 /**
  * Parameterized data-access API. Every value MUST be passed via the $params
- * array (never concatenated into the SQL string). This is the only data layer
- * in the application; the legacy string-SQL helpers were removed in
- * installment 2 of the security refactor.
+ * array (never concatenated into the SQL string).
  */
 function q(string $sql, array $params = []): PDOStatement
 {

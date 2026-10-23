@@ -1,4 +1,4 @@
--- Installment 3 - Auditable vote model.
+-- Auditable vote model migration.
 -- Back up your database before running:
 --   mysqldump -u root evoting_system > evoting_backup.sql
 -- Apply:

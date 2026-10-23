@@ -100,34 +100,40 @@ $winner = $tally->winnerLabel();
         </div>
         <div class="col-6 col-xl-3">
             <div class="card stat-card h-100 p-3">
-                <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
-                    <i class="bi bi-check2-circle"></i>
-                </div>
-                <div>
-                    <div class="text-muted small text-uppercase fw-semibold">Ballots Cast</div>
-                    <div class="fs-4 fw-bold text-dark"><?= (int)$voterReceived ?></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-xl-3">
-            <div class="card stat-card h-100 p-3">
-                <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
-                    <i class="bi bi-pie-chart-fill"></i>
-                </div>
-                <div>
-                    <div class="text-muted small text-uppercase fw-semibold">Turnout</div>
-                    <div class="fs-4 fw-bold text-dark"><?= $turnoutPct ?>%</div>
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small text-uppercase fw-semibold">Ballots Cast</div>
+                        <div class="fs-4 fw-bold text-dark"><?= (int)$voterReceived ?></div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-6 col-xl-3">
             <div class="card stat-card h-100 p-3">
-                <div class="stat-icon bg-warning bg-opacity-10 text-warning me-3">
-                    <i class="bi bi-person-badge-fill"></i>
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
+                        <i class="bi bi-pie-chart-fill"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small text-uppercase fw-semibold">Turnout</div>
+                        <div class="fs-4 fw-bold text-dark"><?= $turnoutPct ?>%</div>
+                    </div>
                 </div>
-                <div>
-                    <div class="text-muted small text-uppercase fw-semibold">Candidates</div>
-                    <div class="fs-4 fw-bold text-dark"><?= (int)$count ?></div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="card stat-card h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning me-3">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small text-uppercase fw-semibold">Candidates</div>
+                        <div class="fs-4 fw-bold text-dark"><?= (int)$count ?></div>
+                    </div>
                 </div>
             </div>
         </div>

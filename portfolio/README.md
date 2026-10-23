@@ -26,7 +26,7 @@ open portfolio/index.html
 
 ## 2. Screenshot & Mockup Catalog
 
-All screenshots are captured directly from the project with current, non-past timestamps and responsive viewports:
+All screenshots are captured directly from the project across desktop and mobile viewports:
 
 | Mockup | File | Format | Description |
 |---|---|---|---|
@@ -49,7 +49,7 @@ All screenshots are captured directly from the project with current, non-past ti
 
 ## 3. Video Assets & Screencast
 
-- **`video/evoting_showcase.mp4`**: High-resolution video screencast recorded via Chrome DevTools MCP, demonstrating live navigation across the user portals.
+- **`video/evoting_showcase.mp4`**: High-resolution video screencast demonstrating live navigation across the user portals.
 - **Embedded Player**: Included directly within `portfolio/index.html` with interactive 4-chapter selector and autoplay tour toggle.
 
 ---

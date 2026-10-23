@@ -26,8 +26,9 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+.env.production
 
-# Logs and Caches
+# Logs, Backups, and Caches
 *.log
 error_log
 php_errors.log
@@ -36,3 +37,6 @@ cookie.txt
 *.cookie
 _backup*/
 *.tmp
+*.bak
+*.old
+

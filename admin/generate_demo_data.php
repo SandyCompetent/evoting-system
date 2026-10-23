@@ -14,9 +14,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($action === "seed_full") {
             $purge = isset($_POST["purge"]) && $_POST["purge"] === "1";
             $res = $seeder->seedFullShowcase($purge);
-            $_SESSION["messages"][] = "Full showcase dataset generated successfully! Created " 
-                . count($res["categories"]) . " categories, " 
-                . count($res["candidates"]) . " candidates, and " 
+            $_SESSION["messages"][] = "Full showcase dataset generated successfully! Created "
+                . count($res["categories"]) . " categories, "
+                . count($res["candidates"]) . " candidates, and "
                 . $res["votes_cast"] . " cast ballots.";
         } elseif ($action === "add_voters") {
             $catId = (int)($_POST["category_id"] ?? 0);
@@ -67,7 +67,7 @@ $now = time();
             <h2 class="h3 fw-bold text-dark mb-1">
                 <i class="bi bi-database-fill-gear text-warning me-2"></i>Showcase & Demo Data Generator
             </h2>
-            <div class="text-muted">Generate realistic test data with current non-past dates for demonstration and testing</div>
+            <div class="text-muted">Generate realistic test data across active, upcoming, and concluded election scenarios</div>
         </div>
         <div>
             <a href="index.php" class="btn btn-sm btn-outline-secondary">
@@ -124,7 +124,7 @@ $now = time();
                 </div>
                 <div class="card-body p-4">
                     <p class="text-muted">
-                        Generates a complete, ready-to-present election environment with current non-past dates:
+                        Generates a complete, ready-to-present election environment across active, upcoming, and concluded scenarios:
                     </p>
                     <ul class="small text-muted mb-4 ps-3">
                         <li><strong>Live Active Election:</strong> Student Council (25 voters, 16 votes cast, 4 candidates). Open right now for live balloting.</li>
@@ -324,7 +324,7 @@ $now = time();
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($categories as $c): 
+                                    <?php foreach ($categories as $c):
                                         $s = !empty($c['vote_start_time']) ? strtotime($c['vote_start_time']) : 0;
                                         $e = !empty($c['vote_end_time']) ? strtotime($c['vote_end_time']) : 0;
                                         $badge = '<span class="badge bg-secondary">Unscheduled</span>';

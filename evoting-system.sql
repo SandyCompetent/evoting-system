@@ -1,5 +1,5 @@
 -- MySQL dump for e-Voting System
--- Modernized Schema & Showcase Dataset (Non-past dates: October 2026)
+-- Schema & Default Seed Dataset (October 2026)
 -- Database: evoting_system
 -- ------------------------------------------------------
 
@@ -40,7 +40,7 @@ CREATE TABLE `election_category` (
 
 LOCK TABLES `election_category` WRITE;
 /*!40000 ALTER TABLE `election_category` DISABLE KEYS */;
-INSERT INTO `election_category` VALUES 
+INSERT INTO `election_category` VALUES
 (30,'Student Council General Election',50,'Yes','2026-10-20 08:00:00','2026-10-28 00:00:00','2026-10-20 09:00:00','2026-10-27 18:00:00'),
 (31,'Faculty Board Representative',30,'Yes','2026-10-21 09:00:00','2026-11-02 00:00:00','2026-10-25 09:00:00','2026-11-01 18:00:00'),
 (32,'Alumni Advisory Board',25,'No','2026-10-14 08:00:00','2026-10-21 18:00:00','2026-10-14 09:00:00','2026-10-21 18:00:00');
@@ -73,7 +73,7 @@ CREATE TABLE `candidate` (
 
 LOCK TABLES `candidate` WRITE;
 /*!40000 ALTER TABLE `candidate` DISABLE KEYS */;
-INSERT INTO `candidate` VALUES 
+INSERT INTO `candidate` VALUES
 -- Candidates for Category 30 (Student Council - Live)
 (25,'Alex Rivera','alex_rivera.jpg','star.png',30,'2026-10-20 08:30:00'),
 (26,'Jane Doe','jane_doe.jpg','eagle.png',30,'2026-10-20 08:31:00'),
@@ -121,7 +121,7 @@ CREATE TABLE `system_users` (
 
 LOCK TABLES `system_users` WRITE;
 /*!40000 ALTER TABLE `system_users` DISABLE KEYS */;
-INSERT INTO `system_users` VALUES 
+INSERT INTO `system_users` VALUES
 -- Admin
 (1,'System Admin','admin@evoting.com',NULL,'$2y$12$h1fxS5SEgNJ2CYG5wo8h/OcRKllm7SWElY7OH37NIb9CYLkUKovse','admin',0,NULL,'2026-10-01 10:00:00'),
 -- Organisers
@@ -205,7 +205,7 @@ CREATE TABLE `vote` (
 
 LOCK TABLES `vote` WRITE;
 /*!40000 ALTER TABLE `vote` DISABLE KEYS */;
-INSERT INTO `vote` VALUES 
+INSERT INTO `vote` VALUES
 -- Category 30 (Student Council)
 (1,101,30,25,'2026-10-20 10:00:00'),
 (2,102,30,25,'2026-10-20 10:05:00'),
@@ -264,7 +264,7 @@ CREATE TABLE `request_to_register` (
 
 LOCK TABLES `request_to_register` WRITE;
 /*!40000 ALTER TABLE `request_to_register` DISABLE KEYS */;
-INSERT INTO `request_to_register` VALUES 
+INSERT INTO `request_to_register` VALUES
 (8,'Dr. Robert Chen','robert.chen@engineering.edu','Engineering Society Executive',40,'Yes','2026-11-05 18:00:00','2026-10-22 14:00:00','pending'),
 (9,'Samantha Reed','samantha@athletics.org','Varsity Sports Club Captaincy',30,'No','2026-11-12 18:00:00','2026-10-22 15:30:00','pending');
 /*!40000 ALTER TABLE `request_to_register` ENABLE KEYS */;
