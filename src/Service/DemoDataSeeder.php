@@ -64,7 +64,7 @@ final class DemoDataSeeder
                     "INSERT INTO system_users (full_name, email, password, role, election_category_id)
                      VALUES ('Administrator', 'admin@evoting.com', ?, 'admin', 0)"
                 );
-                $stmtAdmin->execute([password_hash('admin123', PASSWORD_BCRYPT)]);
+                $stmtAdmin->execute([password_hash('12345678', PASSWORD_BCRYPT)]);
             }
             // ---------------------------------------------------------
             // 1. ACTIVE ELECTION (Voting is currently LIVE)
