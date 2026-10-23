@@ -1,0 +1,43 @@
+name: Deploy to InfinityFree
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'portfolio/**'
+      - '.github/**'
+      - 'README.md'
+      - 'tests/**'
+      - '.idea/**'
+  workflow_dispatch:
+
+jobs:
+  web-deploy:
+    name: Deploy to InfinityFree FTP
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ftpupload.net
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: htdocs/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/.github/**
+          **/portfolio/**
+          **/tests/**
+          **/.idea/**
+          README.md
+          phpunit.xml
+          composer.json
+          run.bash
+          .env.example
+          evoting-system.sql
+          db/migration*.sql
