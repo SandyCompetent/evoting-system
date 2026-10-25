@@ -1,12 +1,12 @@
 # e-Voting System
 
-<a href="https://github.com/SandyCompetent/evoting-system/actions/workflows/ci-tests.yml" target="_blank"><img src="https://github.com/SandyCompetent/evoting-system/actions/workflows/ci-tests.yml/badge.svg?branch=main" alt="Tests"></a>
-<a href="https://php.net/" target="_blank"><img src="https://img.shields.io/badge/php-%3E%3D8.0-blue.svg" alt="PHP Version"></a>
-<a href="https://opensource.org/licenses/MIT" target="_blank"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+<a href="https://github.com/SandyCompetent/evoting-system/actions/workflows/ci-tests.yml" target="_blank" rel="noopener noreferrer"><img src="https://github.com/SandyCompetent/evoting-system/actions/workflows/ci-tests.yml/badge.svg?branch=main" alt="Tests"></a>
+<a href="https://php.net/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/php-%3E%3D8.0-blue.svg" alt="PHP Version"></a>
+<a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
 
 > **Disclaimer:** This project is intended exclusively for **Portfolio and Demo** purposes. It is **not for commercial use**.
 
-🚀 **Live Demo:** <a href="https://evoting-system.freehosting.dev" target="_blank">https://evoting-system.freehosting.dev</a>
+🚀 **Live Demo:** <a href="https://evoting-system.freehosting.dev" target="_blank" rel="noopener noreferrer">https://evoting-system.freehosting.dev</a>
 
 A secure, modern online voting web application built with **PHP** and **MySQL**. Designed for student councils, academic departments, clubs, and organizations to conduct transparent elections with role-based dashboards and automated ballot auditing.
 
@@ -61,7 +61,7 @@ sudo systemctl start mysql
 ```
 
 **Windows:**
-We recommend using <a href="https://www.apachefriends.org/index.html" target="_blank">XAMPP</a> or <a href="https://laragon.org/" target="_blank">Laragon</a> which bundle PHP and MySQL together. Start the Apache and MySQL services from their respective control panels.
+We recommend using <a href="https://www.apachefriends.org/index.html" target="_blank" rel="noopener noreferrer">XAMPP</a> or <a href="https://laragon.org/" target="_blank" rel="noopener noreferrer">Laragon</a> which bundle PHP and MySQL together. Start the Apache and MySQL services from their respective control panels.
 
 
 ### 2. Database Initialization
@@ -83,7 +83,7 @@ Run PHP's built-in development server:
 ```bash
 php -S localhost:8000
 ```
-Open **<a href="http://localhost:8000" target="_blank">http://localhost:8000</a>** in your browser.
+Open **<a href="http://localhost:8000" target="_blank" rel="noopener noreferrer">http://localhost:8000</a>** in your browser.
 
 Alternatively, execute the automated runner script:
 ```bash
@@ -126,4 +126,4 @@ The default dataset includes sample accounts across active, upcoming, and conclu
 
 ## License
 
-This project is intended exclusively for **Portfolio and Demo** purposes. It is **not for commercial use**. Please review the <a href="LICENSE" target="_blank">`LICENSE`</a> file for further details.
+This project is intended exclusively for **Portfolio and Demo** purposes. It is **not for commercial use**. Please review the <a href="LICENSE" target="_blank" rel="noopener noreferrer">`LICENSE`</a> file for further details.
