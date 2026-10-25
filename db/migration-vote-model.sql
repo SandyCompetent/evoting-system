@@ -2,7 +2,7 @@
 -- Back up your database before running:
 --   mysqldump -u root evoting_system > evoting_backup.sql
 -- Apply:
---   mysql -u root evoting_system < db/migration_vote_model.sql
+--   mysql -u root evoting_system < db/migration-vote-model.sql
 
 -- One row per ballot cast. The UNIQUE key is what enforces
 -- one-vote-per-voter-per-election at the database level (defence that does
