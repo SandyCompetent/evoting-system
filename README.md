@@ -62,7 +62,7 @@ Run PHP's built-in development server:
 ```bash
 php -S localhost:8000
 ```
-Open **[http://localhost:8000](http://localhost:8000)** in your browser.
+Open **<a href="https://evoting-system.freehosting.dev/?i=1" target="_blank">https://evoting-system.freehosting.dev/?i=1</a>** in your browser.
 
 Alternatively, execute the automated runner script:
 ```bash
@@ -105,4 +105,4 @@ The default dataset includes sample accounts across active, upcoming, and conclu
 
 ## License
 
-This project is intended exclusively for **Portfolio and Demo** purposes. It is **not for commercial use**. Please review the [`LICENSE`](LICENSE) file for further details.
+This project is intended exclusively for **Portfolio and Demo** purposes. It is **not for commercial use**. Please review the <a href="LICENSE" target="_blank">`LICENSE`</a> file for further details.

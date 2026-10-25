@@ -30,20 +30,20 @@ All screenshots are captured directly from the project across desktop and mobile
 
 | Mockup | File | Format | Description |
 |---|---|---|---|
-| **01. Portal Login** | [images/01-portal-login.png](images/01-portal-login.png) | Desktop 1440x900 | Public sign-in card with floating labels and clean trust note. |
-| **02. Host Requests** | [images/02-admin-requests.png](images/02-admin-requests.png) | Desktop 1440x900 | Administrator queue for reviewing and approving election requests. |
-| **03. Admin Dashboard** | [images/03-admin-dashboard.png](images/03-admin-dashboard.png) | Desktop 1440x900 | Administrator overview with 4 KPI tiles, category list, and Google chart. |
-| **04. Demo Generator** | [images/04-admin-demo-generator.png](images/04-admin-demo-generator.png) | Desktop 1440x900 | 1-Click showcase data generator and credentials cheat-sheet. |
-| **05. Category Management** | [images/05-admin-categories.png](images/05-admin-categories.png) | Desktop 1440x900 | Category roster with RESTful edit links and cascade deletions. |
-| **06. Organiser Dashboard** | [images/06-organiser-dashboard.png](images/06-organiser-dashboard.png) | Desktop 1440x900 | Organiser dashboard with real-time turnout %, voting window editor, and charts. |
-| **07. Candidate Roster** | [images/07-organiser-candidates.png](images/07-organiser-candidates.png) | Desktop 1440x900 | Candidate management with photos, symbol badges, and active-voting safeguards. |
-| **08. Voter Accounts** | [images/08-organiser-voters.png](images/08-organiser-voters.png) | Desktop 1440x900 | Registered voter accounts with DOB and authoritative ballot status. |
-| **09. Live Voter Ballot** | [images/09-voter-live-ballot.png](images/09-voter-live-ballot.png) | Desktop 1440x900 | Responsive candidate card grid with selection highlights and countdown timer. |
-| **10. Vote Confirmation** | [images/10-voter-cast-confirmation.png](images/10-voter-cast-confirmation.png) | Desktop 1440x900 | Post-vote confirmation screen with glassmorphic countdown to polls closing. |
-| **11. Concluded Results** | [images/11-voter-concluded-results.png](images/11-voter-concluded-results.png) | Desktop 1440x900 | Certified election results with gold trophy winner banner and Google Bar chart. |
-| **12. Mobile Ballot View** | [images/12-mobile-voter-ballot.png](images/12-mobile-voter-ballot.png) | Mobile 390x844 | Touch-friendly candidate card selection on mobile iPhone viewport. |
-| **13. Mobile Credentials** | [images/13-mobile-credentials.png](images/13-mobile-credentials.png) | Mobile 390x844 | Responsive demonstration account roster and touch actions. |
-| **14. Mobile Portal Hero** | [images/14-mobile-hero-overview.png](images/14-mobile-hero-overview.png) | Mobile 390x844 | Stacked header and quick metrics on mobile handheld screens. |
+| **01. Portal Login** | <a href="images/01-portal-login.png" target="_blank">images/01-portal-login.png</a> | Desktop 1440x900 | Public sign-in card with floating labels and clean trust note. |
+| **02. Host Requests** | <a href="images/02-admin-requests.png" target="_blank">images/02-admin-requests.png</a> | Desktop 1440x900 | Administrator queue for reviewing and approving election requests. |
+| **03. Admin Dashboard** | <a href="images/03-admin-dashboard.png" target="_blank">images/03-admin-dashboard.png</a> | Desktop 1440x900 | Administrator overview with 4 KPI tiles, category list, and Google chart. |
+| **04. Demo Generator** | <a href="images/04-admin-demo-generator.png" target="_blank">images/04-admin-demo-generator.png</a> | Desktop 1440x900 | 1-Click showcase data generator and credentials cheat-sheet. |
+| **05. Category Management** | <a href="images/05-admin-categories.png" target="_blank">images/05-admin-categories.png</a> | Desktop 1440x900 | Category roster with RESTful edit links and cascade deletions. |
+| **06. Organiser Dashboard** | <a href="images/06-organiser-dashboard.png" target="_blank">images/06-organiser-dashboard.png</a> | Desktop 1440x900 | Organiser dashboard with real-time turnout %, voting window editor, and charts. |
+| **07. Candidate Roster** | <a href="images/07-organiser-candidates.png" target="_blank">images/07-organiser-candidates.png</a> | Desktop 1440x900 | Candidate management with photos, symbol badges, and active-voting safeguards. |
+| **08. Voter Accounts** | <a href="images/08-organiser-voters.png" target="_blank">images/08-organiser-voters.png</a> | Desktop 1440x900 | Registered voter accounts with DOB and authoritative ballot status. |
+| **09. Live Voter Ballot** | <a href="images/09-voter-live-ballot.png" target="_blank">images/09-voter-live-ballot.png</a> | Desktop 1440x900 | Responsive candidate card grid with selection highlights and countdown timer. |
+| **10. Vote Confirmation** | <a href="images/10-voter-cast-confirmation.png" target="_blank">images/10-voter-cast-confirmation.png</a> | Desktop 1440x900 | Post-vote confirmation screen with glassmorphic countdown to polls closing. |
+| **11. Concluded Results** | <a href="images/11-voter-concluded-results.png" target="_blank">images/11-voter-concluded-results.png</a> | Desktop 1440x900 | Certified election results with gold trophy winner banner and Google Bar chart. |
+| **12. Mobile Ballot View** | <a href="images/12-mobile-voter-ballot.png" target="_blank">images/12-mobile-voter-ballot.png</a> | Mobile 390x844 | Touch-friendly candidate card selection on mobile iPhone viewport. |
+| **13. Mobile Credentials** | <a href="images/13-mobile-credentials.png" target="_blank">images/13-mobile-credentials.png</a> | Mobile 390x844 | Responsive demonstration account roster and touch actions. |
+| **14. Mobile Portal Hero** | <a href="images/14-mobile-hero-overview.png" target="_blank">images/14-mobile-hero-overview.png</a> | Mobile 390x844 | Stacked header and quick metrics on mobile handheld screens. |
 
 ---
 
@@ -55,7 +55,7 @@ To run the live PHP application locally:
 ```bash
 php -S localhost:8000
 ```
-Open **[http://localhost:8000](http://localhost:8000)** in your browser.
+Open **<a href="https://evoting-system.freehosting.dev/?i=1" target="_blank">https://evoting-system.freehosting.dev/?i=1</a>** in your browser.
 
 ### Step 2: Showcase Logins (Password: `password123`)
 
@@ -87,4 +87,4 @@ To publish the portfolio online:
    ```
 4. GitHub Actions will automatically deploy the contents of the `portfolio/` directory.
 5. Your live portfolio will be available at:
-   **`http://evoting-system.freehosting.dev`**
+   **<a href="https://evoting-system.freehosting.dev/?i=1" target="_blank">https://evoting-system.freehosting.dev/?i=1</a>**
