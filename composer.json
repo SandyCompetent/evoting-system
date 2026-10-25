@@ -20,5 +20,6 @@
     },
     "scripts": {
         "test": "php tests/run-tests.php"
-    }
+    },
+    "license": "MIT"
 }
