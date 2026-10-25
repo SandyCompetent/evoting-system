@@ -1,5 +1,9 @@
 # e-Voting System
 
+[![Tests](https://github.com/SandyCompetent/evoting-system/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/SandyCompetent/evoting-system/actions/workflows/ci-tests.yml)
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.0-blue.svg)](https://php.net/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 > **Disclaimer:** This project is intended exclusively for **Portfolio and Demo** purposes. It is **not for commercial use**.
 
 A secure, modern online voting web application built with **PHP** and **MySQL**. Designed for student councils, academic departments, clubs, and organizations to conduct transparent elections with role-based dashboards and automated ballot auditing.
