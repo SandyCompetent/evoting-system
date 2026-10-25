@@ -5,7 +5,7 @@ require_role("admin");
 if (($editId = pressed_action("edit")) !== null) {
     csrf_verify();
     $_SESSION["organiser_refID"] = $editId;
-    redirect("update_account_details.php?id=" . $editId);
+    redirect("update-account-details.php?id=" . $editId);
 }
 
 $delId = pressed_action("delete");
@@ -30,14 +30,14 @@ $organisers = fetchAll(
 ?>
 
 <div class="container py-4">
-    <?php require_once("../includes/view_messages_and_errors.php"); ?>
+    <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0 fw-semibold text-primary">
                 <i class="bi bi-people-fill me-2"></i>Organiser Accounts
             </h5>
-            <a href="create_organiser_account.php" class="btn btn-sm btn-primary">
+            <a href="create-organiser-account.php" class="btn btn-sm btn-primary">
                 <i class="bi bi-person-plus me-1"></i> Create New Organiser
             </a>
         </div>
@@ -74,7 +74,7 @@ $organisers = fetchAll(
                                     </td>
                                     <td class="text-muted small"><?= e($value['created_timestamp'] ?? 'N/A'); ?></td>
                                     <td class="text-end pe-3">
-                                        <a href="update_account_details.php?id=<?= (int)$value['user_id'] ?>" class="btn btn-sm btn-outline-primary me-1">
+                                        <a href="update-account-details.php?id=<?= (int)$value['user_id'] ?>" class="btn btn-sm btn-outline-primary me-1">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
                                         <button type="submit" name="delete_id" value="<?= (int)$value['user_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete organiser \'<?= addslashes(e($value['full_name'])) ?>\'?');">

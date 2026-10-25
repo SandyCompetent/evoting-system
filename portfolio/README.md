@@ -30,31 +30,24 @@ All screenshots are captured directly from the project across desktop and mobile
 
 | Mockup | File | Format | Description |
 |---|---|---|---|
-| **01. Portal Login** | [images/01_portal_login.png](images/01_portal_login.png) | Desktop 1440x900 | Public sign-in card with floating labels and clean trust note. |
-| **02. Host Requests** | [images/02_admin_requests.png](images/02_admin_requests.png) | Desktop 1440x900 | Administrator queue for reviewing and approving election requests. |
-| **03. Admin Dashboard** | [images/03_admin_dashboard.png](images/03_admin_dashboard.png) | Desktop 1440x900 | Administrator overview with 4 KPI tiles, category list, and Google chart. |
-| **04. Demo Generator** | [images/04_admin_demo_generator.png](images/04_admin_demo_generator.png) | Desktop 1440x900 | 1-Click showcase data generator and credentials cheat-sheet. |
-| **05. Category Management** | [images/05_admin_categories.png](images/05_admin_categories.png) | Desktop 1440x900 | Category roster with RESTful edit links and cascade deletions. |
-| **06. Organiser Dashboard** | [images/06_organiser_dashboard.png](images/06_organiser_dashboard.png) | Desktop 1440x900 | Organiser dashboard with real-time turnout %, voting window editor, and charts. |
-| **07. Candidate Roster** | [images/07_organiser_candidates.png](images/07_organiser_candidates.png) | Desktop 1440x900 | Candidate management with photos, symbol badges, and active-voting safeguards. |
-| **08. Voter Accounts** | [images/08_organiser_voters.png](images/08_organiser_voters.png) | Desktop 1440x900 | Registered voter accounts with DOB and authoritative ballot status. |
-| **09. Live Voter Ballot** | [images/09_voter_live_ballot.png](images/09_voter_live_ballot.png) | Desktop 1440x900 | Responsive candidate card grid with selection highlights and countdown timer. |
-| **10. Vote Confirmation** | [images/10_voter_cast_confirmation.png](images/10_voter_cast_confirmation.png) | Desktop 1440x900 | Post-vote confirmation screen with glassmorphic countdown to polls closing. |
-| **11. Concluded Results** | [images/11_voter_concluded_results.png](images/11_voter_concluded_results.png) | Desktop 1440x900 | Certified election results with gold trophy winner banner and Google Bar chart. |
-| **12. Mobile Ballot View** | [images/12_mobile_voter_ballot.png](images/12_mobile_voter_ballot.png) | Mobile 390x844 | Touch-friendly candidate card selection on mobile iPhone viewport. |
-| **13. Mobile Credentials** | [images/13_mobile_credentials.png](images/13_mobile_credentials.png) | Mobile 390x844 | Responsive demonstration account roster and touch actions. |
-| **14. Mobile Portal Hero** | [images/14_mobile_hero_overview.png](images/14_mobile_hero_overview.png) | Mobile 390x844 | Stacked header and quick metrics on mobile handheld screens. |
+| **01. Portal Login** | [images/01-portal-login.png](images/01-portal-login.png) | Desktop 1440x900 | Public sign-in card with floating labels and clean trust note. |
+| **02. Host Requests** | [images/02-admin-requests.png](images/02-admin-requests.png) | Desktop 1440x900 | Administrator queue for reviewing and approving election requests. |
+| **03. Admin Dashboard** | [images/03-admin-dashboard.png](images/03-admin-dashboard.png) | Desktop 1440x900 | Administrator overview with 4 KPI tiles, category list, and Google chart. |
+| **04. Demo Generator** | [images/04-admin-demo-generator.png](images/04-admin-demo-generator.png) | Desktop 1440x900 | 1-Click showcase data generator and credentials cheat-sheet. |
+| **05. Category Management** | [images/05-admin-categories.png](images/05-admin-categories.png) | Desktop 1440x900 | Category roster with RESTful edit links and cascade deletions. |
+| **06. Organiser Dashboard** | [images/06-organiser-dashboard.png](images/06-organiser-dashboard.png) | Desktop 1440x900 | Organiser dashboard with real-time turnout %, voting window editor, and charts. |
+| **07. Candidate Roster** | [images/07-organiser-candidates.png](images/07-organiser-candidates.png) | Desktop 1440x900 | Candidate management with photos, symbol badges, and active-voting safeguards. |
+| **08. Voter Accounts** | [images/08-organiser-voters.png](images/08-organiser-voters.png) | Desktop 1440x900 | Registered voter accounts with DOB and authoritative ballot status. |
+| **09. Live Voter Ballot** | [images/09-voter-live-ballot.png](images/09-voter-live-ballot.png) | Desktop 1440x900 | Responsive candidate card grid with selection highlights and countdown timer. |
+| **10. Vote Confirmation** | [images/10-voter-cast-confirmation.png](images/10-voter-cast-confirmation.png) | Desktop 1440x900 | Post-vote confirmation screen with glassmorphic countdown to polls closing. |
+| **11. Concluded Results** | [images/11-voter-concluded-results.png](images/11-voter-concluded-results.png) | Desktop 1440x900 | Certified election results with gold trophy winner banner and Google Bar chart. |
+| **12. Mobile Ballot View** | [images/12-mobile-voter-ballot.png](images/12-mobile-voter-ballot.png) | Mobile 390x844 | Touch-friendly candidate card selection on mobile iPhone viewport. |
+| **13. Mobile Credentials** | [images/13-mobile-credentials.png](images/13-mobile-credentials.png) | Mobile 390x844 | Responsive demonstration account roster and touch actions. |
+| **14. Mobile Portal Hero** | [images/14-mobile-hero-overview.png](images/14-mobile-hero-overview.png) | Mobile 390x844 | Stacked header and quick metrics on mobile handheld screens. |
 
 ---
 
-## 3. Video Assets & Screencast
-
-- **`video/evoting_showcase.mp4`**: High-resolution video screencast demonstrating live navigation across the user portals.
-- **Embedded Player**: Included directly within `portfolio/index.html` with interactive 4-chapter selector and autoplay tour toggle.
-
----
-
-## 4. Live Demonstration Guide
+## 3. Live Demonstration Guide
 
 To run the live PHP application locally:
 
@@ -77,7 +70,7 @@ Open **[http://localhost:8000](http://localhost:8000)** in your browser.
 
 ---
 
-## 5. Hosting the Portfolio on GitHub Pages
+## 4. Hosting the Portfolio on GitHub Pages
 
 This portfolio is 100% static HTML/CSS/JS and is designed to be hosted directly on **GitHub Pages**:
 

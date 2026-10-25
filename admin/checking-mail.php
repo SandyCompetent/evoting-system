@@ -9,7 +9,7 @@ $fromEmail = env("MAIL_FROM", "no-reply@evoting.local");
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <?php require_once("../includes/view_messages_and_errors.php"); ?>
+            <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white border-bottom py-3">
@@ -18,7 +18,7 @@ $fromEmail = env("MAIL_FROM", "no-reply@evoting.local");
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form action="email_script.php" method="post">
+                    <form action="email-script.php" method="post">
                         <?php echo csrf_field(); ?>
 
                         <div class="mb-3">

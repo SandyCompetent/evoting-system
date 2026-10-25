@@ -18,7 +18,7 @@ if (isset($_POST["sendMailBtn"])) {
     if (!filter_var($toEmail, FILTER_VALIDATE_EMAIL) || $hasNewline($toEmail)
         || $subject === "" || $hasNewline($subject)) {
         $_SESSION["errors"][] = "Invalid recipient or subject.";
-        redirect("checkingmail.php");
+        redirect("checking-mail.php");
     }
 
     $headers = implode("\r\n", [
@@ -39,8 +39,8 @@ if (isset($_POST["sendMailBtn"])) {
     } else {
         $_SESSION["errors"][] = "Email could not be sent (mail transport not configured).";
     }
-    redirect("checkingmail.php");
+    redirect("checking-mail.php");
 }
 
 // No direct GET access.
-redirect("checkingmail.php");
+redirect("checking-mail.php");

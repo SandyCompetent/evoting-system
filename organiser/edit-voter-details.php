@@ -9,7 +9,7 @@ $category_id = (int) ($organiser["election_category_id"] ?? 0);
 if (($editId = pressed_action("edit")) !== null) {
     csrf_verify();
     $_SESSION["voter_refID"] = $editId;
-    redirect("update_voter_details.php?id=" . $editId);
+    redirect("update-voter-details.php?id=" . $editId);
 }
 
 $delId = pressed_action("delete");
@@ -35,14 +35,14 @@ $voters = $userRepo->findVotersByCategory($category_id);
 ?>
 
 <div class="container py-4">
-    <?php require_once("../includes/view_messages_and_errors.php"); ?>
+    <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0 fw-semibold text-primary">
                 <i class="bi bi-people-fill me-2"></i>Registered Voters
             </h5>
-            <a href="create_voter_account.php" class="btn btn-sm btn-primary">
+            <a href="create-voter-account.php" class="btn btn-sm btn-primary">
                 <i class="bi bi-person-plus me-1"></i> Add New Voter
             </a>
         </div>
@@ -83,7 +83,7 @@ $voters = $userRepo->findVotersByCategory($category_id);
                                     </td>
                                     <td class="text-muted small"><?= e($voter->createdTimestamp ?? 'N/A'); ?></td>
                                     <td class="text-end pe-3">
-                                        <a href="update_voter_details.php?id=<?= $voter->id ?>" class="btn btn-sm btn-outline-primary me-1">
+                                        <a href="update-voter-details.php?id=<?= $voter->id ?>" class="btn btn-sm btn-outline-primary me-1">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
                                         <button type="submit" name="delete_id" value="<?= $voter->id ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete voter \'<?= addslashes(e($voter->fullName)) ?>\'?');">

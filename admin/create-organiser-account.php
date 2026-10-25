@@ -34,7 +34,7 @@ $categories = fetchAll("SELECT id, name FROM election_category ORDER BY name ASC
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <?php require_once("../includes/view_messages_and_errors.php"); ?>
+            <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white border-bottom py-3">
@@ -72,7 +72,7 @@ $categories = fetchAll("SELECT id, name FROM election_category ORDER BY name ASC
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <a href="edit_account_details.php" class="btn btn-outline-secondary">Cancel</a>
+                            <a href="edit-account-details.php" class="btn btn-outline-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary px-4 fw-semibold" id="submit" name="submit">
                                 <i class="bi bi-person-check me-1"></i> Create Organiser
                             </button>

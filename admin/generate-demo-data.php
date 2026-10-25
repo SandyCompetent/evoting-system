@@ -76,7 +76,7 @@ $now = time();
         </div>
     </div>
 
-    <?php require_once("../includes/view_messages_and_errors.php"); ?>
+    <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
     <!-- Current Database Summary -->
     <div class="row g-3 mb-4">

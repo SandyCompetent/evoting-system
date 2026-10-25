@@ -18,7 +18,7 @@ $candidate = $candidateRepo->findById($candidate_refID, $category_id);
 
 if (!$candidate) {
     $_SESSION["errors"][] = "Candidate not found.";
-    redirect("edit_candidate_details.php");
+    redirect("edit-candidate-details.php");
 }
 
 if (isset($_POST["submit"])) {
@@ -52,7 +52,7 @@ require_once __DIR__ . "/nav.php";
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <?php require_once("../includes/view_messages_and_errors.php"); ?>
+            <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
@@ -100,7 +100,7 @@ require_once __DIR__ . "/nav.php";
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="edit_candidate_details.php" class="btn btn-outline-secondary">
+                            <a href="edit-candidate-details.php" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-1"></i> Back to Candidates
                             </a>
                             <button type="submit" class="btn btn-primary px-4 fw-semibold" id="submit" name="submit">

@@ -57,7 +57,7 @@ $requests = fetchAll("SELECT * FROM request_to_register WHERE ac_status = 'Pendi
 ?>
 
 <div class="container-fluid px-4 py-4">
-    <?php require_once("../includes/view_messages_and_errors.php"); ?>
+    <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">

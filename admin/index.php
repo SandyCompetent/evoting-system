@@ -10,7 +10,7 @@ $categoriesRepo = new PdoCategoryRepository(db());
 if (($editId = pressed_action("edit")) !== null || isset($_GET["edit_id"])) {
     $targetId = $editId ?? (int)($_GET["edit_id"] ?? 0);
     $_SESSION["category_refID"] = $targetId;
-    redirect("update_election_category.php?id=" . $targetId);
+    redirect("update-election-category.php?id=" . $targetId);
 }
 
 // Category delete -> transactional cascade via CategoryRepository
@@ -50,19 +50,19 @@ $now = time();
             <div class="text-muted small">System administration and election management</div>
         </div>
         <div class="mt-2 mt-sm-0 d-flex flex-wrap gap-2">
-            <a href="generate_demo_data.php" class="btn btn-sm btn-outline-warning">
+            <a href="generate-demo-data.php" class="btn btn-sm btn-outline-warning">
                 <i class="bi bi-database-fill-gear me-1"></i>Demo Data
             </a>
-            <a href="create_election_category.php" class="btn btn-sm btn-primary">
+            <a href="create-election-category.php" class="btn btn-sm btn-primary">
                 <i class="bi bi-plus-circle me-1"></i>New Category
             </a>
-            <a href="create_organiser_account.php" class="btn btn-sm btn-outline-primary">
+            <a href="create-organiser-account.php" class="btn btn-sm btn-outline-primary">
                 <i class="bi bi-person-plus me-1"></i>New Organiser
             </a>
         </div>
     </div>
 
-    <?php require_once("../includes/view_messages_and_errors.php"); ?>
+    <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
     <!-- 4-Stat KPI Grid -->
     <div class="row g-2 g-sm-3 mb-4">
@@ -137,7 +137,7 @@ $now = time();
                 <div class="card-body p-4 text-center">
                     <div class="display-5 fw-bold text-dark mb-2"><?= (int)$pending_request ?></div>
                     <p class="text-muted small mb-3">Public requests awaiting verification and approval</p>
-                    <a href="request_to_register.php" class="btn btn-outline-primary btn-sm px-3">
+                    <a href="request-to-register.php" class="btn btn-outline-primary btn-sm px-3">
                         <i class="bi bi-arrow-right-circle me-1"></i> Review Requests Queue
                     </a>
                 </div>
@@ -204,7 +204,7 @@ $now = time();
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-end pe-3">
-                                                <a href="update_election_category.php?id=<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-primary me-1">
+                                                <a href="update-election-category.php?id=<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-primary me-1">
                                                     <i class="bi bi-pencil-square"></i> Edit
                                                 </a>
                                                 <button type="submit" name="delete_id" value="<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete category \'<?= addslashes(e($value['name'])) ?>\' and ALL its associated ballots, candidates, and voters?');">

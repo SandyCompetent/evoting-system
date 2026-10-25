@@ -5,8 +5,8 @@ declare(strict_types=1);
  * CLI Demo Data Seeder for e-Voting System.
  *
  * Usage:
- *   php db/seed_demo_data.php          (seeds showcase data, appending or refreshing)
- *   php db/seed_demo_data.php --fresh  (purges old demo data first)
+ *   php db/seed-demo-data.php          (seeds showcase data, appending or refreshing)
+ *   php db/seed-demo-data.php --fresh  (purges old demo data first)
  */
 
 require_once __DIR__ . "/../includes/bootstrap.php";

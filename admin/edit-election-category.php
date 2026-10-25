@@ -9,7 +9,7 @@ $categoriesRepo = new PdoCategoryRepository(db());
 if (($editId = pressed_action("edit")) !== null) {
     csrf_verify();
     $_SESSION["category_refID"] = $editId;
-    redirect("update_election_category.php?id=" . $editId);
+    redirect("update-election-category.php?id=" . $editId);
 }
 
 $delId = pressed_action("delete");
@@ -33,14 +33,14 @@ $categories = fetchAll("SELECT * FROM election_category ORDER BY name ASC");
 ?>
 
 <div class="container py-4">
-    <?php require_once("../includes/view_messages_and_errors.php"); ?>
+    <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
     <div class="card shadow-sm border-0">
         <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0 fw-semibold text-primary">
                 <i class="bi bi-collection-fill me-2"></i>Election Categories
             </h5>
-            <a href="create_election_category.php" class="btn btn-sm btn-primary">
+            <a href="create-election-category.php" class="btn btn-sm btn-primary">
                 <i class="bi bi-plus-circle me-1"></i> Create New Category
             </a>
         </div>
@@ -71,7 +71,7 @@ $categories = fetchAll("SELECT * FROM election_category ORDER BY name ASC");
                                     <td class="text-muted small"><?= e($value['timestamp'] ?? 'N/A'); ?></td>
                                     <td class="text-muted small"><?= e($value['expire_timestamp'] ?? 'N/A'); ?></td>
                                     <td class="text-end pe-3">
-                                        <a href="update_election_category.php?id=<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-primary me-1">
+                                        <a href="update-election-category.php?id=<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-primary me-1">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
                                         <button type="submit" name="delete_id" value="<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete category \'<?= addslashes(e($value['name'])) ?>\' and all associated ballots?');">

@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . "/../includes/bootstrap.php";
-require_role("admin");
+require_role("voter");
 
 use App\Repository\Pdo\PdoUserRepository;
 use App\Service\AuthService;
@@ -20,7 +20,7 @@ if (isset($_POST["change"])) {
     } catch (\InvalidArgumentException $ex) {
         $_SESSION["errors"][] = $ex->getMessage();
     } catch (\Throwable $ex) {
-        error_log("Admin password change error: " . $ex->getMessage());
+        error_log("Voter password change error: " . $ex->getMessage());
         $_SESSION["errors"][] = "Could not update password. Please try again.";
     }
     redirect($_SERVER["PHP_SELF"]);
@@ -32,12 +32,12 @@ require_once __DIR__ . "/nav.php";
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
-            <?php require_once("../includes/view_messages_and_errors.php"); ?>
+            <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white border-bottom py-3">
                     <h5 class="card-title mb-0 fw-semibold text-primary">
-                        <i class="bi bi-shield-lock-fill me-2"></i>Change Admin Password
+                        <i class="bi bi-shield-lock-fill me-2"></i>Change Voter Password
                     </h5>
                 </div>
                 <div class="card-body p-4">

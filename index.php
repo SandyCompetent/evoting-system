@@ -60,8 +60,8 @@ require_once __DIR__ . "/includes/header.php";
 
 <div class="container py-4">
     <div class="text-center mb-4">
-        <h1 class="display-5 fw-bold text-primary">
-            <i class="bi bi-check2-circle me-2"></i>e-Voting Portal
+        <h1 class="display-5 fw-bold text-primary d-inline-flex align-items-center justify-content-center">
+            <img src="assets/site-icon.svg" alt="Logo" width="48" height="48" class="me-3">e-Voting Portal
         </h1>
         <p class="lead text-muted">Simple, secure online voting</p>
     </div>
@@ -69,7 +69,7 @@ require_once __DIR__ . "/includes/header.php";
     <div class="row g-4 justify-content-center">
         <!-- Sign In Column -->
         <div class="col-lg-5 col-md-6">
-            <?php require_once("includes/view_messages_and_errors.php"); ?>
+            <?php require_once("includes/view-messages-and-errors.php"); ?>
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white border-bottom py-3">
                     <h5 class="card-title mb-0 fw-semibold">

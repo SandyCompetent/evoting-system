@@ -13,7 +13,7 @@ $organiser = fetchOne(
 );
 if (!$organiser) {
     $_SESSION["errors"][] = "Organiser not found.";
-    redirect("edit_account_details.php");
+    redirect("edit-account-details.php");
 }
 
 if (isset($_POST["submit"])) {
@@ -58,7 +58,7 @@ $categories = fetchAll("SELECT id, name FROM election_category ORDER BY name ASC
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <?php require_once("../includes/view_messages_and_errors.php"); ?>
+            <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
@@ -101,7 +101,7 @@ $categories = fetchAll("SELECT id, name FROM election_category ORDER BY name ASC
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="edit_account_details.php" class="btn btn-outline-secondary">
+                            <a href="edit-account-details.php" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-1"></i> Back to Accounts
                             </a>
                             <button type="submit" class="btn btn-primary px-4 fw-semibold" id="submit" name="submit">

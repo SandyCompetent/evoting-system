@@ -20,7 +20,7 @@ $candidates = $candidateRepo->findByCategory($category_id);
         </span>
     </div>
     <div class="card-body p-4">
-        <?php require_once("../includes/view_messages_and_errors.php"); ?>
+        <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
         <?php if (empty($candidates)): ?>
             <div class="alert alert-warning text-center py-4">

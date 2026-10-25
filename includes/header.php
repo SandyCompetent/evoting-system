@@ -7,6 +7,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>e-Voting System</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="<?php echo htmlspecialchars(($appRoot === '/' || $appRoot === '\\' || $appRoot === '') ? '/assets/site-icon.svg' : $appRoot . '/assets/site-icon.svg', ENT_QUOTES, 'UTF-8'); ?>">
     <!-- Bootswatch Zephyr Theme -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/zephyr/bootstrap.min.css">
     <!-- Bootstrap Icons -->

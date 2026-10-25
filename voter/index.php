@@ -80,7 +80,7 @@ $totalVotesCast = $tally->totalVotes();
         </div>
     </div>
 
-    <?php require_once("../includes/view_messages_and_errors.php"); ?>
+    <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
     <?php
     if ($hasVoted) {
@@ -170,7 +170,7 @@ $totalVotesCast = $tally->totalVotes();
             </div>
 
             <?php
-            require_once("give_vote.php");
+            require_once("give-vote.php");
         } else {
             // Expired without voting
             ?>

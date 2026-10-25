@@ -1,5 +1,7 @@
 # e-Voting System
 
+> **Disclaimer:** This project is intended exclusively for **Portfolio and Demo** purposes. It is **not for commercial use**.
+
 A secure, modern online voting web application built with **PHP** and **MySQL**. Designed for student councils, academic departments, clubs, and organizations to conduct transparent elections with role-based dashboards and automated ballot auditing.
 
 ---
@@ -10,7 +12,7 @@ A secure, modern online voting web application built with **PHP** and **MySQL**.
 * **Double-Voting Prevention:** Database-enforced `UNIQUE(voter_id, category_id)` constraint prevents multiple ballots from being cast per voter, even under concurrent requests.
 * **Modern Interface:** Powered by **Bootstrap 5.3.3**, **Bootswatch Zephyr**, and **Bootstrap Icons**, featuring responsive candidate card grids, native HTML5 date/time pickers, floating form labels, and synchronized live countdown timers.
 * **Security & Authentication:** Session fixation safeguards via `session_regenerate_id()`, Bcrypt (`PASSWORD_BCRYPT`) password hashing with automatic legacy upgrade verification, CSRF token validation, and PDO parameterized queries.
-* **Automated Unit Testing:** Includes a zero-dependency CLI test suite runner covering the domain core with 53 unit tests and 134 assertions (`php tests/run_tests.php`).
+* **Automated Unit Testing:** Includes a zero-dependency CLI test suite runner covering the domain core with 53 unit tests and 134 assertions (`php tests/run-tests.php`).
 
 ---
 
@@ -73,7 +75,7 @@ Alternatively, execute the automated runner script:
 
 Run the domain unit test suite directly from your terminal:
 ```bash
-php tests/run_tests.php
+php tests/run-tests.php
 ```
 All 53 unit tests run in memory using SQLite PDO and in-memory repository fakes, executing deterministically without mutating your local MySQL database.
 
@@ -93,31 +95,14 @@ The default dataset includes sample accounts across active, upcoming, and conclu
 | **Voter (Concluded)** | `alumni1@evoting.com` | `password123` | **Results Showcase:** Gold trophy winner banner & Google Bar chart. |
 
 ### Generating Additional Demo Data
-* **From the Admin UI:** Navigate to **Demo Data** in the Admin navigation bar (`/admin/generate_demo_data.php`) for 1-click showcase setup, voter generation, and vote simulations.
+* **From the Admin UI:** Navigate to **Demo Data** in the Admin navigation bar (`/admin/generate-demo-data.php`) for 1-click showcase setup, voter generation, and vote simulations.
 * **From the Command Line:**
   ```bash
-  php db/seed_demo_data.php --fresh
+  php db/seed-demo-data.php --fresh
   ```
-
----
-
-## Standalone Portfolio & GitHub Pages
-
-This project includes a dedicated showcase portfolio package located in [`portfolio/`](portfolio):
-
-* **Open locally:**
-  ```bash
-  open portfolio/index.html
-  ```
-* **Host on GitHub Pages:**
-  The repository includes an automated GitHub Actions deployment workflow at [`.github/workflows/deploy-portfolio.yml`](.github/workflows/deploy-portfolio.yml).
-  1. In your GitHub repository, navigate to **Settings** > **Pages**.
-  2. Under **Build and deployment** > **Source**, select **GitHub Actions**.
-  3. Push to `main`, and the portfolio will be live at:
-     `http://evoting-system.freehosting.dev`
 
 ---
 
 ## License
 
-This project is licensed under the terms included in the [`LICENSE`](LICENSE) file.
+This project is intended exclusively for **Portfolio and Demo** purposes. It is **not for commercial use**. Please review the [`LICENSE`](LICENSE) file for further details.

@@ -72,16 +72,16 @@ $winner = $tally->winnerLabel();
             </div>
         </div>
         <div class="mt-2 mt-sm-0 d-flex flex-wrap gap-2">
-            <a href="create_candidate_account.php" class="btn btn-sm btn-outline-primary">
+            <a href="create-candidate-account.php" class="btn btn-sm btn-outline-primary">
                 <i class="bi bi-person-plus me-1"></i>New Candidate
             </a>
-            <a href="create_voter_account.php" class="btn btn-sm btn-primary">
+            <a href="create-voter-account.php" class="btn btn-sm btn-primary">
                 <i class="bi bi-people me-1"></i>New Voter
             </a>
         </div>
     </div>
 
-    <?php require_once("../includes/view_messages_and_errors.php"); ?>
+    <?php require_once("../includes/view-messages-and-errors.php"); ?>
 
     <!-- 4-Stat KPI Grid -->
     <div class="row g-2 g-sm-3 mb-4">
@@ -208,7 +208,7 @@ $winner = $tally->winnerLabel();
                         <div class="py-3">
                             <i class="bi bi-person-x fs-1 text-muted d-block mb-2"></i>
                             <p class="text-muted">No candidates registered in this election category.</p>
-                            <a href="create_candidate_account.php" class="btn btn-sm btn-primary">
+                            <a href="create-candidate-account.php" class="btn btn-sm btn-primary">
                                 <i class="bi bi-person-plus me-1"></i> Create First Candidate
                             </a>
                         </div>

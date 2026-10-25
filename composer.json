@@ -19,6 +19,6 @@
         }
     },
     "scripts": {
-        "test": "php tests/run_tests.php"
+        "test": "php tests/run-tests.php"
     }
 }
