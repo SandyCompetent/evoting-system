@@ -600,15 +600,15 @@
 
                 <div class="d-flex align-items-center gap-2 ms-lg-3 mt-3 mt-lg-0 flex-nowrap">
                     <!-- Dark/Light Theme Switcher -->
-                    <button class="btn btn-sm btn-outline-light text-white d-inline-flex align-items-center gap-1 px-2.5 py-1.5" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark / Light Theme" aria-label="Toggle Theme" style="color: #ffffff !important; border-color: rgba(255,255,255,0.4);">
+                    <button class="btn btn-sm btn-outline-light text-white d-inline-flex align-items-center gap-1 px-2.5 py-2" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark / Light Theme" aria-label="Toggle Theme" style="color: #ffffff !important; border-color: rgba(255,255,255,0.4);">
                         <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
                     </button>
 
-                    <a class="btn btn-sm btn-outline-light text-white px-3 py-1.5 d-inline-flex align-items-center gap-1.5" href="https://github.com/SandyCompetent/evoting-system" target="_blank" rel="noopener" style="color: #ffffff !important; border-color: rgba(255,255,255,0.4);">
+                    <a class="btn btn-sm btn-outline-light text-white px-3 py-2 d-inline-flex align-items-center gap-2" href="https://github.com/SandyCompetent/evoting-system" target="_blank" rel="noopener" style="color: #ffffff !important; border-color: rgba(255,255,255,0.4);">
                         <i class="bi bi-github"></i>
                         <span style="color: #ffffff !important;">Repo</span>
                     </a>
-                    <a class="btn btn-sm btn-primary px-3 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-sm" href="https://evoting-system.freehosting.dev/?i=1" target="_blank" title="Launch Demo Application">
+                    <a class="btn btn-sm btn-primary px-3 py-2 d-inline-flex align-items-center gap-2 shadow-sm" href="https://evoting-system.freehosting.dev/?i=1" target="_blank" title="Launch Demo Application">
                         <i class="bi bi-box-arrow-up-right"></i>
                         <span>Live Demo</span>
                     </a>
@@ -703,7 +703,7 @@
                     <p class="mb-0" style="color: var(--text-muted);">Click any email or password to copy it instantly to your clipboard, then test that role in the live system.</p>
                 </div>
                 <div class="mt-2 mt-md-0">
-                    <a href="https://evoting-system.freehosting.dev/?i=1" target="_blank" class="btn btn-primary fw-semibold px-3 py-2 shadow-sm d-inline-flex align-items-center gap-1.5">
+                    <a href="https://evoting-system.freehosting.dev/?i=1" target="_blank" class="btn btn-primary fw-semibold px-3 py-2 shadow-sm d-inline-flex align-items-center gap-2">
                         <i class="bi bi-play-circle-fill"></i>
                         <span>Open Live Application</span>
                     </a>
@@ -1033,11 +1033,11 @@
 
                     <!-- Simulator Submit Button -->
                     <div class="d-flex flex-column-reverse flex-sm-row justify-content-between align-items-stretch align-items-sm-center gap-3 mt-4 pt-3 border-top" style="border-color: var(--border-subtle) !important;">
-                        <div class="small fw-semibold text-center text-sm-start" style="color: var(--text-muted);">
-                            <i class="bi bi-shield-check text-success me-1"></i> Selection is confidential &bull; One vote per registered student
-                        </div>
+                        <div class="small fw-semibold text-center text-sm-start text-nowrap" style="color: var(--text-muted);">
+                                <i class="bi bi-shield-check text-success me-1"></i> Selection is confidential &bull; 1 vote per student
+                            </div>
                         <div class="d-flex gap-2 w-100 w-sm-auto justify-content-end">
-                            <button type="button" class="btn btn-outline-dark px-3 py-2 fw-semibold flex-fill flex-sm-grow-0" onclick="resetSimulatedVote()">
+                            <button type="button" class="btn btn-outline-secondary px-3 py-2 fw-semibold flex-fill flex-sm-grow-0" onclick="resetSimulatedVote()">
                                 <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
                             </button>
                             <button type="button" class="btn btn-primary px-4 py-2.5 fw-semibold shadow-sm flex-fill flex-sm-grow-0" onclick="castSimulatedVote()">
@@ -1535,7 +1535,7 @@
                 <span class="text-white fw-bold">e-Voting System</span> &bull; Open-Source Online Voting Platform
             </div>
             <div>
-                Crafted for Student Councils, Universities &amp; Clubs &bull; 100% Mobile &amp; Desktop Accessible
+                Crafted for Student Councils, Universities &amp; Clubs
             </div>
             <div class="mt-2 text-warning">
                 <strong>Disclaimer:</strong> This project is intended exclusively for Portfolio and Demo purposes. It is not for commercial use.
@@ -1567,7 +1567,7 @@
                     <small class="text-white-50 text-start" id="lightboxDesc"></small>
                     <div class="d-flex gap-2">
                         <span class="badge badge-slate d-none d-md-inline-block">Use &larr; &rarr; keys</span>
-                        <button type="button" class="btn btn-outline-light px-3 py-1.5" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-outline-light px-3 py-2" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -1674,7 +1674,7 @@
         }, 1000);
 
         // 4. Interactive Feature Tour & Chapters Walkthrough
-        const tourChapters = [
+        const tourData = [
             { img: 'images/01-portal-login.png', title: 'Chapter 1: Public Portal & Sign-In Form', step: 'Step 1 of 4', url: 'https://evoting.org/index.php' },
             { img: 'images/06-organiser-dashboard.png', title: 'Chapter 2: Organiser Dashboard & Metrics', step: 'Step 2 of 4', url: 'https://evoting.org/organiser/index.php' },
             { img: 'images/09-voter-live-ballot.png', title: 'Chapter 3: Interactive Live Candidate Ballot', step: 'Step 3 of 4', url: 'https://evoting.org/voter/index.php' },
