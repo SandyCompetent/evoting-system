@@ -41,11 +41,26 @@ A secure, modern online voting web application built with **PHP** and **MySQL**.
 
 ## Quick Setup & Running Locally
 
-### 1. Prerequisites (macOS with Homebrew)
+### 1. Prerequisites
+
+Ensure you have **PHP 8.0+** and **MySQL** installed. 
+
+**macOS (Homebrew):**
 ```bash
 brew install php mysql
 brew services start mysql
 ```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt update
+sudo apt install php-cli php-mysql mysql-server
+sudo systemctl start mysql
+```
+
+**Windows:**
+We recommend using [XAMPP](https://www.apachefriends.org/index.html) or [Laragon](https://laragon.org/) which bundle PHP and MySQL together. Start the Apache and MySQL services from their respective control panels.
+
 
 ### 2. Database Initialization
 Create the database and import the latest schema:
