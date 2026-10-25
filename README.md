@@ -6,6 +6,8 @@
 
 > **Disclaimer:** This project is intended exclusively for **Portfolio and Demo** purposes. It is **not for commercial use**.
 
+🚀 **Live Demo:** <a href="https://evoting-system.freehosting.dev" target="_blank">https://evoting-system.freehosting.dev</a>
+
 A secure, modern online voting web application built with **PHP** and **MySQL**. Designed for student councils, academic departments, clubs, and organizations to conduct transparent elections with role-based dashboards and automated ballot auditing.
 
 ---
@@ -81,7 +83,7 @@ Run PHP's built-in development server:
 ```bash
 php -S localhost:8000
 ```
-Open **<a href="https://evoting-system.freehosting.dev/?i=1" target="_blank">https://evoting-system.freehosting.dev/?i=1</a>** in your browser.
+Open **[http://localhost:8000](http://localhost:8000)** in your browser.
 
 Alternatively, execute the automated runner script:
 ```bash
