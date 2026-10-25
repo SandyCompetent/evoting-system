@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Output escaping. Use e($value) everywhere untrusted data is printed into HTML.
  */

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 // Included from voter/index.php within the active-voting branch.
 // Expects $category_id and $category_name in scope.
 use App\Repository\Pdo\PdoCandidateRepository;

@@ -24,9 +24,9 @@ final class AuthService
         if (password_verify($password, $hash)) {
             $valid = true;
         } elseif (hash_equals($hash, sha1($password))) {
-            // Legacy SHA-1 transparent upgrade to bcrypt
+            // Legacy SHA-1 transparent upgrade to Argon2id
             $valid = true;
-            $this->users->updatePassword((int) $row['user_id'], password_hash($password, PASSWORD_DEFAULT));
+            $this->users->updatePassword((int) $row['user_id'], password_hash($password, PASSWORD_ARGON2ID));
         }
 
         if (!$valid) {
@@ -78,7 +78,7 @@ final class AuthService
             throw new InvalidArgumentException('Incorrect old password.');
         }
 
-        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $newHash = password_hash($newPassword, PASSWORD_ARGON2ID);
         $this->users->updatePassword($userId, $newHash);
     }
 }

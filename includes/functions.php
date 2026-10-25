@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Parameterized data-access API. Every value MUST be passed via the $params
  * array (never concatenated into the SQL string).

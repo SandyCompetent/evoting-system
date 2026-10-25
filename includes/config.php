@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Minimal .env loader (no external dependencies).
  * Reads KEY=VALUE pairs from the project-root .env file once and caches them.
@@ -16,7 +17,7 @@ function env(string $key, $default = null)
                     continue;
                 }
                 $parts = array_pad(explode('=', $line, 2), 2, '');
-                $vars[trim($parts[0])] = trim($parts[1]);
+                $vars[trim($parts[0])] = trim(trim($parts[1]), '"\'');
             }
         }
     }

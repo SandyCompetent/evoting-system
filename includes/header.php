@@ -22,8 +22,6 @@
     ?>
     <!-- Application Custom & Bridge CSS -->
     <link rel="stylesheet" href="<?= htmlspecialchars($cssPath, ENT_QUOTES, 'UTF-8') ?>">
-    <!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <?php ob_start(); ?>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">

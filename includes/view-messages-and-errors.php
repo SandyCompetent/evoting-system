@@ -1,4 +1,6 @@
-<?php if (!empty($_SESSION["messages"])): ?>
+<?php
+declare(strict_types=1);
+if (!empty($_SESSION["messages"])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <?php foreach ($_SESSION["messages"] as $message): ?>
             <p class="mb-0"><?php echo e($message); ?></p>

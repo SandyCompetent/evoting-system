@@ -104,12 +104,13 @@ CREATE TABLE `system_users` (
   `date_of_birth` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `role` enum('admin','organiser','voter') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'voter',
-  `election_category_id` int NOT NULL DEFAULT '0',
+  `election_category_id` int DEFAULT NULL,
   `voted` varchar(4) COLLATE utf8mb4_unicode_ci DEFAULT 'No',
   `created_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `uq_email` (`email`),
-  KEY `idx_role_category` (`role`,`election_category_id`)
+  KEY `idx_role_category` (`role`,`election_category_id`),
+  CONSTRAINT `fk_system_users_category` FOREIGN KEY (`election_category_id`) REFERENCES `election_category` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=386560 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -123,7 +124,7 @@ LOCK TABLES `system_users` WRITE;
 /*!40000 ALTER TABLE `system_users` DISABLE KEYS */;
 INSERT INTO `system_users` VALUES
 -- Admin
-(1,'System Admin','admin@evoting.com',NULL,'$2y$12$h1fxS5SEgNJ2CYG5wo8h/OcRKllm7SWElY7OH37NIb9CYLkUKovse','admin',0,NULL,'2026-10-01 10:00:00'),
+(1,'System Admin','admin@evoting.com',NULL,'$2y$12$h1fxS5SEgNJ2CYG5wo8h/OcRKllm7SWElY7OH37NIb9CYLkUKovse','admin',NULL,NULL,'2026-10-01 10:00:00'),
 -- Organisers
 (2,'Sarah Jenkins','council.organiser@evoting.com',NULL,'$2y$10$52Q.R/geqQ54jNpF3arcVebdOvYmRfZDGVaDrrMSjrWThF2z7kFe.','organiser',30,'No','2026-10-20 08:00:00'),
 (3,'Marcus Vance','faculty.organiser@evoting.com',NULL,'$2y$10$52Q.R/geqQ54jNpF3arcVebdOvYmRfZDGVaDrrMSjrWThF2z7kFe.','organiser',31,'No','2026-10-21 09:00:00'),
