@@ -1,8 +1,11 @@
 <?php
 require_once __DIR__ . "/includes/bootstrap.php";
 
+use App\Repository\Pdo\PdoCategoryRepository;
+use App\Repository\Pdo\PdoRegistrationRequestRepository;
 use App\Repository\Pdo\PdoUserRepository;
 use App\Service\AuthService;
+use App\Service\RegistrationRequestService;
 
 // Already logged in? Send to the right dashboard.
 if (isset($_SESSION["role"]) && in_array($_SESSION["role"], ["admin", "organiser", "voter"], true)) {
@@ -18,7 +21,7 @@ if (isset($_POST["login"])) {
     $auth = new AuthService(new PdoUserRepository(db()));
     $user = $auth->authenticate($email, $password);
 
-    if ($user !== null) {
+    if ($user !== null && in_array($user->role, ['admin', 'organiser', 'voter'], true)) {
         session_regenerate_id(true);          // prevent session fixation
         $_SESSION["user_id"] = $user->id;
         $_SESSION["role"]    = $user->role;
@@ -26,33 +29,40 @@ if (isset($_POST["login"])) {
     }
 
     $_SESSION["errors"][] = "Invalid email or password.";
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 // ---- Public request to register an election ----
 if (isset($_POST["request_register"])) {
     csrf_verify();
-    $full_name = trim($_POST["full_name"] ?? "");
-    $email     = trim($_POST["email"] ?? "");
-    $category  = trim($_POST["category"] ?? "");
-    $max_voter = (int) ($_POST["max_voter"] ?? 0);
-    $is_adult  = (($_POST["is_adult_voter"] ?? "No") === "Yes") ? "Yes" : "No";
-    $raw_expire = trim($_POST["expire_timestamp"] ?? "");
-    $expire    = $raw_expire !== "" ? date("Y-m-d H:i:s", strtotime($raw_expire)) : "";
+    $full_name  = trim($_POST["full_name"] ?? "");
+    $email      = trim($_POST["email"] ?? "");
+    $category   = trim($_POST["category"] ?? "");
+    $max_voter  = filter_var($_POST["max_voter"] ?? "", FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1, 'max_range' => 10000],
+    ]);
+    $is_adult   = (($_POST["is_adult_voter"] ?? "No") === "Yes") ? "Yes" : "No";
+    $expire     = parse_datetime_local((string) ($_POST["expire_timestamp"] ?? ""));
 
-    if ($full_name === "" || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $_SESSION["errors"][] = "Please provide a valid name and email address.";
-        redirect($_SERVER["PHP_SELF"]);
+    if ($full_name === "" || !text_within_length($full_name, 100)
+        || !filter_var($email, FILTER_VALIDATE_EMAIL) || !text_within_length($email, 100)
+        || $category === "" || !text_within_length($category, 100)
+        || $max_voter === false
+        || $expire === null || !is_future_datetime($expire)
+    ) {
+        $_SESSION["errors"][] = "Please provide a valid name, email, category, voter limit, and future expiry time.";
+        redirect(current_path());
     }
 
-    execute(
-        "INSERT INTO request_to_register
-            (full_name, email, election_category, max_voter, adult_voter, expire_timestamp)
-         VALUES (?, ?, ?, ?, ?, ?)",
-        [$full_name, $email, $category, $max_voter, $is_adult, $expire]
+    $service = new RegistrationRequestService(
+        db(),
+        new PdoCategoryRepository(db()),
+        new PdoUserRepository(db()),
+        new PdoRegistrationRequestRepository(db()),
     );
+    $service->submit($full_name, $email, $category, (int) $max_voter, $is_adult, $expire);
     $_SESSION["messages"][] = "Election registration request submitted successfully. An administrator will review your application.";
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/includes/header.php";
@@ -61,7 +71,7 @@ require_once __DIR__ . "/includes/header.php";
 <div class="container py-4">
     <div class="text-center mb-4">
         <h1 class="display-5 fw-bold text-primary d-inline-flex align-items-center justify-content-center">
-            <img src="assets/site-icon.svg" alt="Logo" width="48" height="48" class="me-3">e-Voting Portal
+            <img src="<?= e(asset_url('assets/site-icon.svg')); ?>" alt="Logo" width="48" height="48" class="me-3">e-Voting Portal
         </h1>
         <p class="lead text-muted">Simple, secure online voting</p>
     </div>
@@ -77,7 +87,7 @@ require_once __DIR__ . "/includes/header.php";
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                    <form action="<?= e(current_path()); ?>" method="post">
                         <?php echo csrf_field(); ?>
 
                         <div class="form-floating mb-3">
@@ -121,8 +131,7 @@ require_once __DIR__ . "/includes/header.php";
                         Need to conduct a democratic vote for your institution, department, or organization? Submit an election request to receive administrator credentials.
                     </p>
 
-                    <div id="register_form" class="collapse">
-                        <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" class="mt-3">
+                    <div id="register_form" class="collapse">                            <form action="<?= e(current_path()); ?>" method="post" class="mt-3">
                             <?php echo csrf_field(); ?>
 
                             <div class="row g-3">

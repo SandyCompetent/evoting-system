@@ -4,10 +4,10 @@ require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("organiser");
 
 use App\Repository\Pdo\PdoCandidateRepository;
+use App\Repository\Pdo\PdoUserRepository;
 
-$user_id     = (int) $_SESSION["user_id"];
-$organiser   = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
-$category_id = (int) ($organiser["election_category_id"] ?? 0);
+$user_id = (int) $_SESSION["user_id"];
+$category_id = (int) ((new PdoUserRepository(db()))->categoryIdForUser($user_id) ?? 0);
 
 $candidateRepo = new PdoCandidateRepository(db());
 
@@ -16,7 +16,7 @@ if (isset($_POST["submit"])) {
     $candidate_name = trim($_POST["candidate_name"] ?? "");
     if ($candidate_name === "") {
         $_SESSION["errors"][] = "Candidate name is required.";
-        redirect($_SERVER["PHP_SELF"]);
+        redirect(current_path());
     }
     try {
         $photo  = store_uploaded_image($_FILES["uploadPhoto"]  ?? [], __DIR__ . "/../upload/photo");
@@ -28,7 +28,7 @@ if (isset($_POST["submit"])) {
         error_log("Candidate create failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Could not add candidate: " . $ex->getMessage();
     }
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
@@ -46,7 +46,7 @@ require_once __DIR__ . "/nav.php";
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+                    <form action="<?= e(current_path()); ?>" method="post" enctype="multipart/form-data">
                         <?php echo csrf_field(); ?>
 
                         <div class="mb-3">

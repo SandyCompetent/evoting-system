@@ -26,11 +26,11 @@ if ($delId !== null && $delId > 0) {
         error_log("Category delete failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Could not delete category.";
     }
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
-$categories = fetchAll("SELECT * FROM election_category ORDER BY name ASC");
+$categories = $categoriesRepo->allRows();
 ?>
 
 <div class="container py-4">
@@ -46,7 +46,7 @@ $categories = fetchAll("SELECT * FROM election_category ORDER BY name ASC");
             </a>
         </div>
         <div class="card-body p-0">
-            <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+            <form action="<?= e(current_path()); ?>" method="post">
                 <?php echo csrf_field(); ?>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -75,7 +75,7 @@ $categories = fetchAll("SELECT * FROM election_category ORDER BY name ASC");
                                         <a href="update-election-category.php?id=<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-primary me-1">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
-                                        <button type="submit" name="delete_id" value="<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete category \'<?= addslashes(e($value['name'])) ?>\' and all associated ballots?');">
+                                        <button type="submit" name="delete_id" value="<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-danger" data-confirm="Delete category '<?= e($value['name']) ?>' and all associated ballots?">
                                             <i class="bi bi-trash"></i> Delete
                                         </button>
                                     </td>

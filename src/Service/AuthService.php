@@ -70,6 +70,9 @@ final class AuthService
         }
 
         $row = $this->users->findByEmail($user->email);
+        if ($row === null) {
+            throw new InvalidArgumentException('User account not found.');
+        }
         $currentHash = (string) ($row['password'] ?? '');
 
         $isMatch = password_verify($oldPassword, $currentHash) || hash_equals($currentHash, sha1($oldPassword));

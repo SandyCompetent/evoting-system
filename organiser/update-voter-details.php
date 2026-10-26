@@ -1,22 +1,21 @@
 <?php
 declare(strict_types=1);
+use App\Repository\Pdo\PdoUserRepository;
 use App\Support\Password;
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("organiser");
+
+$userRepo = new PdoUserRepository(db());
 
 $voter_refID = (int) ($_GET["id"] ?? $_POST["id"] ?? $_SESSION["voter_refID"] ?? 0);
 if ($voter_refID > 0) {
     $_SESSION["voter_refID"] = $voter_refID;
 }
 
-$user_id     = (int) $_SESSION["user_id"];
-$organiser   = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
-$category_id = (int) ($organiser["election_category_id"] ?? 0);
+$user_id = (int) $_SESSION["user_id"];
+$category_id = (int) ($userRepo->categoryIdForUser($user_id) ?? 0);
 
-$voter = fetchOne(
-    "SELECT * FROM system_users WHERE user_id = ? AND role = 'voter' AND election_category_id = ?",
-    [$voter_refID, $category_id]
-);
+$voter = $userRepo->findVoterInCategory($voter_refID, $category_id);
 if (!$voter) {
     $_SESSION["errors"][] = "Voter not found.";
     redirect("edit-voter-details.php");
@@ -28,33 +27,30 @@ if (isset($_POST["submit"])) {
     $email = trim($_POST["email"] ?? "");
     $pass  = (string) ($_POST["password"] ?? "");
 
-    if ($fname === "" || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if ($fname === "" || !text_within_length($fname, 255)
+        || !filter_var($email, FILTER_VALIDATE_EMAIL) || !text_within_length($email, 100)
+    ) {
         $_SESSION["errors"][] = "Please provide a valid name and email.";
-        redirect($_SERVER["PHP_SELF"] . "?id=" . $voter_refID);
+        redirect(current_path() . "?id=" . $voter_refID);
+    }
+
+    $passwordHash = null;
+    if ($pass !== "") {
+        if (strlen($pass) < 8) {
+            $_SESSION["errors"][] = "Password must be at least 8 characters.";
+            redirect(current_path() . "?id=" . $voter_refID);
+        }
+        $passwordHash = Password::hash($pass);
     }
 
     try {
-        if ($pass !== "") {
-            if (strlen($pass) < 8) {
-                $_SESSION["errors"][] = "Password must be at least 8 characters.";
-                redirect($_SERVER["PHP_SELF"] . "?id=" . $voter_refID);
-            }
-            execute(
-                "UPDATE system_users SET full_name = ?, email = ?, password = ? WHERE user_id = ? AND election_category_id = ?",
-                [$fname, $email, Password::hash($pass), $voter_refID, $category_id]
-            );
-        } else {
-            execute(
-                "UPDATE system_users SET full_name = ?, email = ? WHERE user_id = ? AND election_category_id = ?",
-                [$fname, $email, $voter_refID, $category_id]
-            );
-        }
+        $userRepo->updateVoter($voter_refID, $category_id, $fname, $email, $passwordHash);
         $_SESSION["messages"][] = "Voter details updated successfully.";
     } catch (PDOException $ex) {
         error_log("Voter update failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Update failed (the email may already be in use).";
     }
-    redirect($_SERVER["PHP_SELF"] . "?id=" . $voter_refID);
+    redirect(current_path() . "?id=" . $voter_refID);
 }
 
 require_once __DIR__ . "/nav.php";
@@ -73,7 +69,7 @@ require_once __DIR__ . "/nav.php";
                     <span class="badge bg-secondary">User ID #<?= (int)$voter_refID ?></span>
                 </div>
                 <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>?id=<?= (int)$voter_refID ?>" method="post">
+                    <form action="<?= e(current_path()); ?>?id=<?= (int)$voter_refID ?>" method="post">
                         <?php echo csrf_field(); ?>
                         <input type="hidden" name="id" value="<?= (int)$voter_refID ?>">
 

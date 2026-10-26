@@ -24,11 +24,25 @@ final class PdoVoteRepository implements VoteRepository
     public function record(int $voterId, int $categoryId, int $candidateId): void
     {
         try {
+            $this->pdo->beginTransaction();
+
             $stmt = $this->pdo->prepare(
                 'INSERT INTO vote (voter_id, category_id, candidate_id) VALUES (?, ?, ?)'
             );
             $stmt->execute([$voterId, $categoryId, $candidateId]);
+
+            // The vote table is authoritative; this denormalised flag is used
+            // by the organiser voter list, so it must change in the same
+            // transaction as the ballot itself.
+            $markVoted = $this->pdo->prepare("UPDATE system_users SET voted = 'Yes' WHERE user_id = ?");
+            $markVoted->execute([$voterId]);
+
+            $this->pdo->commit();
         } catch (PDOException $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
             // 23000 = integrity constraint violation = UNIQUE(voter_id, category_id).
             if ($e->getCode() === '23000') {
                 throw new AlreadyVotedException('You have already voted in this election.', 0, $e);

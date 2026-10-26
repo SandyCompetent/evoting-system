@@ -24,7 +24,7 @@ if (isset($_POST["change"])) {
         error_log("Organiser password change error: " . $ex->getMessage());
         $_SESSION["errors"][] = "Could not update password. Please try again.";
     }
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
@@ -42,7 +42,7 @@ require_once __DIR__ . "/nav.php";
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                    <form action="<?php echo e(current_path()); ?>" method="post">
                         <?php echo csrf_field(); ?>
 
                         <div class="mb-3">

@@ -1,5 +1,7 @@
 <?php
 declare(strict_types=1);
+use App\Repository\Pdo\PdoCategoryRepository;
+use App\Repository\Pdo\PdoUserRepository;
 use App\Support\Password;
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("admin");
@@ -10,27 +12,27 @@ if (isset($_POST["submit"])) {
     $email = trim($_POST["email"] ?? "");
     $cat   = (int) ($_POST["election_category"] ?? 0);
 
-    if ($fname === "" || !filter_var($email, FILTER_VALIDATE_EMAIL) || $cat <= 0) {
+    if ($fname === "" || !text_within_length($fname, 255)
+        || !filter_var($email, FILTER_VALIDATE_EMAIL) || !text_within_length($email, 100) || $cat <= 0
+    ) {
         $_SESSION["errors"][] = "Please provide a valid name, email and category.";
-        redirect($_SERVER["PHP_SELF"]);
+        redirect(current_path());
     }
     $plain = bin2hex(random_bytes(4));
     try {
-        execute(
-            "INSERT INTO system_users (full_name, email, password, role, election_category_id)
-             VALUES (?, ?, ?, 'organiser', ?)",
-            [$fname, $email, Password::hash($plain), $cat]
-        );
+        $userRepo = new PdoUserRepository(db());
+        $userRepo->createOrganiser($fname, $email, Password::hash($plain), $cat);
         $_SESSION["messages"][] = "Organiser account created. Temporary password for {$email}: {$plain} (share securely).";
     } catch (PDOException $ex) {
         error_log("Organiser create failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Could not create organiser (the email may already be registered).";
     }
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
-$categories = fetchAll("SELECT id, name FROM election_category ORDER BY name ASC");
+$categoriesRepo = new PdoCategoryRepository(db());
+$categories = $categoriesRepo->allRows();
 ?>
 
 <div class="container py-4">
@@ -45,7 +47,7 @@ $categories = fetchAll("SELECT id, name FROM election_category ORDER BY name ASC
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                    <form action="<?= e(current_path()); ?>" method="post">
                         <?php echo csrf_field(); ?>
 
                         <div class="mb-3">

@@ -4,15 +4,15 @@ require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("organiser");
 
 use App\Repository\Pdo\PdoCandidateRepository;
+use App\Repository\Pdo\PdoUserRepository;
 
 $candidate_refID = (int) ($_GET["id"] ?? $_POST["id"] ?? $_SESSION["candidate_refID"] ?? 0);
 if ($candidate_refID > 0) {
     $_SESSION["candidate_refID"] = $candidate_refID;
 }
 
-$user_id     = (int) $_SESSION["user_id"];
-$organiser   = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
-$category_id = (int) ($organiser["election_category_id"] ?? 0);
+$user_id = (int) $_SESSION["user_id"];
+$category_id = (int) ((new PdoUserRepository(db()))->categoryIdForUser($user_id) ?? 0);
 
 $candidateRepo = new PdoCandidateRepository(db());
 $candidate = $candidateRepo->findById($candidate_refID, $category_id);
@@ -27,7 +27,7 @@ if (isset($_POST["submit"])) {
     $candidate_name = trim($_POST["candidate_name"] ?? "");
     if ($candidate_name === "") {
         $_SESSION["errors"][] = "Candidate name is required.";
-        redirect($_SERVER["PHP_SELF"] . "?id=" . $candidate_refID);
+        redirect(current_path() . "?id=" . $candidate_refID);
     }
     try {
         $photo  = null;
@@ -44,7 +44,7 @@ if (isset($_POST["submit"])) {
         error_log("Candidate update failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Update failed: " . $ex->getMessage();
     }
-    redirect($_SERVER["PHP_SELF"] . "?id=" . $candidate_refID);
+    redirect(current_path() . "?id=" . $candidate_refID);
 }
 
 require_once __DIR__ . "/nav.php";
@@ -63,7 +63,7 @@ require_once __DIR__ . "/nav.php";
                     <span class="badge bg-secondary">Candidate ID #<?= (int)$candidate_refID ?></span>
                 </div>
                 <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>?id=<?= (int)$candidate_refID ?>" method="post" enctype="multipart/form-data">
+                    <form action="<?= e(current_path()); ?>?id=<?= (int)$candidate_refID ?>" method="post" enctype="multipart/form-data">
                         <?php echo csrf_field(); ?>
                         <input type="hidden" name="id" value="<?= (int)$candidate_refID ?>">
 
@@ -80,7 +80,7 @@ require_once __DIR__ . "/nav.php";
                                 <div class="form-text mb-2">Leave blank to keep existing portrait.</div>
                                 <?php if (!empty($candidate->photo)): ?>
                                     <div class="p-2 border rounded bg-light text-center">
-                                        <img src="../upload/photo/<?php echo e($candidate->photo); ?>" alt="Current Photo" class="rounded border" style="max-width: 120px; max-height: 120px; object-fit: cover;">
+                                        <img src="<?= e(asset_url('upload/photo/' . $candidate->photo)); ?>" alt="Current Photo" class="rounded border image-preview">
                                         <div class="small text-muted mt-1">Current Photo</div>
                                     </div>
                                 <?php endif; ?>
@@ -93,7 +93,7 @@ require_once __DIR__ . "/nav.php";
                                 <div class="form-text mb-2">Leave blank to keep existing symbol.</div>
                                 <?php if (!empty($candidate->symbol)): ?>
                                     <div class="p-2 border rounded bg-light text-center">
-                                        <img src="../upload/symbol/<?php echo e($candidate->symbol); ?>" alt="Current Symbol" class="rounded border p-1 bg-white" style="max-width: 120px; max-height: 120px; object-fit: contain;">
+                                        <img src="<?= e(asset_url('upload/symbol/' . $candidate->symbol)); ?>" alt="Current Symbol" class="rounded border p-1 bg-white image-preview-contain">
                                         <div class="small text-muted mt-1">Current Symbol</div>
                                     </div>
                                 <?php endif; ?>

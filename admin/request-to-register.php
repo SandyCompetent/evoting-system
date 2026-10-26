@@ -1,19 +1,30 @@
 <?php
 declare(strict_types=1);
-use App\Support\Password;
+use App\Repository\Pdo\PdoCategoryRepository;
+use App\Repository\Pdo\PdoRegistrationRequestRepository;
+use App\Repository\Pdo\PdoUserRepository;
+use App\Service\RegistrationRequestService;
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("admin");
 
-// Reject a pending request.
+$requestsRepo = new PdoRegistrationRequestRepository(db());
+$requestService = new RegistrationRequestService(
+    db(),
+    new PdoCategoryRepository(db()),
+    new PdoUserRepository(db()),
+    $requestsRepo,
+);
+
+// Reject a pending request (status is preserved as Rejected).
 $delId = pressed_action("delete");
 if ($delId === null && isset($_POST["reject_id"])) {
     $delId = (int)$_POST["reject_id"];
 }
 if ($delId !== null && $delId > 0) {
     csrf_verify();
-    $n = execute("DELETE FROM request_to_register WHERE id = ?", [$delId]);
-    $_SESSION[$n ? "messages" : "errors"][] = $n ? "Election request rejected." : "Reject failed.";
-    redirect($_SERVER["PHP_SELF"]);
+    $rejected = $requestService->reject($delId);
+    $_SESSION[$rejected ? "messages" : "errors"][] = $rejected ? "Election request rejected." : "Reject failed.";
+    redirect(current_path());
 }
 
 // Accept a pending request: create the category + an organiser, then mark approved.
@@ -23,39 +34,21 @@ if ($acceptId === null && isset($_POST["accept_id"])) {
 }
 if ($acceptId !== null && $acceptId > 0) {
     csrf_verify();
-    $req = fetchOne("SELECT * FROM request_to_register WHERE id = ? AND ac_status = 'Pending'", [$acceptId]);
-    if (!$req) {
-        $_SESSION["errors"][] = "Request not found or already processed.";
-        redirect($_SERVER["PHP_SELF"]);
-    }
-    $plain = bin2hex(random_bytes(4));
-    $pdo = db();
     try {
-        $pdo->beginTransaction();
-        execute(
-            "INSERT INTO election_category (name, expire_timestamp) VALUES (?, ?)",
-            [trim($req["election_category"]), trim($req["expire_timestamp"])]
-        );
-        $categoryId = (int) $pdo->lastInsertId();
-        execute(
-            "INSERT INTO system_users (full_name, email, password, role, election_category_id)
-             VALUES (?, ?, ?, 'organiser', ?)",
-            [$req["full_name"], $req["email"], Password::hash($plain), $categoryId]
-        );
-        execute("UPDATE request_to_register SET ac_status = 'Approved' WHERE id = ?", [$acceptId]);
-        $pdo->commit();
+        $result = $requestService->approve($acceptId);
         $_SESSION["messages"][] = "Request approved! Category and organiser account created. "
-            . "Temporary password for " . $req["email"] . ": " . $plain . " (share securely).";
-    } catch (PDOException $ex) {
-        if ($pdo->inTransaction()) { $pdo->rollBack(); }
+            . "Temporary password for " . $result["email"] . ": " . $result["password"] . " (share securely).";
+    } catch (\RuntimeException $ex) {
+        $_SESSION["errors"][] = $ex->getMessage();
+    } catch (\Throwable $ex) {
         error_log("Request approval failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Approval failed (the organiser email may already exist).";
     }
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
-$requests = fetchAll("SELECT * FROM request_to_register WHERE ac_status = 'Pending' ORDER BY timestamp DESC");
+$requests = $requestsRepo->pending();
 ?>
 
 <div class="container-fluid px-4 py-4">
@@ -69,7 +62,7 @@ $requests = fetchAll("SELECT * FROM request_to_register WHERE ac_status = 'Pendi
             <span class="badge bg-secondary"><?= count($requests) ?> Pending</span>
         </div>
         <div class="card-body p-0">
-            <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+            <form action="<?= e(current_path()); ?>" method="post">
                 <?php echo csrf_field(); ?>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -117,7 +110,7 @@ $requests = fetchAll("SELECT * FROM request_to_register WHERE ac_status = 'Pendi
                                         <button type="submit" name="accept_id" value="<?= (int)$value['id']; ?>" class="btn btn-sm btn-success me-1">
                                             <i class="bi bi-check-lg"></i> Accept
                                         </button>
-                                        <button type="submit" name="reject_id" value="<?= (int)$value['id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Reject request for \'<?= addslashes(e($value['election_category'])) ?>\'?');">
+                                        <button type="submit" name="reject_id" value="<?= (int)$value['id']; ?>" class="btn btn-sm btn-outline-danger" data-confirm="Reject request for '<?= e($value['election_category']) ?>'?">
                                             <i class="bi bi-x-lg"></i> Reject
                                         </button>
                                     </td>

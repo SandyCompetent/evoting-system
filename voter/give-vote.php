@@ -30,7 +30,7 @@ $candidates = $candidateRepo->findByCategory($category_id);
                 <p class="mb-0 text-muted">There are no candidates participating in this election category yet.</p>
             </div>
         <?php else: ?>
-            <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" onsubmit="return confirm('Are you sure you want to submit your vote for this candidate?');">
+            <form action="<?= e(current_path()); ?>" method="post" data-confirm="Are you sure you want to submit your vote for this candidate?">
                 <?php echo csrf_field(); ?>
 
                 <div class="row g-4 mb-4">
@@ -38,10 +38,10 @@ $candidates = $candidateRepo->findByCategory($category_id);
                         $candId     = $cand->id;
                         $name       = $cand->fullName;
                         $initial    = strtoupper(mb_substr($name, 0, 1));
-                        $photoPath  = "../upload/photo/" . $cand->photo;
-                        $hasPhoto   = !empty($cand->photo) && is_file(__DIR__ . "/" . $photoPath);
-                        $symbolPath = "../upload/symbol/" . $cand->symbol;
-                        $hasSymbol  = !empty($cand->symbol) && is_file(__DIR__ . "/" . $symbolPath);
+                        $photoPath  = asset_url('upload/photo/' . $cand->photo);
+                        $hasPhoto   = !empty($cand->photo) && is_file(__DIR__ . '/../upload/photo/' . $cand->photo);
+                        $symbolPath = asset_url('upload/symbol/' . $cand->symbol);
+                        $hasSymbol  = !empty($cand->symbol) && is_file(__DIR__ . '/../upload/symbol/' . $cand->symbol);
                     ?>
                         <div class="col-sm-6 col-lg-4">
                             <label class="candidate-card-wrapper d-block text-start h-100" for="cand_<?= $candId ?>">

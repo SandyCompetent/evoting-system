@@ -10,7 +10,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'organiser') {
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm mb-4">
     <div class="container-fluid">
         <a class="navbar-brand fw-bold d-inline-flex align-items-center" href="index.php">
-            <img src="../assets/site-icon.svg" alt="Logo" width="24" height="24" class="d-inline-block align-text-top me-2"> e-Voting <span class="badge bg-light text-primary fs-6 ms-1">Organiser</span>
+            <img src="<?= e(asset_url('assets/site-icon.svg')); ?>" alt="Logo" width="24" height="24" class="d-inline-block align-text-top me-2"> e-Voting <span class="badge bg-light text-primary fs-6 ms-1">Organiser</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#organiserNavbar" aria-controls="organiserNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>

@@ -1,14 +1,17 @@
 <?php
 declare(strict_types=1);
+use App\Repository\Pdo\PdoCategoryRepository;
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("admin");
+
+$categoriesRepo = new PdoCategoryRepository(db());
 
 $category_refID = (int) ($_GET["id"] ?? $_POST["id"] ?? $_SESSION["category_refID"] ?? 0);
 if ($category_refID > 0) {
     $_SESSION["category_refID"] = $category_refID;
 }
 
-$category = fetchOne("SELECT * FROM election_category WHERE id = ?", [$category_refID]);
+$category = $categoriesRepo->findRow($category_refID);
 if (!$category) {
     $_SESSION["errors"][] = "Category not found.";
     redirect("edit-election-category.php");
@@ -16,20 +19,22 @@ if (!$category) {
 
 if (isset($_POST["submit"])) {
     csrf_verify();
-    $name       = trim($_POST["category_name"] ?? "");
-    $raw_expire = trim($_POST["expire_timestamp"] ?? "");
-    $expire     = $raw_expire !== "" ? date("Y-m-d H:i:s", strtotime($raw_expire)) : "";
+    $name   = trim($_POST["category_name"] ?? "");
+    $expire = parse_datetime_local((string) ($_POST["expire_timestamp"] ?? ""));
 
-    if ($name === "") {
-        $_SESSION["errors"][] = "Category name is required.";
-        redirect($_SERVER["PHP_SELF"] . "?id=" . $category_refID);
+    if ($name === "" || !text_within_length($name, 255) || $expire === null) {
+        $_SESSION["errors"][] = "A valid category name and expiry time are required.";
+        redirect(current_path() . "?id=" . $category_refID);
     }
-    execute(
-        "UPDATE election_category SET name = ?, expire_timestamp = ? WHERE id = ?",
-        [$name, $expire, $category_refID]
-    );
-    $_SESSION["messages"][] = "Category updated successfully.";
-    redirect($_SERVER["PHP_SELF"] . "?id=" . $category_refID);
+
+    try {
+        $categoriesRepo->update($category_refID, $name, $expire);
+        $_SESSION["messages"][] = "Category updated successfully.";
+    } catch (PDOException $ex) {
+        error_log("Category update failed: " . $ex->getMessage());
+        $_SESSION["errors"][] = "Could not update category.";
+    }
+    redirect(current_path() . "?id=" . $category_refID);
 }
 
 require_once __DIR__ . "/nav.php";
@@ -48,7 +53,7 @@ require_once __DIR__ . "/nav.php";
                     <span class="badge bg-secondary">ID #<?= (int) $category_refID ?></span>
                 </div>
                 <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>?id=<?= (int)$category_refID ?>" method="post">
+                    <form action="<?= e(current_path()); ?>?id=<?= (int)$category_refID ?>" method="post">
                         <?php echo csrf_field(); ?>
                         <input type="hidden" name="id" value="<?= (int)$category_refID ?>">
 

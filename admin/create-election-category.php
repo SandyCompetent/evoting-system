@@ -1,27 +1,33 @@
 <?php
 declare(strict_types=1);
+use App\Repository\Pdo\PdoCategoryRepository;
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("admin");
 
 if (isset($_POST["submit"])) {
     csrf_verify();
-    $category   = trim($_POST["category_name"] ?? "");
-    $raw_expire = trim($_POST["expire_timestamp"] ?? "");
-    $expire     = $raw_expire !== "" ? date("Y-m-d H:i:s", strtotime($raw_expire)) : "";
+    $category = trim($_POST["category_name"] ?? "");
+    $expire   = parse_datetime_local((string) ($_POST["expire_timestamp"] ?? ""));
 
-    if ($category === "") {
-        $_SESSION["errors"][] = "Category name is required.";
-        redirect($_SERVER["PHP_SELF"]);
+    if ($category === "" || !text_within_length($category, 255)
+        || $expire === null || !is_future_datetime($expire)
+    ) {
+        $_SESSION["errors"][] = "A category name and a future expiry time are required.";
+        redirect(current_path());
     }
 
     try {
-        execute("INSERT INTO election_category (name, expire_timestamp) VALUES (?, ?)", [$category, $expire]);
+        $categoriesRepo = new PdoCategoryRepository(db());
+        $now = date("Y-m-d H:i:s");
+        // Elections open immediately and run until the expiry the admin chose;
+        // the organiser can still narrow the window from their dashboard.
+        $categoriesRepo->create($category, 0, 'No', $expire, $now, $expire);
         $_SESSION["messages"][] = "Category created successfully.";
     } catch (PDOException $ex) {
         error_log("Category create failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Could not create category.";
     }
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
@@ -39,7 +45,7 @@ require_once __DIR__ . "/nav.php";
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                    <form action="<?= e(current_path()); ?>" method="post">
                         <?php echo csrf_field(); ?>
 
                         <div class="mb-3">

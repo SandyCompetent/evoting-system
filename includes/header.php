@@ -8,20 +8,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>e-Voting System</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="<?php echo htmlspecialchars(($appRoot === '/' || $appRoot === '\\' || $appRoot === '') ? '/assets/site-icon.svg' : $appRoot . '/assets/site-icon.svg', ENT_QUOTES, 'UTF-8'); ?>">
+    <link rel="icon" type="image/svg+xml" href="<?= e(asset_url('assets/site-icon.svg')); ?>">
     <!-- Bootswatch Zephyr Theme -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/zephyr/bootstrap.min.css">
+    <link rel="stylesheet" href="<?= e(BOOTSTRAP_CSS); ?>">
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <?php
-    $appRoot = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
-    if (preg_match('#/(admin|organiser|voter)$#', $appRoot)) {
-        $appRoot = dirname($appRoot);
-    }
-    $cssPath = ($appRoot === '/' || $appRoot === '\\' || $appRoot === '') ? '/assets/css/style.css' : $appRoot . '/assets/css/style.css';
-    ?>
+    <link rel="stylesheet" href="<?= e(BOOTSTRAP_ICONS_CSS); ?>">
     <!-- Application Custom & Bridge CSS -->
-    <link rel="stylesheet" href="<?= htmlspecialchars($cssPath, ENT_QUOTES, 'UTF-8') ?>">
-    <?php ob_start(); ?>
+    <link rel="stylesheet" href="<?= e(asset_url('assets/css/style.css')); ?>">
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">

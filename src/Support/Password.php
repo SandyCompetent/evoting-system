@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use RuntimeException;
+
 /**
  * Single source of truth for password hashing.
  *
@@ -13,7 +15,12 @@ final class Password
 {
     public static function hash(string $plain): string
     {
-        return password_hash($plain, self::algorithm());
+        $hash = password_hash($plain, self::algorithm());
+        if ($hash === false) {
+            throw new RuntimeException('Password hashing failed.');
+        }
+
+        return $hash;
     }
 
     public static function needsRehash(string $hash): bool

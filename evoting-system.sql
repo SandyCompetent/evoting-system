@@ -110,7 +110,7 @@ CREATE TABLE `system_users` (
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `uq_email` (`email`),
   KEY `idx_role_category` (`role`,`election_category_id`),
-  CONSTRAINT `fk_system_users_category` FOREIGN KEY (`election_category_id`) REFERENCES `election_category` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_system_users_category` FOREIGN KEY (`election_category_id`) REFERENCES `election_category` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB AUTO_INCREMENT=386560 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

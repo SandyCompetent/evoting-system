@@ -65,6 +65,56 @@ final class PdoCategoryRepository implements CategoryRepository
         $stmt->execute([$start, $end, $id]);
     }
 
+    /**
+     * @return array<int,array<string,mixed>>
+     */
+    public function allRows(): array
+    {
+        $stmt = $this->pdo->query('SELECT * FROM election_category ORDER BY name ASC');
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function findRow(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM election_category WHERE id = ?');
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ?: null;
+    }
+
+    public function create(
+        string $name,
+        int $maxVoter,
+        string $adultVoter,
+        string $expireTimestamp,
+        string $voteStart,
+        string $voteEnd,
+    ): int {
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO election_category
+                (name, max_voter, adult_voter, expire_timestamp, vote_start_time, vote_end_time)
+             VALUES (?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([$name, $maxVoter, $adultVoter, $expireTimestamp, $voteStart, $voteEnd]);
+
+        return (int) $this->pdo->lastInsertId();
+    }
+
+    public function update(int $id, string $name, string $expireTimestamp): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE election_category SET name = ?, expire_timestamp = ? WHERE id = ?'
+        );
+        $stmt->execute([$name, $expireTimestamp, $id]);
+    }
+
+    public function count(): int
+    {
+        return (int) $this->pdo->query('SELECT COUNT(*) FROM election_category')->fetchColumn();
+    }
+
     public function deleteWithCascade(int $id): void
     {
         try {

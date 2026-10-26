@@ -3,6 +3,8 @@ declare(strict_types=1);
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("admin");
 
+use App\Repository\Pdo\PdoCategoryRepository;
+use App\Repository\Pdo\PdoDashboardRepository;
 use App\Service\DemoDataSeeder;
 
 $seeder = new DemoDataSeeder(db());
@@ -46,19 +48,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $_SESSION["errors"][] = "Operation failed: " . $e->getMessage();
     }
 
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
 
 $pdo = db();
-$categoryCount  = (int)($pdo->query("SELECT COUNT(*) FROM election_category")->fetchColumn() ?: 0);
-$organiserCount = (int)($pdo->query("SELECT COUNT(*) FROM system_users WHERE role = 'organiser'")->fetchColumn() ?: 0);
-$voterCount     = (int)($pdo->query("SELECT COUNT(*) FROM system_users WHERE role = 'voter'")->fetchColumn() ?: 0);
-$ballotCount    = (int)($pdo->query("SELECT COUNT(*) FROM vote")->fetchColumn() ?: 0);
-$requestCount   = (int)($pdo->query("SELECT COUNT(*) FROM request_to_register WHERE ac_status = 'pending'")->fetchColumn() ?: 0);
+$counts = (new PdoDashboardRepository($pdo))->demoCounts();
+$categoryCount  = $counts['categories'];
+$organiserCount = $counts['organisers'];
+$voterCount     = $counts['voters'];
+$ballotCount    = $counts['ballots'];
+$requestCount   = $counts['pending'];
 
-$categories = fetchAll("SELECT id, name, vote_start_time, vote_end_time FROM election_category ORDER BY id DESC");
+$categories = (new PdoCategoryRepository($pdo))->allRows();
 $now = time();
 ?>
 
@@ -134,7 +137,7 @@ $now = time();
                         <li><strong>Pending Requests:</strong> 2 election registration requests for admin approval.</li>
                     </ul>
 
-                    <form action="<?= e($_SERVER['PHP_SELF']) ?>" method="post">
+                    <form action="<?= e(current_path()) ?>" method="post">
                         <?= csrf_field() ?>
                         <input type="hidden" name="action" value="seed_full">
 
@@ -162,7 +165,7 @@ $now = time();
                 <div class="card-body p-4">
                     <!-- Add Voters Form -->
                     <h6 class="fw-bold text-dark mb-2">Add Random Voters to Category</h6>
-                    <form action="<?= e($_SERVER['PHP_SELF']) ?>" method="post" class="row g-2 align-items-end mb-4">
+                    <form action="<?= e(current_path()) ?>" method="post" class="row g-2 align-items-end mb-4">
                         <?= csrf_field() ?>
                         <input type="hidden" name="action" value="add_voters">
 
@@ -196,7 +199,7 @@ $now = time();
                     <!-- Simulate Votes Form -->
                     <h6 class="fw-bold text-dark mb-2 mt-3">Simulate Random Ballots</h6>
                     <p class="small text-muted mb-2">Casts random votes for unvoted voters to populate tally charts.</p>
-                    <form action="<?= e($_SERVER['PHP_SELF']) ?>" method="post" class="row g-2 align-items-end">
+                    <form action="<?= e(current_path()) ?>" method="post" class="row g-2 align-items-end">
                         <?= csrf_field() ?>
                         <input type="hidden" name="action" value="simulate_votes">
 
@@ -237,7 +240,7 @@ $now = time();
                     <p class="small text-muted">
                         Clears all categories, candidates, voters, ballots, and registration requests. The administrator account is preserved.
                     </p>
-                    <form action="<?= e($_SERVER['PHP_SELF']) ?>" method="post" onsubmit="return confirm('Are you sure you want to delete all test data? This will clear all categories, candidates, voters, and ballots.');">
+                    <form action="<?= e(current_path()) ?>" method="post" data-confirm="Are you sure you want to delete all test data? This will clear all categories, candidates, voters, and ballots.">
                         <?= csrf_field() ?>
                         <input type="hidden" name="action" value="purge">
                         <button type="submit" class="btn btn-sm btn-outline-danger">

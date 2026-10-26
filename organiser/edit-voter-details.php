@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
+use App\Repository\Pdo\PdoUserRepository;
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("organiser");
 
-$user_id   = (int) $_SESSION["user_id"];
-$organiser = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
-$category_id = (int) ($organiser["election_category_id"] ?? 0);
+$user_id = (int) $_SESSION["user_id"];
+$userRepo = new PdoUserRepository(db());
+$category_id = (int) ($userRepo->categoryIdForUser($user_id) ?? 0);
 
 if (($editId = pressed_action("edit")) !== null) {
     csrf_verify();
@@ -19,19 +20,12 @@ if ($delId === null && isset($_POST["delete_id"])) {
 }
 if ($delId !== null && $delId > 0) {
     csrf_verify();
-    $n = execute(
-        "DELETE FROM system_users WHERE user_id = ? AND role = 'voter' AND election_category_id = ?",
-        [$delId, $category_id]
-    );
-    $_SESSION[$n ? "messages" : "errors"][] = $n ? "Voter removed successfully." : "Delete failed.";
-    redirect($_SERVER["PHP_SELF"]);
+    $deleted = $userRepo->deleteVoter($delId, $category_id);
+    $_SESSION[$deleted ? "messages" : "errors"][] = $deleted ? "Voter removed successfully." : "Delete failed.";
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
-
-use App\Repository\Pdo\PdoUserRepository;
-
-$userRepo = new PdoUserRepository(db());
 $voters = $userRepo->findVotersByCategory($category_id);
 ?>
 
@@ -48,7 +42,7 @@ $voters = $userRepo->findVotersByCategory($category_id);
             </a>
         </div>
         <div class="card-body p-0">
-            <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+            <form action="<?= e(current_path()); ?>" method="post">
                 <?php echo csrf_field(); ?>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -87,7 +81,7 @@ $voters = $userRepo->findVotersByCategory($category_id);
                                         <a href="update-voter-details.php?id=<?= $voter->id ?>" class="btn btn-sm btn-outline-primary me-1">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
-                                        <button type="submit" name="delete_id" value="<?= $voter->id ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete voter \'<?= addslashes(e($voter->fullName)) ?>\'?');">
+                                        <button type="submit" name="delete_id" value="<?= $voter->id ?>" class="btn btn-sm btn-outline-danger" data-confirm="Delete voter '<?= e($voter->fullName) ?>'?">
                                             <i class="bi bi-trash"></i> Delete
                                         </button>
                                     </td>

@@ -24,8 +24,6 @@ if (isset($_POST["submit"])) {
     $candidate_id = (int) ($_POST["vote"] ?? 0);
     try {
         $votes->castVote($user_id, $candidate_id);
-        // Denormalised convenience flag for dashboards; the vote table is authoritative.
-        execute("UPDATE system_users SET voted = 'Yes' WHERE user_id = ?", [$user_id]);
         $_SESSION["messages"][] = "Your ballot has been successfully verified and recorded. Thank you for voting!";
     } catch (VoteException $ex) {
         $_SESSION["errors"][] = $ex->getMessage();
@@ -33,7 +31,7 @@ if (isset($_POST["submit"])) {
         error_log("Vote cast failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Vote submission failed. Please try again.";
     }
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
@@ -106,8 +104,8 @@ $totalVotesCast = $tally->totalVotes();
                     </h5>
                 </div>
                 <div class="card-body p-3">
-                    <div id="barChartContainer" style="width: 100%; min-height: 280px;">
-                        <div id="barChart" style="width: 100%; height: 280px;"></div>
+                    <div id="barChartContainer" class="chart-box chart-box-lg">
+                        <div id="voter-bar-chart" class="chart-canvas-lg"></div>
                     </div>
                 </div>
             </div>
@@ -190,74 +188,21 @@ $totalVotesCast = $tally->totalVotes();
     ?>
 </div>
 
-<script type="text/javascript">
-    // Timezone synchronization: pass exact epoch milliseconds computed by server PHP
-    var start_target = <?= $start !== false ? ($start * 1000) : 0 ?>;
-    var end_target   = <?= $end !== false ? ($end * 1000) : 0 ?>;
-    var server_time  = <?= (time() * 1000) ?>;
-    var client_offset = server_time - Date.now();
-
-    function renderTiles(containerId, targetMillis) {
-        var el = document.getElementById(containerId);
-        if (!el || targetMillis <= 0) return;
-
-        var now = Date.now() + client_offset;
-        var diff = Math.max(0, Math.floor((targetMillis - now) / 1000));
-
-        var d = Math.floor(diff / 86400); diff %= 86400;
-        var h = Math.floor(diff / 3600);  diff %= 3600;
-        var m = Math.floor(diff / 60);    var s = Math.floor(diff % 60);
-
-        el.innerHTML =
-            '<div class="countdown-tile"><span class="val">' + d + '</span><span class="lbl">Days</span></div>' +
-            '<div class="countdown-tile"><span class="val">' + (h < 10 ? '0' + h : h) + '</span><span class="lbl">Hours</span></div>' +
-            '<div class="countdown-tile"><span class="val">' + (m < 10 ? '0' + m : m) + '</span><span class="lbl">Minutes</span></div>' +
-            '<div class="countdown-tile"><span class="val">' + (s < 10 ? '0' + s : s) + '</span><span class="lbl">Seconds</span></div>';
-    }
-
-    function updateTimers() {
-        renderTiles('vote_start_countdown', start_target);
-        renderTiles('vote_end_countdown', end_target);
-        renderTiles('poll_close_countdown', end_target);
-    }
-
-    updateTimers();
-    setInterval(updateTimers, 1000);
-</script>
-
-<?php if ($hasVoted && $end !== false && $now > $end): ?>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
-    var candidate_name_array = <?php echo json_encode($candidate_name_array); ?>;
-    var candidate_vote_array = <?php echo json_encode($candidate_vote_array); ?>;
-
-    google.charts.load('current', { 'packages': ['bar'] });
-    google.charts.setOnLoadCallback(drawBar);
-
-    function drawBar() {
-        var el = document.getElementById('barChart');
-        if (!el || candidate_name_array.length === 0) return;
-
-        var data = [['Candidate', 'Votes']];
-        for (var i = 0; i < candidate_name_array.length; i++) {
-            data.push([candidate_name_array[i], candidate_vote_array[i]]);
-        }
-        var containerWidth = el.parentElement ? el.parentElement.clientWidth : 400;
-        var chart = new google.charts.Bar(el);
-        chart.draw(google.visualization.arrayToDataTable(data),
-            google.charts.Bar.convertOptions({
-                legend: { position: 'none' },
-                bar: { groupWidth: "50%" },
-                width: containerWidth,
-                height: 280
-            })
-        );
-    }
-
-    window.addEventListener('resize', drawBar);
-</script>
-<?php endif; ?>
+<div id="voter-dashboard-data" class="d-none"
+     data-countdown="<?= e(json_encode([
+         'start' => $start !== false ? ($start * 1000) : 0,
+         'end' => $end !== false ? ($end * 1000) : 0,
+         'serverTime' => time() * 1000,
+     ])); ?>"
+     <?php if ($hasVoted && $end !== false && $now > $end): ?>data-chart="<?= e(json_encode([
+         'names' => array_values($candidate_name_array),
+         'votes' => array_values($candidate_vote_array),
+     ])); ?>"<?php endif; ?>></div>
 
 <?php
+$pageScripts = [asset_url('assets/js/voter-dashboard.js')];
+if ($hasVoted && $end !== false && $now > $end) {
+    array_unshift($pageScripts, GOOGLE_CHARTS_LOADER);
+}
 require_once("../includes/footer.php");
 ?>

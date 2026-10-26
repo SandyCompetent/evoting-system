@@ -4,33 +4,37 @@ require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("organiser");
 
 use App\Repository\Pdo\PdoCategoryRepository;
+use App\Repository\Pdo\PdoUserRepository;
 use App\Service\VoteServiceFactory;
 
-$user_id    = (int) $_SESSION["user_id"];
-$organiser  = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
-$categoryID = (int) ($organiser["election_category_id"] ?? 0);
+$user_id = (int) $_SESSION["user_id"];
+$userRepo = new PdoUserRepository(db());
+$categoryID = (int) ($userRepo->findById($user_id)?->categoryId ?? 0);
 
 $categoryRepo = new PdoCategoryRepository(db());
 $votesService = VoteServiceFactory::create(db());
 
 if (isset($_POST["update_vote_time"])) {
     csrf_verify();
-    $raw_start = trim($_POST["start_timestamp"] ?? "");
-    $raw_end   = trim($_POST["end_timestamp"] ?? "");
-    $start     = $raw_start !== "" ? date("Y-m-d H:i:s", strtotime($raw_start)) : "";
-    $end       = $raw_end !== "" ? date("Y-m-d H:i:s", strtotime($raw_end)) : "";
+    $start = parse_datetime_local((string) ($_POST["start_timestamp"] ?? ""));
+    $end   = parse_datetime_local((string) ($_POST["end_timestamp"] ?? ""));
+
+    if ($start === null || $end === null || strtotime($start) >= strtotime($end)) {
+        $_SESSION["errors"][] = "Please provide a valid start and end time; the end must be after the start.";
+        redirect(current_path());
+    }
 
     $categoryRepo->updateVotingWindow($categoryID, $start, $end);
     $_SESSION["messages"][] = "Election voting window updated successfully.";
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
 
-$cat = fetchOne("SELECT * FROM election_category WHERE id = ?", [$categoryID]);
-$categoryName      = $cat["name"] ?? "Election";
-$get_vote_start_dt = $cat["vote_start_time"] ?? "";
-$get_vote_end_dt   = $cat["vote_end_time"] ?? "";
+$category           = $categoryRepo->find($categoryID);
+$categoryName       = $category?->name ?? "Election";
+$get_vote_start_dt  = $category?->startsAt?->format('Y-m-d H:i:s') ?? "";
+$get_vote_end_dt    = $category?->endsAt?->format('Y-m-d H:i:s') ?? "";
 
 // Turnout summary via VoteService & Turnout Value Object
 $turnoutReport = $votesService->turnoutReport($categoryID);
@@ -151,8 +155,8 @@ $winner = $tally->winnerLabel();
                     </h5>
                 </div>
                 <div class="card-body p-3">
-                    <div id="barChartContainer" style="width: 100%; min-height: 280px;">
-                        <div id="barChart" style="width: 100%; height: 280px;"></div>
+                    <div id="barChartContainer" class="chart-box chart-box-lg">
+                        <div id="organiser-bar-chart" class="chart-canvas-lg"></div>
                     </div>
                 </div>
             </div>
@@ -164,8 +168,7 @@ $winner = $tally->winnerLabel();
                         <i class="bi bi-clock-history me-2"></i>Configure Election Voting Window
                     </h5>
                 </div>
-                <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                <div class="card-body p-4">                        <form action="<?= e(current_path()); ?>" method="post">
                         <?php echo csrf_field(); ?>
 
                         <div class="row g-3">
@@ -225,8 +228,8 @@ $winner = $tally->winnerLabel();
                     </h5>
                 </div>
                 <div class="card-body p-3">
-                    <div id="piechartContainer" style="width: 100%; min-height: 250px;">
-                        <div id="piechart" style="width: 100%; height: 250px;"></div>
+                    <div id="piechartContainer" class="chart-box chart-box-bar">
+                        <div id="organiser-pie-chart" class="chart-canvas"></div>
                     </div>
                 </div>
             </div>
@@ -234,65 +237,14 @@ $winner = $tally->winnerLabel();
     </div>
 </div>
 
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
-    var candidate_name_array = <?php echo json_encode($candidate_name_array); ?>;
-    var candidate_vote_array = <?php echo json_encode($candidate_vote_array); ?>;
-    var voterReceived = <?php echo (int) $voterReceived; ?>;
-    var voterPending  = <?php echo (int) $voterPending; ?>;
-
-    google.charts.load('current', { 'packages': ['bar', 'corechart'] });
-    google.charts.setOnLoadCallback(function () {
-        drawBar();
-        drawPie();
-    });
-
-    function drawBar() {
-        var el = document.getElementById('barChart');
-        if (!el || candidate_name_array.length === 0) return;
-        var data = [['Candidate', 'Votes']];
-        for (var i = 0; i < candidate_name_array.length; i++) {
-            data.push([candidate_name_array[i], candidate_vote_array[i]]);
-        }
-        var containerWidth = el.parentElement ? el.parentElement.clientWidth : 400;
-        var chart = new google.charts.Bar(el);
-        chart.draw(google.visualization.arrayToDataTable(data),
-            google.charts.Bar.convertOptions({
-                legend: { position: 'none' },
-                bar: { groupWidth: "50%" },
-                width: containerWidth,
-                height: 280
-            })
-        );
-    }
-
-    function drawPie() {
-        var el = document.getElementById('piechart');
-        if (!el) return;
-        var data = google.visualization.arrayToDataTable([
-            ['Participation', 'Voters'],
-            ['Ballots Cast', voterReceived],
-            ['Pending Voters', voterPending]
-        ]);
-        var containerWidth = el.parentElement ? el.parentElement.clientWidth : 300;
-        var chart = new google.visualization.PieChart(el);
-        chart.draw(data, {
-            pieHole: 0.45,
-            legend: { position: 'bottom' },
-            colors: ['#2563eb', '#cbd5e1'],
-            chartArea: { width: '90%', height: '75%' },
-            width: containerWidth,
-            height: 250
-        });
-    }
-
-    // Responsive window resize listener fixes NaN container width bugs
-    window.addEventListener('resize', function() {
-        drawBar();
-        drawPie();
-    });
-</script>
+<div id="organiser-chart-data" class="d-none" data-chart="<?= e(json_encode([
+    'names' => array_values($candidate_name_array),
+    'votes' => array_values($candidate_vote_array),
+    'received' => (int) $voterReceived,
+    'pending' => (int) $voterPending,
+])); ?>"></div>
 
 <?php
+$pageScripts = [GOOGLE_CHARTS_LOADER, asset_url('assets/js/organiser-dashboard.js')];
 require_once("../includes/footer.php");
 ?>

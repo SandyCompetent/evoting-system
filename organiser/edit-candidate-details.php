@@ -5,10 +5,10 @@ require_role("organiser");
 
 use App\Exception\VoteException;
 use App\Repository\Pdo\PdoCandidateRepository;
+use App\Repository\Pdo\PdoUserRepository;
 
-$user_id   = (int) $_SESSION["user_id"];
-$organiser = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
-$category_id = (int) ($organiser["election_category_id"] ?? 0);
+$user_id = (int) $_SESSION["user_id"];
+$category_id = (int) ((new PdoUserRepository(db()))->categoryIdForUser($user_id) ?? 0);
 
 $candidateRepo = new PdoCandidateRepository(db());
 
@@ -35,7 +35,7 @@ if ($delId !== null && $delId > 0) {
         error_log("Candidate delete failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Could not delete candidate.";
     }
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
@@ -55,7 +55,7 @@ $candidates = $candidateRepo->findByCategory($category_id);
             </a>
         </div>
         <div class="card-body p-0">
-            <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+            <form action="<?php echo e(current_path()); ?>" method="post">
                 <?php echo csrf_field(); ?>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -74,18 +74,18 @@ $candidates = $candidateRepo->findByCategory($category_id);
                                 </tr>
                             <?php endif; ?>
                             <?php foreach ($candidates as $cand):
-                                $photoPath  = "../upload/photo/" . $cand->photo;
-                                $hasPhoto   = !empty($cand->photo) && is_file(__DIR__ . "/" . $photoPath);
-                                $symbolPath = "../upload/symbol/" . $cand->symbol;
-                                $hasSymbol  = !empty($cand->symbol) && is_file(__DIR__ . "/" . $symbolPath);
+                                $photoPath  = asset_url('upload/photo/' . $cand->photo);
+                                $hasPhoto   = !empty($cand->photo) && is_file(__DIR__ . '/../upload/photo/' . $cand->photo);
+                                $symbolPath = asset_url('upload/symbol/' . $cand->symbol);
+                                $hasSymbol  = !empty($cand->symbol) && is_file(__DIR__ . '/../upload/symbol/' . $cand->symbol);
                             ?>
                                 <tr>
                                     <td class="ps-3 fw-medium">
                                         <div class="d-flex align-items-center">
                                             <?php if ($hasPhoto): ?>
-                                                <img src="<?= e($photoPath); ?>" alt="<?= e($cand->fullName); ?>" class="rounded-circle me-3 border" style="width: 48px; height: 48px; object-fit: cover;">
+                                                <img src="<?= e($photoPath); ?>" alt="<?= e($cand->fullName); ?>" class="rounded-circle me-3 border table-thumb">
                                             <?php else: ?>
-                                                <div class="avatar-monogram me-3" style="width: 48px; height: 48px; font-size: 1.25rem;">
+                                                <div class="avatar-monogram me-3 avatar-monogram-sm">
                                                     <?= e(strtoupper(mb_substr($cand->fullName, 0, 1))); ?>
                                                 </div>
                                             <?php endif; ?>
@@ -104,7 +104,7 @@ $candidates = $candidateRepo->findByCategory($category_id);
                                     </td>
                                     <td>
                                         <?php if ($hasSymbol): ?>
-                                            <img src="<?= e($symbolPath); ?>" alt="Symbol" class="rounded border p-1 bg-white" style="width: 40px; height: 40px; object-fit: contain;">
+                                            <img src="<?= e($symbolPath); ?>" alt="Symbol" class="rounded border p-1 bg-white table-thumb-symbol">
                                         <?php else: ?>
                                             <span class="badge bg-light text-muted border">None</span>
                                         <?php endif; ?>
@@ -113,7 +113,7 @@ $candidates = $candidateRepo->findByCategory($category_id);
                                         <a href="update-candidate-details.php?id=<?= $cand->id ?>" class="btn btn-sm btn-outline-primary me-1">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
-                                        <button type="submit" name="delete_id" value="<?= $cand->id ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete candidate \'<?= addslashes(e($cand->fullName)) ?>\'? This action cannot be undone.');">
+                                        <button type="submit" name="delete_id" value="<?= $cand->id ?>" class="btn btn-sm btn-outline-danger" data-confirm="Delete candidate '<?= e($cand->fullName) ?>'? This action cannot be undone.">
                                             <i class="bi bi-trash"></i> Delete
                                         </button>
                                     </td>

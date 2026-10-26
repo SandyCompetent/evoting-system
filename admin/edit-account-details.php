@@ -1,7 +1,10 @@
 <?php
 declare(strict_types=1);
+use App\Repository\Pdo\PdoUserRepository;
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("admin");
+
+$userRepo = new PdoUserRepository(db());
 
 if (($editId = pressed_action("edit")) !== null) {
     csrf_verify();
@@ -15,19 +18,13 @@ if ($delId === null && isset($_POST["delete_id"])) {
 }
 if ($delId !== null && $delId > 0) {
     csrf_verify();
-    $n = execute("DELETE FROM system_users WHERE user_id = ? AND role = 'organiser'", [$delId]);
-    $_SESSION[$n ? "messages" : "errors"][] = $n ? "Organiser deleted successfully." : "Delete failed.";
-    redirect($_SERVER["PHP_SELF"]);
+    $deleted = $userRepo->deleteOrganiser($delId);
+    $_SESSION[$deleted ? "messages" : "errors"][] = $deleted ? "Organiser deleted successfully." : "Delete failed.";
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
-$organisers = fetchAll(
-    "SELECT u.*, c.name AS category_name
-       FROM system_users u
-       LEFT JOIN election_category c ON c.id = u.election_category_id
-      WHERE u.role = 'organiser'
-      ORDER BY u.full_name ASC"
-);
+$organisers = $userRepo->findOrganisersWithCategory();
 ?>
 
 <div class="container py-4">
@@ -43,7 +40,7 @@ $organisers = fetchAll(
             </a>
         </div>
         <div class="card-body p-0">
-            <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+            <form action="<?= e(current_path()); ?>" method="post">
                 <?php echo csrf_field(); ?>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -78,7 +75,7 @@ $organisers = fetchAll(
                                         <a href="update-account-details.php?id=<?= (int)$value['user_id'] ?>" class="btn btn-sm btn-outline-primary me-1">
                                             <i class="bi bi-pencil-square"></i> Edit
                                         </a>
-                                        <button type="submit" name="delete_id" value="<?= (int)$value['user_id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete organiser \'<?= addslashes(e($value['full_name'])) ?>\'?');">
+                                        <button type="submit" name="delete_id" value="<?= (int)$value['user_id'] ?>" class="btn btn-sm btn-outline-danger" data-confirm="Delete organiser '<?= e($value['full_name']) ?>'?">
                                             <i class="bi bi-trash"></i> Delete
                                         </button>
                                     </td>

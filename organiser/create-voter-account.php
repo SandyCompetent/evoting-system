@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+use App\Repository\Pdo\PdoUserRepository;
 use App\Support\Password;
 require_once __DIR__ . "/../includes/bootstrap.php";
 
@@ -8,9 +9,9 @@ if (($_SESSION["role"] ?? "") !== "organiser") {
     redirect("../index.php");
 }
 
-$user_id   = (int) $_SESSION["user_id"];
-$organiser = fetchOne("SELECT election_category_id FROM system_users WHERE user_id = ?", [$user_id]);
-$category_id = (int) ($organiser["election_category_id"] ?? 0);
+$user_id = (int) $_SESSION["user_id"];
+$userRepo = new PdoUserRepository(db());
+$category_id = (int) ($userRepo->categoryIdForUser($user_id) ?? 0);
 
 // Collects temporary passwords generated this request, shown once to the organiser.
 $created_credentials = [];
@@ -22,28 +23,24 @@ if (isset($_POST["submit"])) {
     $email = trim($_POST["email"] ?? "");
     $dob   = trim($_POST["dob"] ?? "");
 
-    if ($fname === "" || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if ($fname === "" || !text_within_length($fname, 255)
+        || !filter_var($email, FILTER_VALIDATE_EMAIL) || !text_within_length($email, 100)
+    ) {
         $_SESSION["errors"][] = "Please provide a valid name and email.";
-        redirect($_SERVER["PHP_SELF"]);
+        redirect(current_path());
     }
 
-    $plain   = bin2hex(random_bytes(4));                 // unique temporary password
-    $encPass = Password::hash($plain);
+    $plain = bin2hex(random_bytes(4));                 // unique temporary password
 
     try {
-        execute(
-            "INSERT INTO system_users
-                (full_name, date_of_birth, email, password, role, election_category_id, voted)
-             VALUES (?, ?, ?, ?, 'voter', ?, 'No')",
-            [$fname, $dob, $email, $encPass, $category_id]
-        );
+        $userRepo->createVoter($fname, $email, $dob, Password::hash($plain), $category_id);
         $_SESSION["messages"][] = "Voter '" . $fname . "' created. Temporary password: " . $plain
             . " (share it securely; the voter should change it on first login).";
     } catch (PDOException $e) {
         error_log("Voter insert failed: " . $e->getMessage());
         $_SESSION["errors"][] = "Could not create voter (the email may already be registered).";
     }
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 // ---- Bulk CSV import ----
@@ -56,65 +53,64 @@ if (isset($_POST["upload_csv"])) {
 
     if (!$ok || !is_uploaded_file($tmp)) {
         $_SESSION["errors"][] = "File upload failed. Please try again.";
-        redirect($_SERVER["PHP_SELF"]);
+        redirect(current_path());
     }
     if (strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== "csv") {
         $_SESSION["errors"][] = "Please upload a .csv file only.";
-        redirect($_SERVER["PHP_SELF"]);
+        redirect(current_path());
     }
 
     $handle = fopen($tmp, "r");
     if ($handle === false) {
         $_SESSION["errors"][] = "Could not read the uploaded file.";
-        redirect($_SERVER["PHP_SELF"]);
+        redirect(current_path());
     }
 
-    $pdo = db();
-    $pdo->beginTransaction();
-    $insert = $pdo->prepare(
-        "INSERT INTO system_users
-            (full_name, email, date_of_birth, password, role, election_category_id, voted)
-         VALUES (?, ?, ?, ?, 'voter', ?, 'No')"
-    );
-
+    $rows = [];
     $rowNum = 0;
-    $imported = 0;
     $skipped = 0;
-    try {
-        while (($cols = fgetcsv($handle, 10000, ",")) !== false) {
-            $rowNum++;
-            if ($rowNum === 1 && stripos((string) ($cols[0] ?? ""), "name") !== false) {
-                continue;
-            }
-            $full  = sanitize_csv_cell(trim((string) ($cols[0] ?? "")));
-            $email = trim((string) ($cols[1] ?? ""));
-            $dob   = trim((string) ($cols[2] ?? ""));
 
-            if ($full === "" || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $skipped++;
-                continue;
-            }
-
-            $plain   = bin2hex(random_bytes(4));
-            $insert->execute([
-                $full, $email, $dob, Password::hash($plain), $category_id,
-            ]);
-            $created_credentials[] = $email . " -> " . $plain;
-            $imported++;
+    while (($cols = fgetcsv($handle, 10000, ",")) !== false) {
+        $rowNum++;
+        if ($rowNum === 1 && stripos((string) ($cols[0] ?? ""), "name") !== false) {
+            continue;
         }
-        $pdo->commit();
-    } catch (PDOException $e) {
-        $pdo->rollBack();
-        error_log("CSV import failed: " . $e->getMessage());
-        $_SESSION["errors"][] = "Import aborted on row {$rowNum}; no voters were added.";
-        fclose($handle);
-        redirect($_SERVER["PHP_SELF"]);
+        $full  = sanitize_csv_cell(trim((string) ($cols[0] ?? "")));
+        $email = trim((string) ($cols[1] ?? ""));
+        $dob   = trim((string) ($cols[2] ?? ""));
+
+        if ($full === "" || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $skipped++;
+            continue;
+        }
+
+        $plain = bin2hex(random_bytes(4));
+        $rows[] = [
+            'full_name' => $full,
+            'email' => $email,
+            'date_of_birth' => $dob,
+            'password_hash' => Password::hash($plain),
+        ];
+        $created_credentials[] = $email . " -> " . $plain;
     }
     fclose($handle);
 
-    $_SESSION["messages"][] = "Imported {$imported} voter(s); skipped {$skipped} invalid row(s).";
+    if ($rows === []) {
+        $_SESSION["errors"][] = "No valid voter rows were found in the CSV file.";
+        redirect(current_path());
+    }
+
+    try {
+        $userRepo->importVoters($rows, $category_id);
+    } catch (\RuntimeException $e) {
+        error_log("CSV import failed: " . $e->getMessage());
+        $_SESSION["errors"][] = $e->getMessage();
+        redirect(current_path());
+    }
+
+    $_SESSION["messages"][] = "Imported " . count($rows) . " voter(s); skipped {$skipped} invalid row(s).";
     $_SESSION["csv_credentials"] = $created_credentials;
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
@@ -148,7 +144,7 @@ unset($_SESSION["csv_credentials"]);
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                    <form action="<?= e(current_path()); ?>" method="post">
                         <?php echo csrf_field(); ?>
 
                         <div class="row g-3">
@@ -191,7 +187,7 @@ unset($_SESSION["csv_credentials"]);
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data">
+                    <form action="<?= e(current_path()); ?>" method="post" enctype="multipart/form-data">
                         <?php echo csrf_field(); ?>
 
                         <div class="mb-3">
@@ -203,7 +199,7 @@ unset($_SESSION["csv_credentials"]);
                         <div class="mb-3">
                             <label class="form-label fw-semibold text-muted">Required Template Format:</label>
                             <div>
-                                <img src="../assets/template.png" class="img-fluid border rounded shadow-sm" alt="CSV template: full_name, email, date_of_birth" style="max-height: 120px;">
+                                <img src="<?= e(asset_url('assets/template.png')); ?>" class="img-fluid border rounded shadow-sm csv-template-preview" alt="CSV template: full_name, email, date_of_birth">
                             </div>
                         </div>
 

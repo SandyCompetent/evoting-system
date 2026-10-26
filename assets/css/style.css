@@ -480,3 +480,62 @@ body {
     background: rgba(0, 0, 0, 0.15);
     border-radius: 9999px;
 }
+
+/* --------------------------------------------------------------------------
+   Layout primitives that replaced inline style attributes (CSP cleanup).
+   -------------------------------------------------------------------------- */
+.chart-box {
+    width: 100%;
+}
+
+.chart-box-bar {
+    min-height: 250px;
+}
+
+.chart-box-lg {
+    min-height: 280px;
+}
+
+.chart-canvas {
+    width: 100%;
+    height: 250px;
+}
+
+.chart-canvas-lg {
+    width: 100%;
+    height: 280px;
+}
+
+.table-thumb {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+}
+
+.table-thumb-symbol {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.avatar-monogram-sm {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+}
+
+.image-preview {
+    max-width: 120px;
+    max-height: 120px;
+    object-fit: cover;
+}
+
+.image-preview-contain {
+    max-width: 120px;
+    max-height: 120px;
+    object-fit: contain;
+}
+
+.csv-template-preview {
+    max-height: 120px;
+}

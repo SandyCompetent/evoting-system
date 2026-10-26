@@ -4,8 +4,10 @@ require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("admin");
 
 use App\Repository\Pdo\PdoCategoryRepository;
+use App\Repository\Pdo\PdoDashboardRepository;
 
 $categoriesRepo = new PdoCategoryRepository(db());
+$dashboardRepo  = new PdoDashboardRepository(db());
 
 // Category edit -> stash id and open update page (supports legacy POST button and GET)
 if (($editId = pressed_action("edit")) !== null || isset($_GET["edit_id"])) {
@@ -28,17 +30,18 @@ if ($delId !== null && $delId > 0) {
         error_log("Category cascade delete failed: " . $ex->getMessage());
         $_SESSION["errors"][] = "Could not delete category.";
     }
-    redirect($_SERVER["PHP_SELF"]);
+    redirect(current_path());
 }
 
 require_once __DIR__ . "/nav.php";
 
-$categoryCount     = (int) (fetchOne("SELECT COUNT(*) c FROM election_category")["c"] ?? 0);
-$organisationCount = (int) (fetchOne("SELECT COUNT(*) c FROM system_users WHERE role = 'organiser'")["c"] ?? 0);
-$voterCount        = (int) (fetchOne("SELECT COUNT(*) c FROM system_users WHERE role = 'voter'")["c"] ?? 0);
-$pending_request   = (int) (fetchOne("SELECT COUNT(*) c FROM request_to_register WHERE ac_status = 'Pending'")["c"] ?? 0);
+$stats             = $dashboardRepo->adminCounts();
+$categoryCount     = $stats['categories'];
+$organisationCount = $stats['organisers'];
+$voterCount        = $stats['voters'];
+$pending_request   = $stats['pending'];
 
-$categories = fetchAll("SELECT * FROM election_category ORDER BY name ASC");
+$categories = $categoriesRepo->allRows();
 $now = time();
 ?>
 
@@ -151,8 +154,13 @@ $now = time();
                     </h5>
                 </div>
                 <div class="card-body p-3">
-                    <div id="barChartContainer" style="width: 100%; min-height: 250px;">
-                        <div id="barChart" style="width: 100%; height: 250px;"></div>
+                    <div id="barChartContainer" class="chart-box chart-box-bar">
+                        <div id="admin-bar-chart" class="chart-canvas" data-chart="<?= e(json_encode([
+                            ['Entity', 'Count'],
+                            ['Categories', $categoryCount],
+                            ['Organisers', $organisationCount],
+                            ['Voters', $voterCount],
+                        ])); ?>"></div>
                     </div>
                 </div>
             </div>
@@ -168,7 +176,7 @@ $now = time();
                     <span class="badge bg-secondary"><?= count($categories) ?> Total</span>
                 </div>
                 <div class="card-body p-0">
-                    <form action="<?php echo e($_SERVER['PHP_SELF']); ?>" method="post">
+                    <form action="<?= e(current_path()); ?>" method="post">
                         <?php echo csrf_field(); ?>
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
@@ -208,7 +216,7 @@ $now = time();
                                                 <a href="update-election-category.php?id=<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-primary me-1">
                                                     <i class="bi bi-pencil-square"></i> Edit
                                                 </a>
-                                                <button type="submit" name="delete_id" value="<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete category \'<?= addslashes(e($value['name'])) ?>\' and ALL its associated ballots, candidates, and voters?');">
+                                                <button type="submit" name="delete_id" value="<?= (int)$value['id'] ?>" class="btn btn-sm btn-outline-danger" data-confirm="Delete category '<?= e($value['name']) ?>' and ALL its associated ballots, candidates, and voters?">
                                                     <i class="bi bi-trash"></i> Delete
                                                 </button>
                                             </td>
@@ -224,37 +232,7 @@ $now = time();
     </div>
 </div>
 
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
-    google.charts.load('current', { 'packages': ['bar'] });
-    google.charts.setOnLoadCallback(drawStuff);
-
-    function drawStuff() {
-        var el = document.getElementById('barChart');
-        if (!el) return;
-
-        var data = new google.visualization.arrayToDataTable([
-            ['Entity', 'Count'],
-            ["Categories", <?php echo (int) $categoryCount; ?>],
-            ["Organisers", <?php echo (int) $organisationCount; ?>],
-            ["Voters",     <?php echo (int) $voterCount; ?>]
-        ]);
-
-        var containerWidth = el.parentElement ? el.parentElement.clientWidth : 300;
-        var options = {
-            width: containerWidth,
-            height: 250,
-            legend: { position: 'none' },
-            bar: { groupWidth: "55%" }
-        };
-
-        var chart = new google.charts.Bar(el);
-        chart.draw(data, google.charts.Bar.convertOptions(options));
-    }
-
-    window.addEventListener('resize', drawStuff);
-</script>
-
 <?php
+$pageScripts = [GOOGLE_CHARTS_LOADER, asset_url('assets/js/admin-dashboard.js')];
 require_once("../includes/footer.php");
 ?>

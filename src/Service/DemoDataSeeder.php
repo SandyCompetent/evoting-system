@@ -284,7 +284,9 @@ final class DemoDataSeeder
      */
     public function addRandomVoters(int $categoryId, int $count = 10): array
     {
-        $category = $this->pdo->query("SELECT id, name FROM election_category WHERE id = " . (int)$categoryId)->fetch(PDO::FETCH_ASSOC);
+        $categoryStmt = $this->pdo->prepare('SELECT id, name FROM election_category WHERE id = ?');
+        $categoryStmt->execute([$categoryId]);
+        $category = $categoryStmt->fetch(PDO::FETCH_ASSOC);
         if (!$category) {
             throw new RuntimeException("Category ID {$categoryId} not found.");
         }
@@ -334,8 +336,12 @@ final class DemoDataSeeder
         }
 
         // Get unvoted voters in this category
-        $stmtVoters = $this->pdo->prepare("SELECT user_id FROM system_users WHERE election_category_id = ? AND role = 'voter' AND voted = 'No' LIMIT " . (int)$ballotsToCast);
-        $stmtVoters->execute([$categoryId]);
+        $stmtVoters = $this->pdo->prepare(
+            "SELECT user_id FROM system_users WHERE election_category_id = ? AND role = 'voter' AND voted = 'No' LIMIT ?"
+        );
+        $stmtVoters->bindValue(1, $categoryId, PDO::PARAM_INT);
+        $stmtVoters->bindValue(2, $ballotsToCast, PDO::PARAM_INT);
+        $stmtVoters->execute();
         $voterIds = $stmtVoters->fetchAll(PDO::FETCH_COLUMN);
 
         if (empty($voterIds)) {
