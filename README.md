@@ -17,8 +17,8 @@ A secure, modern online voting web application built with **PHP** and **MySQL**.
 * **Layered Architecture:** Refactored into Domain Entities (`Candidate`, `Turnout`, `User`, `Election`), Service Layer (`VoteService`, `AuthService`, `DemoDataSeeder`), and Repositories (`CandidateRepository`, `CategoryRepository`, `UserRepository`).
 * **Double-Voting Prevention:** Database-enforced `UNIQUE(voter_id, category_id)` constraint prevents multiple ballots from being cast per voter, even under concurrent requests.
 * **Modern Interface:** Powered by **Bootstrap 5.3.3**, **Bootswatch Zephyr**, and **Bootstrap Icons**, featuring responsive candidate card grids, native HTML5 date/time pickers, floating form labels, and synchronized live countdown timers.
-* **Security & Authentication:** Session fixation safeguards via `session_regenerate_id()`, Bcrypt (`PASSWORD_BCRYPT`) password hashing with automatic legacy upgrade verification, CSRF token validation, and PDO parameterized queries.
-* **Automated Unit Testing:** Includes a zero-dependency CLI test suite runner covering the domain core with 53 unit tests and 134 assertions (`php tests/run-tests.php`).
+* **Security & Authentication:** Session fixation safeguards via `session_regenerate_id()`, Argon2id (`PASSWORD_ARGON2ID`, with a `PASSWORD_DEFAULT` fallback) password hashing, transparent rehashing of legacy bcrypt/SHA-1 hashes on login, CSRF token validation, and PDO parameterized queries.
+* **Automated Unit Testing:** Includes a zero-dependency CLI test suite runner covering the domain core with 56 unit tests and 142 assertions (`php tests/run-tests.php`).
 
 ---
 
@@ -90,6 +90,14 @@ Alternatively, execute the automated runner script:
 ./run.bash
 ```
 
+### Upgrading an Existing Database
+If your database was created before the category foreign key was introduced, back it up and apply the migration:
+```bash
+mysqldump -u root evoting_system > evoting_backup.sql
+mysql -u root evoting_system < db/migration-2026-10-26-category-fk.sql
+```
+Fresh installs already include the constraint and do not need the migration.
+
 ---
 
 ## Automated Tests
@@ -98,7 +106,7 @@ Run the domain unit test suite directly from your terminal:
 ```bash
 php tests/run-tests.php
 ```
-All 53 unit tests run in memory using SQLite PDO and in-memory repository fakes, executing deterministically without mutating your local MySQL database.
+All 56 unit tests run in memory using SQLite PDO and in-memory repository fakes, executing deterministically without mutating your local MySQL database.
 
 ---
 

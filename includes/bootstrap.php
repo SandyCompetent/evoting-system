@@ -13,7 +13,7 @@ header("X-Frame-Options: SAMEORIGIN");
 header("X-Content-Type-Options: nosniff");
 header("X-XSS-Protection: 1; mode=block");
 header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://ajax.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:;");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com fonts.googleapis.com; font-src 'self' https://cdn.jsdelivr.net fonts.gstatic.com; img-src 'self' data:;");
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';

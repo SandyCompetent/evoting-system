@@ -30,6 +30,22 @@ final class AuthServiceTest extends TestCase
         self::assertSame('admin', $user->role);
     }
 
+    public function testAuthenticateRehashesBcryptToArgon2id(): void
+    {
+        $hash = password_hash('Secret123!', PASSWORD_BCRYPT);
+        $this->users->addUser(12, 'Dana Voter', 'dana@test.com', $hash, 'voter');
+
+        $user = $this->auth->authenticate('dana@test.com', 'Secret123!');
+        self::assertNotNull($user);
+
+        $updated = $this->users->findByEmail('dana@test.com');
+        self::assertNotNull($updated);
+        self::assertTrue(password_verify('Secret123!', $updated['password']));
+        if (defined('PASSWORD_ARGON2ID')) {
+            self::assertTrue(str_starts_with($updated['password'], '$argon2id$'));
+        }
+    }
+
     public function testAuthenticateUpgradesSha1Transparently(): void
     {
         $sha1 = sha1('OldPassword1');

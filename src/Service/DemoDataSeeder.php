@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Support\Password;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -29,7 +30,7 @@ final class DemoDataSeeder
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
-        $this->defaultPasswordHash = password_hash('password123', PASSWORD_BCRYPT);
+        $this->defaultPasswordHash = Password::hash('password123');
     }
 
     /**
@@ -61,10 +62,10 @@ final class DemoDataSeeder
             $hasAdmin = (int)($this->pdo->query("SELECT COUNT(*) FROM system_users WHERE role = 'admin'")->fetchColumn() ?: 0);
             if ($hasAdmin === 0) {
                 $stmtAdmin = $this->pdo->prepare(
-                    "INSERT INTO system_users (full_name, email, password, role, election_category_id)
-                     VALUES ('Administrator', 'admin@evoting.com', ?, 'admin', 0)"
+                    "INSERT INTO system_users (full_name, email, password, role)
+                     VALUES ('Administrator', 'admin@evoting.com', ?, 'admin')"
                 );
-                $stmtAdmin->execute([password_hash('12345678', PASSWORD_BCRYPT)]);
+                $stmtAdmin->execute([Password::hash('12345678')]);
             }
             // ---------------------------------------------------------
             // 1. ACTIVE ELECTION (Voting is currently LIVE)

@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+use App\Support\Password;
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("organiser");
 
@@ -40,7 +41,7 @@ if (isset($_POST["submit"])) {
             }
             execute(
                 "UPDATE system_users SET full_name = ?, email = ?, password = ? WHERE user_id = ? AND election_category_id = ?",
-                [$fname, $email, password_hash($pass, PASSWORD_DEFAULT), $voter_refID, $category_id]
+                [$fname, $email, Password::hash($pass), $voter_refID, $category_id]
             );
         } else {
             execute(

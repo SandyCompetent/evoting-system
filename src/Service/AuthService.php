@@ -5,6 +5,7 @@ namespace App\Service;
 
 use App\Domain\User;
 use App\Repository\UserRepository;
+use App\Support\Password;
 use InvalidArgumentException;
 
 final class AuthService
@@ -19,18 +20,16 @@ final class AuthService
         }
 
         $hash = (string) ($row['password'] ?? '');
-        $valid = false;
-
-        if (password_verify($password, $hash)) {
-            $valid = true;
-        } elseif (hash_equals($hash, sha1($password))) {
-            // Legacy SHA-1 transparent upgrade to Argon2id
-            $valid = true;
-            $this->users->updatePassword((int) $row['user_id'], password_hash($password, PASSWORD_ARGON2ID));
-        }
+        $valid = password_verify($password, $hash)
+            || hash_equals($hash, sha1($password));
 
         if (!$valid) {
             return null;
+        }
+
+        // Upgrade legacy SHA-1 and bcrypt hashes on the next successful login.
+        if (Password::needsRehash($hash)) {
+            $this->users->updatePassword((int) $row['user_id'], Password::hash($password));
         }
 
         return new User(
@@ -78,7 +77,6 @@ final class AuthService
             throw new InvalidArgumentException('Incorrect old password.');
         }
 
-        $newHash = password_hash($newPassword, PASSWORD_ARGON2ID);
-        $this->users->updatePassword($userId, $newHash);
+        $this->users->updatePassword($userId, Password::hash($newPassword));
     }
 }

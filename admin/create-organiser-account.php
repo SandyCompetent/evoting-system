@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+use App\Support\Password;
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("admin");
 
@@ -18,7 +19,7 @@ if (isset($_POST["submit"])) {
         execute(
             "INSERT INTO system_users (full_name, email, password, role, election_category_id)
              VALUES (?, ?, ?, 'organiser', ?)",
-            [$fname, $email, password_hash($plain, PASSWORD_DEFAULT), $cat]
+            [$fname, $email, Password::hash($plain), $cat]
         );
         $_SESSION["messages"][] = "Organiser account created. Temporary password for {$email}: {$plain} (share securely).";
     } catch (PDOException $ex) {

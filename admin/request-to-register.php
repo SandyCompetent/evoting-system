@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+use App\Support\Password;
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_role("admin");
 
@@ -39,7 +40,7 @@ if ($acceptId !== null && $acceptId > 0) {
         execute(
             "INSERT INTO system_users (full_name, email, password, role, election_category_id)
              VALUES (?, ?, ?, 'organiser', ?)",
-            [$req["full_name"], $req["email"], password_hash($plain, PASSWORD_DEFAULT), $categoryId]
+            [$req["full_name"], $req["email"], Password::hash($plain), $categoryId]
         );
         execute("UPDATE request_to_register SET ac_status = 'Approved' WHERE id = ?", [$acceptId]);
         $pdo->commit();

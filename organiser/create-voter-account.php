@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+use App\Support\Password;
 require_once __DIR__ . "/../includes/bootstrap.php";
 
 // Guard before any output so we can redirect safely.
@@ -27,7 +28,7 @@ if (isset($_POST["submit"])) {
     }
 
     $plain   = bin2hex(random_bytes(4));                 // unique temporary password
-    $encPass = password_hash($plain, PASSWORD_DEFAULT);
+    $encPass = Password::hash($plain);
 
     try {
         execute(
@@ -96,7 +97,7 @@ if (isset($_POST["upload_csv"])) {
 
             $plain   = bin2hex(random_bytes(4));
             $insert->execute([
-                $full, $email, $dob, password_hash($plain, PASSWORD_DEFAULT), $category_id,
+                $full, $email, $dob, Password::hash($plain), $category_id,
             ]);
             $created_credentials[] = $email . " -> " . $plain;
             $imported++;
