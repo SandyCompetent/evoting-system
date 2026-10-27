@@ -22,12 +22,16 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
-// Lightweight PHPUnit compatibility shim if PHPUnit isn't loaded
-if (!class_exists(\PHPUnit\Framework\TestCase::class)) {
+// Lightweight PHPUnit compatibility shim for the standalone runner.
+// Use $autoload = false so Composer's autoloader (if vendor/ is present) does not
+// load PHPUnit 10's TestCase, which requires constructor args and internal runner state.
+if (!class_exists(\PHPUnit\Framework\TestCase::class, false)) {
     abstract class SimpleTestCase
     {
         public static int $assertionCount = 0;
         private ?string $expectedException = null;
+
+        public function __construct(string $name = '') {}
 
         protected function setUp(): void {}
         protected function tearDown(): void {}
